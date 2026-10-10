@@ -62,6 +62,12 @@ const AUDIO_LINES = {
   flomoSupport: new URL('../../assets/audio/flomoSupport.mp3', import.meta.url).href,
   togarWarning: new URL('../../assets/audio/togarWarning.mp3', import.meta.url).href,
   jallahRival: new URL('../../assets/audio/jallahRival.mp3', import.meta.url).href,
+  // New conversation lines
+  markieResolve: new URL('../../assets/audio/markieResolve.mp3', import.meta.url).href,
+  kollieParents: new URL('../../assets/audio/kollieParents.mp3', import.meta.url).href,
+  boakaiProof: new URL('../../assets/audio/boakaiProof.mp3', import.meta.url).href,
+  siaHope: new URL('../../assets/audio/siaHope.mp3', import.meta.url).href,
+  tennehTogether: new URL('../../assets/audio/tennehTogether.mp3', import.meta.url).href,
 };
 
 export class VoiceSystem {

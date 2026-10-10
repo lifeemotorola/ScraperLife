@@ -97,15 +97,15 @@ export class Game {
 
   createNPCs() {
     const people = [
-      { id: 'kollie', label: 'OLD MAN KOLLIE', position: [-4, -3], shirt: 0x6a5540, skin: 0x6d4432, quote: DIALOGUE.truth },
-      { id: 'tenneh', label: 'TENNEH', position: [16, 13], shirt: 0x783d73, skin: 0x8a4d43, quote: DIALOGUE.tenneh },
-      { id: 'flomo', label: 'FLOMO', position: [-18, 13], shirt: 0x3b6781, skin: 0x6b382a, quote: DIALOGUE.flomoSupport },
-      { id: 'sia', label: 'SIA', position: [-11, 4], shirt: 0xd28942, skin: 0x6d4432, quote: DIALOGUE.siaThanks },
-      { id: 'garmai', label: 'GARMAI', position: [4, 13], shirt: 0x4d6a91, skin: 0x7f4638, quote: DIALOGUE.garmaiWhisper },
-      { id: 'boakai', label: 'BOAKAI', position: [32, -3], shirt: 0x6b6540, skin: 0x57301f, quote: DIALOGUE.boakai },
-      { id: 'jallah', label: 'JALLAH', position: [-22, 1], shirt: 0x407665, skin: 0x6a3825, quote: DIALOGUE.jallahRival },
-      { id: 'togar', label: 'TOGAR', position: [13, -4], shirt: 0x5e3030, skin: 0x4a291f, quote: DIALOGUE.togarWarning },
-      { id: 'vardee', label: 'VARDEE', position: [-22, -16], shirt: 0x54252a, skin: 0x4a291f, quote: DIALOGUE.vardeeConfront },
+      { id: 'kollie', label: 'OLD MAN KOLLIE', position: [-4, -3], shirt: 0x6a5540, skin: 0x6d4432, quote: DIALOGUE.truth, quoteId: 'truth' },
+      { id: 'tenneh', label: 'TENNEH', position: [16, 13], shirt: 0x783d73, skin: 0x8a4d43, quote: DIALOGUE.tenneh, quoteId: 'tenneh' },
+      { id: 'flomo', label: 'FLOMO', position: [-18, 13], shirt: 0x3b6781, skin: 0x6b382a, quote: DIALOGUE.flomoSupport, quoteId: 'flomoSupport' },
+      { id: 'sia', label: 'SIA', position: [-11, 4], shirt: 0xd28942, skin: 0x6d4432, quote: DIALOGUE.siaThanks, quoteId: 'siaThanks' },
+      { id: 'garmai', label: 'GARMAI', position: [4, 13], shirt: 0x4d6a91, skin: 0x7f4638, quote: DIALOGUE.garmaiWhisper, quoteId: 'garmaiWhisper' },
+      { id: 'boakai', label: 'BOAKAI', position: [32, -3], shirt: 0x6b6540, skin: 0x57301f, quote: DIALOGUE.boakai, quoteId: 'boakai' },
+      { id: 'jallah', label: 'JALLAH', position: [-22, 1], shirt: 0x407665, skin: 0x6a3825, quote: DIALOGUE.jallahRival, quoteId: 'jallahRival' },
+      { id: 'togar', label: 'TOGAR', position: [13, -4], shirt: 0x5e3030, skin: 0x4a291f, quote: DIALOGUE.togarWarning, quoteId: 'togarWarning' },
+      { id: 'vardee', label: 'VARDEE', position: [-22, -16], shirt: 0x54252a, skin: 0x4a291f, quote: DIALOGUE.vardeeConfront, quoteId: 'vardeeConfront' },
     ];
     return Object.fromEntries(people.map((data) => [data.id, new NPC(this.scene, data)]));
   }
@@ -201,7 +201,9 @@ export class Game {
     } else if (hit.type === 'radio' && this.missions.repairRadio()) {
       this.city.activateRadio(); this.ui.toast('KOLLIE’S RADIO RESTORED // + PLATFORM MAP UNLOCKED'); this.dialogue.play('radioFixed', 6); this.updateQuest();
     } else if (hit.type === 'kollie' && this.missions.speakWithKollie()) {
-      this.ui.toast('CASE NOTE ADDED // VARDEE + KORMAH'); this.dialogue.play('truth', 7); this.updateQuest();
+      this.ui.toast('CASE NOTE ADDED // VARDEE + KORMAH'); this.updateQuest();
+      // Kollie speaks twice: the accusation, then the memory of Markie's parents.
+      this.dialogue.playConversation(['truth', 'kollieParents'], null, { truth: 7, kollieParents: 8 });
     } else if (hit.type === 'tenneh' && this.missions.speakWithTenneh()) {
       // market -> complete
       this.ui.toast('NEW LEAD // VARDEE’S MARKET RUNNERS'); this.dialogue.play('tenneh', 7); this.updateQuest();
@@ -222,7 +224,8 @@ export class Game {
       // Immediately push to warehouse phase after acknowledging
       setTimeout(() => { if (this.missions.enterWarehouse()) { this.ui.toast('OBJECTIVE // ENTER WAREHOUSE 6'); this.updateQuest(); } }, 1200);
     } else if (hit.type === 'boakai2' && this.missions.enterWarehouse()) {
-      this.ui.toast('WAREHOUSE 6 // LEDGER INSIDE'); this.dialogue.play('boakai', 4); this.updateQuest();
+      this.ui.toast('WAREHOUSE 6 // LEDGER INSIDE'); this.updateQuest();
+      this.dialogue.playConversation(['boakai', 'boakaiProof'], null, { boakai: 6, boakaiProof: 7 });
     } else if (hit.type === 'ledger') {
       // Ledger pickup: supports both boakai->warehouse entry and warehouse->vardee collection
       if (this.missions.is('boakai') && this.missions.enterWarehouse()) {
@@ -234,7 +237,13 @@ export class Game {
         this.tryCollectLedger();
       }
     } else if (hit.type === 'vardee' && this.missions.confrontVardee()) {
-      this.ui.toast('VARDEE CONFRONTED // TRUTH HAS A PRICE'); this.dialogue.play('vardeeConfront', 6); this.updateQuest();
+      this.ui.toast('VARDEE CONFRONTED // TRUTH HAS A PRICE'); this.updateQuest();
+      // A three-voice standoff: Vardee threatens, Togar warns, Markie stands his ground.
+      this.dialogue.playConversation(
+        ['vardeeConfront', 'togarWarning', 'markieResolve'],
+        null,
+        { vardeeConfront: 6, togarWarning: 5, markieResolve: 6 },
+      );
       this.city.ledger?.light && (this.city.ledger.light.intensity = 0);
     } else if ((hit.type === 'finale' || hit.type === 'finale_sia') && this.missions.speakWithTenneh()) {
       // finale -> finale_complete is handled via MissionSystem speakWithTenneh when in finale
@@ -249,12 +258,14 @@ export class Game {
       // reads the truth aloud, and Sia asks what it all means. The completion screen
       // waits for the conversation instead of cutting the voices off.
       this.dialogue.playConversation(
-        ['finale', 'warehouse', 'siaThanks'],
+        ['finale', 'warehouse', 'siaThanks', 'siaHope', 'tennehTogether'],
         () => setTimeout(() => { this.running = false; this.ui.completeGame(this.inventory.scrap, this.missions.totalMissions); }, 900),
-        { finale: 7, warehouse: 6, siaThanks: 5 },
+        { finale: 7, warehouse: 6, siaThanks: 5, siaHope: 7, tennehTogether: 6 },
       );
     } else if (hit.type === 'npc') {
-      this.dialogue.playText(hit.object.quote, 4);
+      // Voice the side character with their recorded clip when one exists.
+      if (hit.object.quoteId) this.dialogue.play(hit.object.quoteId, 4);
+      else this.dialogue.playText(hit.object.quote, 4);
     }
   }
 
