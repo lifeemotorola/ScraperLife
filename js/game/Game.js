@@ -8,7 +8,7 @@ import { NPC } from '../entities/NPC.js';
 import { Enemy } from '../entities/Enemy.js';
 import { ScrapPulse } from '../entities/Weapon.js';
 import { City } from '../world/City.js';
-import { ClimateController, setupEnvironment, COLORS } from '../world/Environment.js';
+import { ClimateController, addGlowPoints, setupEnvironment, COLORS } from '../world/Environment.js';
 import { MissionSystem } from '../systems/MissionSystem.js';
 import { DialogueSystem } from '../systems/DialogueSystem.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
@@ -36,9 +36,13 @@ export class Game {
     this.cameraOrbitYaw = 0;
     this.cameraOrbitPitch = 0;
     this.renderer = new THREE.WebGLRenderer({ antialias: !this.isMobile, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, this.isMobile ? 1.25 : 2)); this.renderer.setSize(innerWidth, innerHeight);
+    // Pixel ratio drives fill-rate cost (x4 at DPR 2), so desktop is capped at 1.5 for smoother frames.
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, this.isMobile ? 1.25 : 1.5)); this.renderer.setSize(innerWidth, innerHeight);
     this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.shadowMap.autoUpdate = !this.isMobile;
+    // Desktop re-renders the sun's shadow map on a timer (see animate) instead of every frame.
+    this.renderer.shadowMap.autoUpdate = false;
+    this.renderer.shadowMap.needsUpdate = !this.isMobile;
+    this.shadowTimer = 0;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     document.getElementById('game').appendChild(this.renderer.domElement);
     this.clock = new THREE.Clock();
@@ -99,22 +103,26 @@ export class Game {
   }
 
   createScrap() {
-    // Expanded platform: 16 scrap sites across 92-unit sector, still need 7 for radio
+    // Expanded platform: 20 scrap sites across 92-unit sector, still need 7 for radio
     const locations = [
       [-14,10],[-21,-4],[-9,4],[4,13],[10,5],[18,15],[23,-18],[-1,-17],
       [7,-8],[18,-26],[0,26],[-25,25],
       [-32,-10], [34, 8], [-8,-32], [30, 22], [-30,32], [10,-34], [36,-20], [-36, 6]
     ];
-    return locations.map(([x,z], index) => {
+    const glows = [];
+    const scrap = locations.map(([x,z], index) => {
       const group = new THREE.Group(); group.position.set(x, .32, z);
       const metal = new THREE.Mesh(new THREE.IcosahedronGeometry(.31, 0), new THREE.MeshStandardMaterial({ color: 0xa9b3ac, metalness: .85, roughness: .23, emissive: 0x1b4946, emissiveIntensity: .3 }));
       metal.rotation.set(index, index * .6, 0); group.add(metal);
       const ring = new THREE.Mesh(new THREE.TorusGeometry(.45,.018,6,20),new THREE.MeshBasicMaterial({color:COLORS.teal,transparent:true,opacity:.65}));
       ring.rotation.x = Math.PI / 2; ring.position.y = -.28; group.add(ring);
-      const light = new THREE.PointLight(COLORS.teal, 1.4, 4); light.position.y = .4; group.add(light);
-      group.userData = { baseY: .32, phase: index * .8, collected: false };
+      // Each piece's teal shimmer is a glow point (not a PointLight); it is hidden when the piece is collected.
+      glows.push({ x, y: .72, z, color: COLORS.teal });
+      group.userData = { baseY: .32, phase: index * .8, collected: false, glowIndex: index };
       this.scene.add(group); return group;
     });
+    this.scrapGlow = addGlowPoints(this.scene, glows, { size: 1.6, opacity: .9 });
+    return scrap;
   }
 
   start() {
@@ -169,7 +177,7 @@ export class Game {
     if (!this.running || !this.interaction) return;
     const hit = this.interaction;
     if (hit.type === 'scrap') {
-      hit.object.userData.collected = true; hit.object.visible = false;
+      hit.object.userData.collected = true; hit.object.visible = false; this.scrapGlow.setColor(hit.object.userData.glowIndex, 0);
       const total = this.inventory.collectScrap(); this.ui.toast(`SALVAGE SECURED // ${total} PIECE${total === 1 ? '' : 'S'}`);
       if (total === 1) this.dialogue.play('firstScrap', 4);
       if (total === 7) { this.ui.toast('ALL MATERIALS FOUND // RETURN TO KOLLIE'); this.dialogue.play('allScrap', 5); }
@@ -292,6 +300,12 @@ export class Game {
     if (this.interaction) this.ui.showInteraction(this.interaction.text); else this.ui.hideInteraction();
     this.ui.updateStatus({ resolve: this.combat.resolve, pulse: this.pulse.charge, player: this.player.position, target: this.objectiveTarget(), missionTitle: this.missions.mission.title });
   }
+  // The sun moves slowly, so its shadow map does not need a full re-render every frame.
+  updateShadows(delta) {
+    if (this.isMobile) return; // mobile keeps shadows off, as before
+    this.shadowTimer += delta;
+    if (this.shadowTimer >= 1 / 30) { this.shadowTimer = 0; this.renderer.shadowMap.needsUpdate = true; }
+  }
   animate() {
     requestAnimationFrame(() => this.animate());
     const delta = Math.min(this.clock.getDelta(), .05); this.time += delta;
@@ -299,6 +313,7 @@ export class Game {
     this.ui.updateWorldInfo(climate);
     if (climate.changed && this.running) this.ui.toast(`CLIMATE SHIFT // ${climate.label}`);
     if (this.running) this.update(delta);
+    this.updateShadows(delta);
     this.updateCamera(); this.renderer.render(this.scene, this.camera);
   }
 }
