@@ -1,0 +1,13 @@
+{
+  "name": "Scraper Life",
+  "short_name": "Scraper Life",
+  "description": "A third-person action-adventure set in Waterside, Monrovia.",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#101a1c",
+  "theme_color": "#101a1c",
+  "orientation": "landscape",
+  "icons": [
+    { "src": "/scraper-life-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

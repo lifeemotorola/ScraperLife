@@ -1,0 +1,12 @@
+Markie base character asset
+===========================
+
+Source: Animated Human by Quaternius
+https://opengameart.org/content/animated-human-low-poly
+
+License: CC0 1.0 Universal (Public Domain Dedication)
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The model is used as the rigged COLLADA (.dae) base for Markie in Scraper Life.
+Its material is styled in-game for the prototype. Future production should
+replace or further customise it with an original, Liberian-reviewed Markie model.
