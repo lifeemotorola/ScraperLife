@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101a1c" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/assets/textures/scraper-life-icon.svg" type="image/svg+xml" />
+    <title>Scraper Life — A Markie Story</title>
+  </head>
+  <body>
+    <div id="game"></div>
+
+    <div id="ui" aria-live="polite">
+      <header class="brand">
+        <div class="brand-mark">SL</div>
+        <div>
+          <p class="eyebrow">A MONROVIA STORY</p>
+          <h1>SCRAPER <span>LIFE</span></h1>
+        </div>
+      </header>
+
+      <aside class="quest-panel glass">
+        <div class="panel-heading"><span class="orange-dot"></span> CURRENT JOB</div>
+        <h2 id="quest-title">The Weight of Truth</h2>
+        <p id="quest-description">Old Man Kollie needs parts to power his radio. Search Waterside for usable scrap.</p>
+        <div class="quest-progress">
+          <span id="progress-label">SCRAP 0 / 7</span>
+          <div class="bar"><i id="progress-bar"></i></div>
+        </div>
+      </aside>
+
+      <section class="status-panel glass">
+        <div class="status-row"><span>MARKIE KOLLIE</span><span id="district">WATERSIDE, MONROVIA</span></div>
+        <div class="meter-label"><span>RESOLVE</span><b id="resolve-number">100</b></div>
+        <div class="resolve-meter"><i id="resolve-bar"></i></div>
+        <div class="pulse-line"><span class="pulse-dot"></span><span id="pulse-status">SCRAP PULSE READY</span></div>
+        <div class="world-line"><span id="world-time">DAY 01 // 14:30</span><span id="weather-label">COASTAL CLEAR</span></div>
+      </section>
+
+      <section class="map-panel glass">
+        <div class="map-title">MONROVIA // WATERSIDE</div>
+        <div id="minimap" class="minimap">
+          <i class="map-road road-a"></i><i class="map-road road-b"></i><i class="map-road road-c"></i>
+          <i class="map-water"></i>
+          <b class="map-objective"></b>
+          <b id="map-player" class="map-player"></b>
+        </div>
+        <div class="map-key"><span><i class="key-player"></i>MARKIE</span><span><i class="key-objective"></i>JOB</span></div>
+      </section>
+
+      <div id="interaction" class="interaction hidden"><kbd>E</kbd><span id="interaction-text">PICK UP SCRAP</span></div>
+      <div id="toast" class="toast hidden"></div>
+      <div id="subtitle" class="subtitle hidden"></div>
+
+      <footer class="controls glass">
+        <span><kbd>W A S D</kbd> MOVE</span>
+        <span><kbd>SHIFT</kbd> RUN</span>
+        <span><kbd>SPACE</kbd> SCRAP PULSE</span>
+        <span><kbd>E</kbd> INTERACT</span>
+        <span><kbd>DRAG</kbd> LOOK</span>
+        <span><kbd>C</kbd> <b id="camera-label">WIDE VIEW</b></span>
+      </footer>
+
+      <section id="mobile-controller" class="mobile-controller" aria-label="Android touch controller">
+        <div id="joystick-zone" class="joystick-zone" aria-label="Move Markie">
+          <div id="joystick-base" class="joystick-base"><i id="joystick-knob" class="joystick-knob"></i></div>
+          <span>MOVE</span>
+        </div>
+        <div class="mobile-actions">
+          <button id="touch-run" class="touch-button touch-run" aria-label="Hold to run">RUN</button>
+          <button id="touch-camera" class="touch-button touch-camera" aria-label="Change camera view">CAM</button>
+          <button id="touch-pulse" class="touch-button touch-pulse" aria-label="Use Scrap Pulse">PULSE</button>
+          <button id="touch-interact" class="touch-button touch-use" aria-label="Interact">USE</button>
+        </div>
+      </section>
+    </div>
+
+    <main id="intro" class="overlay">
+      <div class="intro-noise"></div>
+      <section class="intro-card">
+        <p class="eyebrow">WATERSIDE, MONROVIA — SECTOR 04</p>
+        <h2>EVERYTHING CAN<br /><em>BREAK.</em></h2>
+        <p class="intro-copy">Markie Kollie has spent years carrying the silence left by his parents’ deaths. In the streets of Monrovia, a broken radio may finally lead him to the truth.</p>
+        <div class="cast"><span>MARKIE KOLLIE</span><i></i><span>OLD MAN KOLLIE</span><i></i><span>TENNEH</span></div>
+        <button id="start-button">START THE JOURNEY <b>↗</b></button>
+        <p class="fine-print">A playable 3D vertical slice · Original characters and setting</p>
+      </section>
+    </main>
+
+    <main id="complete" class="overlay hidden">
+      <section class="intro-card completion-card">
+        <p class="eyebrow">JOB COMPLETE</p>
+        <h2>THE CITY<br /><em>REMEMBERS.</em></h2>
+        <p class="intro-copy">Old Man Kollie has named Vardee and Kormah. Tenneh knows the market is watching. Markie has his first real lead—and the city is only getting louder.</p>
+        <div class="completion-stats"><div><b id="final-scrap">7</b><span>SCRAP SAVED</span></div><div><b>02</b><span>NAMES UNCOVERED</span></div><div><b>NEW</b><span>LEAD FOUND</span></div></div>
+        <button id="restart-button">PLAY AGAIN <b>↻</b></button>
+      </section>
+    </main>
+
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>
