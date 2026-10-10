@@ -53,7 +53,7 @@ export class Game {
     this.dialogue = new DialogueSystem(this.ui, DIALOGUE);
     this.combat = new CombatSystem();
     this.physics = new PhysicsEngine({ limit: 48 });
-    this.city = new City(this.scene, this.physics); this.city.build();
+    this.city = new City(this.scene, this.physics); this.city.build({ lampLightCount: this.isMobile ? 3 : 5 });
     this.player = new Player(this.scene, new THREE.Vector3(-16, 0, 16));
     this.pulse = new ScrapPulse(this.scene);
     this.npcs = this.createNPCs();
@@ -313,6 +313,7 @@ export class Game {
     this.ui.updateWorldInfo(climate);
     if (climate.changed && this.running) this.ui.toast(`CLIMATE SHIFT // ${climate.label}`);
     if (this.running) this.update(delta);
+    this.city.updateLamps(this.player.position);
     this.updateShadows(delta);
     this.updateCamera(); this.renderer.render(this.scene, this.camera);
   }

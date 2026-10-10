@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { COLORS, addGlowPoints, addGlowSprite, lamp, road } from './Environment.js';
+import { COLORS, LampLightPool, addGlowPoints, addGlowSprite, lamp, road } from './Environment.js';
 import { Building, makeSign } from './Building.js';
 
 export class City {
   constructor(scene, physics) { this.scene = scene; this.physics = physics; this.generator = null; this.generatorPosition = new THREE.Vector3(-3, 0, -2); this.warehousePos = new THREE.Vector3(3, 0, -23); this.ledgerPos = new THREE.Vector3(3, 0, -23); }
-  build() {
+  build({ lampLightCount = 5 } = {}) {
     this.addTerrain();
     // Platform expanded: 96-unit sector, new ring road and cross streets for larger navigation
     road(this.scene, -2, 0, 10, 86, 'z'); road(this.scene, 7, -8, 62, 9, 'x'); road(this.scene, -18, 13, 36, 7, 'x');
@@ -30,8 +30,10 @@ export class City {
     for (let x = -36; x < 36; x += 14) lamp(this.scene, x, 18, lampGlows);
     for (let x = -36; x < 36; x += 16) lamp(this.scene, x, -30, lampGlows);
     addGlowPoints(this.scene, lampGlows, { size: 2.6, opacity: .85 });
+    this.lampLights = new LampLightPool(this.scene, lampGlows, lampLightCount);
     this.addDistrictMarkers();
   }
+  updateLamps(playerPosition) { this.lampLights?.update(playerPosition); }
   addTerrain() {
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(96,96), new THREE.MeshStandardMaterial({ color: COLORS.ground, roughness: 1 }));
     ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; this.scene.add(ground);
