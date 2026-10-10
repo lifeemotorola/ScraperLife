@@ -5,6 +5,15 @@ export const DIALOGUE = {
   radioFixed: 'OLD MAN KOLLIE: “Good. Now the old radio can speak again. Come closer, my boy.”',
   truth: 'OLD MAN KOLLIE: “Your parents did not die by chance. Vardee moved the streets; Kormah made the papers disappear.”',
   tenneh: 'TENNEH: “I saw Vardee’s men at the market. If you chase this truth, Markie, do not chase it alone.”',
+  boakai: 'BOAKAI: “You want truth? Then fetch me the ledger they left in Warehouse 6. Paper does not lie, people do.”',
+  warehouse: 'MARKIE: “This ledger... names, payments, a date. The night my parents died.”',
+  vardeeConfront: 'VARDEE: “You think a boy with scrap can rewrite this city? Kormah owns the stamp, I own the streets.”',
+  finale: 'TENNEH: “We will make the market hear it, Markie. And Garmai will make sure the docks remember too.”',
+  siaThanks: 'SIA: “Mister Markie, will this keep us safe? I want to stay in school.”',
+  garmaiWhisper: 'GARMAI: “Every trader already whispers your name. Be careful who you trust with it.”',
+  flomoSupport: 'FLOMO: “You are not alone, brother. I will watch your back at the interchange.”',
+  togarWarning: 'TOGAR: “Vardee does not forgive loose ends. Walk away, Markie.”',
+  jallahRival: 'JALLAH: “You want respect? Take it from Vardee, not from me.”',
 };
 
 // Story roster is data-driven so future missions can use the same names and roles.
