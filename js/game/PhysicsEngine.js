@@ -1,5 +1,5 @@
 export class PhysicsEngine {
-  constructor({ limit = 29 } = {}) { this.limit = limit; this.colliders = []; }
+  constructor({ limit = 48 } = {}) { this.limit = limit; this.colliders = []; }
   addBuilding({ x, z, width, depth }) { this.colliders.push({ x, z, width, depth }); }
   canMove(position, radius = 0.35) {
     if (Math.abs(position.x) > this.limit || Math.abs(position.z) > this.limit) return false;

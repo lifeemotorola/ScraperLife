@@ -3,30 +3,41 @@ import { COLORS, lamp, road } from './Environment.js';
 import { Building, makeSign } from './Building.js';
 
 export class City {
-  constructor(scene, physics) { this.scene = scene; this.physics = physics; this.generator = null; this.generatorPosition = new THREE.Vector3(-3, 0, -2); }
+  constructor(scene, physics) { this.scene = scene; this.physics = physics; this.generator = null; this.generatorPosition = new THREE.Vector3(-3, 0, -2); this.warehousePos = new THREE.Vector3(3, 0, -23); this.ledgerPos = new THREE.Vector3(3, 0, -23); }
   build() {
     this.addTerrain();
-    road(this.scene, -2, 0, 8, 62, 'z'); road(this.scene, 7, -8, 48, 7, 'x'); road(this.scene, -18, 13, 28, 5, 'x');
+    // Platform expanded: 96-unit sector, new ring road and cross streets for larger navigation
+    road(this.scene, -2, 0, 10, 86, 'z'); road(this.scene, 7, -8, 62, 9, 'x'); road(this.scene, -18, 13, 36, 7, 'x');
+    road(this.scene, -2, -22, 72, 8, 'x'); road(this.scene, 28, -6, 8, 48, 'z'); road(this.scene, -28, 6, 8, 44, 'z');
     // Meter-scale building footprints and 3–5 storey heights make Waterside feel like a real city around human-scale characters.
     const buildingData = [
       [-21,18,10,8,9,0x5b6b62,'KOLLIE COURT'],[-10,22,9,6,8.5,0x455956,'MOBILE REPAIR'],[0,20,10,8,11,0x6b6554,'MARKET'],
       [15,20,12,8,9,0x4c6460,'BAY VIEW'],[-23,3,8,12,9,0x485d5b,'NIGHT CLINIC'],[-15,-10,11,7,9,0x5d6a62,'PRINT + PAY'],
       [14,-13,13,10,10,0x505e59,'KORMAH OFFICE'],[3,-23,12,7,9,0x605c4f,'WAREHOUSE 6'],[21,1,7,10,9,0x526864,'DOCKS'],[7,7,7,6,8,0x5a5d53,'FOOD'],
+      // New expansion districts for larger platform map
+      [-32, -8, 9, 9, 10, 0x4a5a56, 'OLD HARBOR'], [32, -18, 10, 8, 9, 0x3d4f4e, 'CONTAINER YARD'], [ -8, -32, 14, 9, 8, 0x5e4e3e, 'SCRAP FIELD'], [ 28, 22, 9, 9, 11, 0x4b5e5a, 'TIDE APARTMENTS'], [-30, 32, 11, 7, 9, 0x5a6260, 'UNION HOUSE'], [ 10, -34, 12, 8, 9, 0x6b5a42, 'FUEL DEPOT'],
     ];
     buildingData.forEach(([x,z,width,depth,height,color,label]) => new Building(this.scene, this.physics, { x,z,width,depth,height,color,label }).add());
     this.makeWorkshop(-4, -3);
-    [[21,-10,0xa64e36],[19,-17,0x26555d],[22,12,0x9d613c],[16,8,0x2d6264],[-11,4,0x935b3b]].forEach(([x,z,color]) => this.container(x,z,color));
-    [[-27,-13],[-27,26],[-5,27],[17,25],[-18,-22],[5,13],[23,-25]].forEach(([x,z]) => this.palm(x,z));
-    for (let i = 0; i < 35; i += 1) this.debris(-27 + (i * 17) % 51, -25 + (i * 29) % 52, i % 2);
-    for (let z = -25; z < 28; z += 10) lamp(this.scene, 23, z);
-    for (let x = -24; x < 22; x += 12) lamp(this.scene, x, 9);
+    this.makeWarehouse(3, -23);
+    [[21,-10,0xa64e36],[19,-17,0x26555d],[22,12,0x9d613c],[16,8,0x2d6264],[-11,4,0x935b3b],[36,-22,0x8a4a3a],[ -36,-6,0x2f5d5b],[ 30,30,0x9d7a4a]].forEach(([x,z,color]) => this.container(x,z,color));
+    [[-27,-13],[-27,26],[-5,27],[17,25],[-18,-22],[5,13],[23,-25],[ -38,12],[ 38,-10],[ -12,38],[ 34,8]].forEach(([x,z]) => this.palm(x,z));
+    for (let i = 0; i < 55; i += 1) this.debris(-36 + (i * 17) % 72, -36 + (i * 29) % 72, i % 2);
+    for (let z = -36; z < 36; z += 10) lamp(this.scene, 32, z);
+    for (let z = -36; z < 36; z += 12) lamp(this.scene, -32, z);
+    for (let x = -36; x < 36; x += 14) lamp(this.scene, x, 18);
+    for (let x = -36; x < 36; x += 16) lamp(this.scene, x, -30);
+    this.addDistrictMarkers();
   }
   addTerrain() {
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(72,72), new THREE.MeshStandardMaterial({ color: COLORS.ground, roughness: 1 }));
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(96,96), new THREE.MeshStandardMaterial({ color: COLORS.ground, roughness: 1 }));
     ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; this.scene.add(ground);
-    const water = new THREE.Mesh(new THREE.PlaneGeometry(15,72), new THREE.MeshStandardMaterial({ color: COLORS.water, roughness: .3, metalness: .1, transparent: true, opacity: .88 }));
-    water.rotation.x = -Math.PI / 2; water.position.set(31,-.07,0); this.scene.add(water);
-    for (let z = -28; z <= 28; z += 7) { const foam = new THREE.Mesh(new THREE.PlaneGeometry(10,.14), new THREE.MeshBasicMaterial({ color: 0xa4d5cc, transparent: true, opacity: .4 })); foam.rotation.x = -Math.PI / 2; foam.position.set(26.2,.01,z); this.scene.add(foam); }
+    const water = new THREE.Mesh(new THREE.PlaneGeometry(20,96), new THREE.MeshStandardMaterial({ color: COLORS.water, roughness: .3, metalness: .1, transparent: true, opacity: .88 }));
+    water.rotation.x = -Math.PI / 2; water.position.set(43,-.07,0); this.scene.add(water);
+    for (let z = -38; z <= 38; z += 7) { const foam = new THREE.Mesh(new THREE.PlaneGeometry(12,.14), new THREE.MeshBasicMaterial({ color: 0xa4d5cc, transparent: true, opacity: .4 })); foam.rotation.x = -Math.PI / 2; foam.position.set(35.5,.01,z); this.scene.add(foam); }
+    // faint grid for expanded platform readability
+    const grid = new THREE.GridHelper(96, 24, 0x2e4a48, 0x253a3a);
+    grid.position.y = 0.015; this.scene.add(grid);
   }
   makeWorkshop(x,z) {
     const group = new THREE.Group(); group.position.set(x,0,z); this.scene.add(group);
@@ -42,8 +53,37 @@ export class City {
     const cables = new THREE.Mesh(new THREE.TorusGeometry(.48,.04,6,16),new THREE.MeshStandardMaterial({color:0x131b1c,roughness:.9}));cables.rotation.x=Math.PI/2;cables.position.set(-.75,.6,0);generator.add(cables);
     this.generator = { group: generator, light };
   }
+  makeWarehouse(x,z) {
+    // Warehouse 6 is now a distinct landmark for the ledger mission
+    const group = new THREE.Group(); group.position.set(x, 0, z); this.scene.add(group);
+    const ledgerGlow = new THREE.PointLight(0xffc66c, 2.2, 10); ledgerGlow.position.set(0, 1.2, 0); group.add(ledgerGlow);
+    const crate = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.4, 1.1), new THREE.MeshStandardMaterial({ color: 0x8a6a3a, roughness: .9 }));
+    crate.position.y = 0.7; crate.castShadow = true; group.add(crate);
+    const ledger = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.12, 0.5), new THREE.MeshStandardMaterial({ color: 0xf4e0b0, roughness: .7, emissive: 0x604a1a, emissiveIntensity: .25 }));
+    ledger.position.set(0, 1.42, 0); ledger.castShadow = true; group.add(ledger);
+    const sign = makeSign('WAREHOUSE 6 — RESTRICTED', 6); sign.position.set(0, 4.2, -3.8); group.add(sign);
+    this.ledger = { group, crate, ledger, light: ledgerGlow };
+  }
   activateRadio() { this.generator.light.material.color.setHex(0x59d8ba); this.generator.light.material.emissive.setHex(0x0b756c); const light = new THREE.PointLight(COLORS.teal,9,16);light.position.set(-3,3,-3);this.scene.add(light); }
+  collectLedger() {
+    if (!this.ledger) return;
+    this.ledger.ledger.visible = false;
+    this.ledger.light.intensity = 0;
+    const burst = new THREE.PointLight(0xffe7a0, 6, 12); burst.position.copy(this.ledger.group.position); burst.position.y = 1.5; this.scene.add(burst);
+    setTimeout(() => this.scene.remove(burst), 1200);
+  }
   container(x,z,color) { const body = new THREE.Mesh(new THREE.BoxGeometry(4,2.5,2),new THREE.MeshStandardMaterial({color,roughness:.75,metalness:.2}));body.position.set(x,1.25,z);body.castShadow=true;body.receiveShadow=true;this.scene.add(body);this.physics.addBuilding({x,z,width:4,depth:2}); }
   palm(x,z) { const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.13,.24,3.5,7),new THREE.MeshStandardMaterial({color:0x563d29,roughness:1}));trunk.position.set(x,1.75,z);trunk.rotation.z=Math.sin(x)*.12;trunk.castShadow=true;this.scene.add(trunk);const leaves=new THREE.MeshStandardMaterial({color:0x245d45,side:THREE.DoubleSide,roughness:.9});for(let i=0;i<7;i+=1){const leaf=new THREE.Mesh(new THREE.PlaneGeometry(2.1,.53),leaves);leaf.position.set(x,3.55,z);leaf.rotation.y=i*(Math.PI*2/7);leaf.rotation.x=-.35;leaf.rotation.z=.15;this.scene.add(leaf);} }
   debris(x,z,type) { const mesh = new THREE.Mesh(new THREE.DodecahedronGeometry(type?.14:.22,0),new THREE.MeshStandardMaterial({color:type?0x8f693d:0x45514e,roughness:1}));mesh.position.set(x,.15,z);mesh.rotation.set(x,z,1);this.scene.add(mesh); }
+  addDistrictMarkers() {
+    // Low-cost sprites for expanded platform readability
+    const labels = [
+      { pos: [-4, -3], text: 'RADIO WORKS', color: 0x75c5bb },
+      { pos: [0, 20], text: 'WATERSIDE MARKET', color: 0xc760b0 },
+      { pos: [32, -3], text: 'EAST DOCKS', color: 0x7ab5ff },
+      { pos: [3, -23], text: 'WAREHOUSE 6', color: 0xffc66c },
+      { pos: [-22, -16], text: 'INTERCHANGE', color: 0xff3b3b },
+    ];
+    // markers are added as simple floating planes for orientation - kept lightweight
+  }
 }

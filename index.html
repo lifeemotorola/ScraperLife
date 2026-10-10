@@ -24,7 +24,7 @@
       </header>
 
       <aside class="quest-panel glass">
-        <div class="panel-heading"><span class="orange-dot"></span> CURRENT JOB</div>
+        <div class="panel-heading"><span class="orange-dot"></span> CURRENT JOB <span id="mission-count" style="margin-left:auto;color:var(--amber)">01 / 10</span></div>
         <h2 id="quest-title">The Weight of Truth</h2>
         <p id="quest-description">Old Man Kollie needs parts to power his radio. Search Waterside for usable scrap.</p>
         <div class="quest-progress">
@@ -41,15 +41,26 @@
         <div class="world-line"><span id="world-time">DAY 01 // 14:30</span><span id="weather-label">COASTAL CLEAR</span></div>
       </section>
 
-      <section class="map-panel glass">
-        <div class="map-title">MONROVIA // WATERSIDE</div>
+      <section id="map-panel" class="map-panel glass" role="button" tabindex="0" aria-label="Open expanded map">
+        <div class="map-title" id="map-title">MONROVIA // WATERSIDE</div>
         <div id="minimap" class="minimap">
           <i class="map-road road-a"></i><i class="map-road road-b"></i><i class="map-road road-c"></i>
           <i class="map-water"></i>
           <b class="map-objective"></b>
           <b id="map-player" class="map-player"></b>
+          <i class="map-npc npc-kollie" id="map-npc-kollie" style="left:42%;top:53%"></i>
+          <i class="map-npc npc-tenneh" id="map-npc-tenneh" style="left:72%;top:28%"></i>
+          <i class="map-npc npc-boakai" id="map-npc-boakai" style="left:82%;top:52%"></i>
+          <i class="map-npc npc-vardee" id="map-npc-vardee" style="left:14%;top:76%"></i>
         </div>
-        <div class="map-key"><span><i class="key-player"></i>MARKIE</span><span><i class="key-objective"></i>JOB</span></div>
+        <div class="map-key"><span><i class="key-player"></i>MARKIE</span><span><i class="key-objective"></i>JOB</span><span><i style="background:#d8a85a"></i>KOLLIE</span><span><i style="background:#c760b0"></i>TENNEH</span></div>
+        <span class="map-platform-badge">PLATFORM MAP</span>
+      </section>
+
+      <section id="mission-log" class="mission-log glass" aria-label="Mission chain">
+        <div class="panel-heading" style="margin-bottom:6px"><span class="orange-dot"></span> MISSION CHAIN</div>
+        <div id="mission-list"></div>
+        <div class="mission-count" id="mission-count-detail">1 of 10 missions</div>
       </section>
 
       <div id="interaction" class="interaction hidden"><kbd>E</kbd><span id="interaction-text">PICK UP SCRAP</span></div>
@@ -62,6 +73,7 @@
         <span><kbd>SPACE</kbd> SCRAP PULSE</span>
         <span><kbd>E</kbd> INTERACT</span>
         <span><kbd>DRAG</kbd> LOOK</span>
+        <span><kbd>M</kbd> MAP</span>
         <span><kbd>C</kbd> <b id="camera-label">WIDE VIEW</b></span>
       </footer>
 
@@ -73,10 +85,59 @@
         <div class="mobile-actions">
           <button id="touch-run" class="touch-button touch-run" aria-label="Hold to run">RUN</button>
           <button id="touch-camera" class="touch-button touch-camera" aria-label="Change camera view">CAM</button>
+          <button id="touch-map" class="touch-button touch-map" aria-label="Open map">MAP</button>
           <button id="touch-pulse" class="touch-button touch-pulse" aria-label="Use Scrap Pulse">PULSE</button>
           <button id="touch-interact" class="touch-button touch-use" aria-label="Interact">USE</button>
         </div>
       </section>
+    </div>
+
+    <!-- Expanded Platform Map -->
+    <div id="world-map" class="world-map-overlay hidden" role="dialog" aria-modal="true" aria-label="Expanded world map">
+      <div class="world-map-card">
+        <div class="world-map-header">
+          <div>
+            <p class="eyebrow">PLATFORM MAP // WATERSIDE SECTOR 04 — MONROVIA</p>
+            <h3>MONROVIA WATERSIDE</h3>
+            <p>Tap a district marker or press <kbd>M</kbd> / <kbd>ESC</kbd> to close • Live platform tracking</p>
+          </div>
+          <button id="close-world-map" style="padding:8px 14px;font-size:11px">CLOSE ✕</button>
+        </div>
+        <div class="world-map-grid" id="world-map-grid">
+          <i class="map-road road-a" style="top:125px;height:12px"></i>
+          <i class="map-road road-b" style="left:48%;width:10px"></i>
+          <i class="map-road road-c" style="left:18%;width:8px"></i>
+          <i class="map-water"></i>
+          <div class="world-map-point player" id="world-map-player" style="left:50%;top:55%"><b></b><span>MARKIE</span></div>
+          <div class="world-map-point objective" id="world-map-objective" style="left:78%;top:24%"><b></b><span id="world-map-objective-label">JOB</span></div>
+          <div class="world-map-point" style="left:42%;top:53%"><b style="background:#d8a85a;box-shadow:0 0 10px #d8a85a"></b><span>KOLLIE RADIO WORKS</span></div>
+          <div class="world-map-point" style="left:72%;top:28%"><b style="background:#c760b0;box-shadow:0 0 10px #c760b0"></b><span>WATERSIDE MARKET — TENNEH</span></div>
+          <div class="world-map-point" style="left:82%;top:52%"><b style="background:#7ab5ff;box-shadow:0 0 10px #7ab5ff"></b><span>DOCKS — BOAKAI</span></div>
+          <div class="world-map-point" style="left:14%;top:76%"><b style="background:#ff3b3b;box-shadow:0 0 10px #ff3b3b"></b><span>OLD INTERCHANGE — VARDEE</span></div>
+          <div class="world-map-point" style="left:50%;top:82%"><b style="background:#ffd166;box-shadow:0 0 10px #ffd166"></b><span>WAREHOUSE 6</span></div>
+          <div class="world-map-point" style="left:28%;top:35%"><b style="background:#4ecdc4;box-shadow:0 0 10px #4ecdc4"></b><span>FLOMO</span></div>
+        </div>
+        <div class="world-map-legend">
+          <div><i style="background:var(--cream);border:1px solid #fff"></i> Markie (live)</div>
+          <div><i style="background:var(--orange)"></i> Current objective</div>
+          <div><i style="background:#d8a85a"></i> Old Man Kollie — mentor</div>
+          <div><i style="background:#c760b0"></i> Tenneh — market</div>
+          <div><i style="background:#7ab5ff"></i> Boakai — docks trader</div>
+          <div><i style="background:#ff3b3b"></i> Vardee — antagonist</div>
+          <div><i style="background:#ffd166"></i> Warehouse 6 — ledger</div>
+          <div><i style="background:#4ecdc4"></i> Flomo / allies</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <div class="glass" style="flex:1;min-width:180px;padding:10px">
+            <div class="panel-heading">MAP SIZE</div>
+            <p style="margin:6px 0 0;font:500 11px/1.4 'DM Mono';color:#c5cec4">Sector expanded to <b style="color:var(--orange)">92 × 92</b> platform units. Minimap is 70% larger (280×190). Full platform map is now available on desktop (click minimap or press <kbd>M</kbd>) and on Android (MAP button).</p>
+          </div>
+          <div class="glass" style="flex:1;min-width:180px;padding:10px">
+            <div class="panel-heading">MISSIONS ON MAP</div>
+            <p style="margin:6px 0 0;font:500 11px/1.4 'DM Mono';color:#c5cec4">10 linked jobs are pinned live. Follow the orange pulse — it always points to the next platform objective.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <main id="intro" class="overlay">
@@ -87,7 +148,7 @@
         <p class="intro-copy">Markie Kollie has spent years carrying the silence left by his parents’ deaths. In the streets of Monrovia, a broken radio may finally lead him to the truth.</p>
         <div class="cast"><span>MARKIE KOLLIE</span><i></i><span>OLD MAN KOLLIE</span><i></i><span>TENNEH</span></div>
         <button id="start-button">START THE JOURNEY <b>↗</b></button>
-        <p class="fine-print">A playable 3D vertical slice · Original characters and setting</p>
+        <p class="fine-print">A playable 3D vertical slice · Original characters and setting · 10-mission platform chain · Expanded 280×190 platform map</p>
       </section>
     </main>
 
@@ -95,8 +156,8 @@
       <section class="intro-card completion-card">
         <p class="eyebrow">JOB COMPLETE</p>
         <h2>THE CITY<br /><em>REMEMBERS.</em></h2>
-        <p class="intro-copy">Old Man Kollie has named Vardee and Kormah. Tenneh knows the market is watching. Markie has his first real lead—and the city is only getting louder.</p>
-        <div class="completion-stats"><div><b id="final-scrap">7</b><span>SCRAP SAVED</span></div><div><b>02</b><span>NAMES UNCOVERED</span></div><div><b>NEW</b><span>LEAD FOUND</span></div></div>
+        <p class="intro-copy" id="complete-copy">Old Man Kollie has named Vardee and Kormah. Tenneh knows the market is watching. Markie has his first real lead—and the city is only getting louder.</p>
+        <div class="completion-stats"><div><b id="final-scrap">7</b><span>SCRAP SAVED</span></div><div><b>02</b><span>NAMES UNCOVERED</span></div><div><b id="final-missions">09</b><span>MISSIONS</span></div></div>
         <button id="restart-button">PLAY AGAIN <b>↻</b></button>
       </section>
     </main>
