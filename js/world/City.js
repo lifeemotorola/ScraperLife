@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { COLORS, lamp, road } from './Environment.js';
+import { COLORS, LampLightPool, addGlowPoints, addGlowSprite, lamp, road } from './Environment.js';
 import { Building, makeSign } from './Building.js';
 
 export class City {
   constructor(scene, physics) { this.scene = scene; this.physics = physics; this.generator = null; this.generatorPosition = new THREE.Vector3(-3, 0, -2); this.warehousePos = new THREE.Vector3(3, 0, -23); this.ledgerPos = new THREE.Vector3(3, 0, -23); }
-  build() {
+  build({ lampLightCount = 5 } = {}) {
     this.addTerrain();
     // Platform expanded: 96-unit sector, new ring road and cross streets for larger navigation
     road(this.scene, -2, 0, 10, 86, 'z'); road(this.scene, 7, -8, 62, 9, 'x'); road(this.scene, -18, 13, 36, 7, 'x');
@@ -23,12 +23,17 @@ export class City {
     [[21,-10,0xa64e36],[19,-17,0x26555d],[22,12,0x9d613c],[16,8,0x2d6264],[-11,4,0x935b3b],[36,-22,0x8a4a3a],[ -36,-6,0x2f5d5b],[ 30,30,0x9d7a4a]].forEach(([x,z,color]) => this.container(x,z,color));
     [[-27,-13],[-27,26],[-5,27],[17,25],[-18,-22],[5,13],[23,-25],[ -38,12],[ 38,-10],[ -12,38],[ 34,8]].forEach(([x,z]) => this.palm(x,z));
     for (let i = 0; i < 55; i += 1) this.debris(-36 + (i * 17) % 72, -36 + (i * 29) % 72, i % 2);
-    for (let z = -36; z < 36; z += 10) lamp(this.scene, 32, z);
-    for (let z = -36; z < 36; z += 12) lamp(this.scene, -32, z);
-    for (let x = -36; x < 36; x += 14) lamp(this.scene, x, 18);
-    for (let x = -36; x < 36; x += 16) lamp(this.scene, x, -30);
+    // Street lamps share one glow object instead of 25 PointLights (see addGlowPoints).
+    const lampGlows = [];
+    for (let z = -36; z < 36; z += 10) lamp(this.scene, 32, z, lampGlows);
+    for (let z = -36; z < 36; z += 12) lamp(this.scene, -32, z, lampGlows);
+    for (let x = -36; x < 36; x += 14) lamp(this.scene, x, 18, lampGlows);
+    for (let x = -36; x < 36; x += 16) lamp(this.scene, x, -30, lampGlows);
+    addGlowPoints(this.scene, lampGlows, { size: 2.6, opacity: .85 });
+    this.lampLights = new LampLightPool(this.scene, lampGlows, lampLightCount);
     this.addDistrictMarkers();
   }
+  updateLamps(playerPosition) { this.lampLights?.update(playerPosition); }
   addTerrain() {
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(96,96), new THREE.MeshStandardMaterial({ color: COLORS.ground, roughness: 1 }));
     ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; this.scene.add(ground);
@@ -64,12 +69,13 @@ export class City {
     const sign = makeSign('WAREHOUSE 6 — RESTRICTED', 6); sign.position.set(0, 4.2, -3.8); group.add(sign);
     this.ledger = { group, crate, ledger, light: ledgerGlow };
   }
-  activateRadio() { this.generator.light.material.color.setHex(0x59d8ba); this.generator.light.material.emissive.setHex(0x0b756c); const light = new THREE.PointLight(COLORS.teal,9,16);light.position.set(-3,3,-3);this.scene.add(light); }
+  activateRadio() { this.generator.light.material.color.setHex(0x59d8ba); this.generator.light.material.emissive.setHex(0x0b756c); addGlowSprite(this.scene, new THREE.Vector3(-3, 3, -3), COLORS.teal, 9); }
   collectLedger() {
     if (!this.ledger) return;
     this.ledger.ledger.visible = false;
     this.ledger.light.intensity = 0;
-    const burst = new THREE.PointLight(0xffe7a0, 6, 12); burst.position.copy(this.ledger.group.position); burst.position.y = 1.5; this.scene.add(burst);
+    const burstPosition = this.ledger.group.position.clone(); burstPosition.y = 1.5;
+    const burst = addGlowSprite(this.scene, burstPosition, 0xffe7a0, 10);
     setTimeout(() => this.scene.remove(burst), 1200);
   }
   container(x,z,color) { const body = new THREE.Mesh(new THREE.BoxGeometry(4,2.5,2),new THREE.MeshStandardMaterial({color,roughness:.75,metalness:.2}));body.position.set(x,1.25,z);body.castShadow=true;body.receiveShadow=true;this.scene.add(body);this.physics.addBuilding({x,z,width:4,depth:2}); }

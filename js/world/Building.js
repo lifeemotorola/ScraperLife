@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { COLORS } from './Environment.js';
 
 export function makeSign(text, width = 3) {
@@ -23,13 +24,19 @@ export class Building {
     body.castShadow = true; body.receiveShadow = true; group.add(body);
     const roof = new THREE.Mesh(new THREE.BoxGeometry(width + .32, .28, depth + .32), new THREE.MeshStandardMaterial({ color: COLORS.roof, roughness: 1 }));
     roof.position.y = height / 2 + .14; roof.castShadow = true; group.add(roof);
+    // All windows of a building share one merged geometry (one draw call instead of one per window).
     const windowMaterial = new THREE.MeshStandardMaterial({ color: 0xf6b866, emissive: 0xe48b38, emissiveIntensity: 1.4, roughness: .6 });
+    const windowGeometries = [];
+    const windowBox = new THREE.BoxGeometry(.48, .58, .03);
     for (let row = 0; row < Math.max(1, Math.floor(height / 2.4)); row += 1) {
       for (let col = 0; col < Math.max(1, Math.floor(width / 2)); col += 1) {
-        const window = new THREE.Mesh(new THREE.BoxGeometry(.48, .58, .03), windowMaterial);
-        window.position.set(-width / 2 + .9 + col * 1.7, -height / 2 + 1.35 + row * 2.2, -depth / 2 - .02); group.add(window);
+        const geometry = windowBox.clone().translate(-width / 2 + .9 + col * 1.7, -height / 2 + 1.35 + row * 2.2, -depth / 2 - .02);
+        windowGeometries.push(geometry);
       }
     }
+    windowBox.dispose();
+    group.add(new THREE.Mesh(mergeGeometries(windowGeometries), windowMaterial));
+    windowGeometries.forEach((geometry) => geometry.dispose());
     // Street-facing details keep the larger buildings readable at human scale.
     const door = new THREE.Mesh(new THREE.BoxGeometry(1.05, 2.1, .08), new THREE.MeshStandardMaterial({ color: 0x1b2527, roughness: .78, metalness: .12 }));
     door.position.set(0, -height / 2 + 1.05, -depth / 2 - .06); group.add(door);
