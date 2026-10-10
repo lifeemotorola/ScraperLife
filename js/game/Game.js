@@ -244,8 +244,15 @@ export class Game {
         // need to trigger speakWithTenneh for finale
         this.missions.phase = 'finale_complete';
       }
-      this.ui.toast('LEDGER DELIVERED // THE MARKET WILL REMEMBER'); this.dialogue.play('finale', 7); this.updateQuest();
-      setTimeout(() => { this.running = false; this.voice.stop(); this.ui.completeGame(this.inventory.scrap, this.missions.totalMissions); }, 3600);
+      this.ui.toast('LEDGER DELIVERED // THE MARKET WILL REMEMBER'); this.updateQuest();
+      // A real spoken exchange closes the chapter: Tenneh answers the market, Markie
+      // reads the truth aloud, and Sia asks what it all means. The completion screen
+      // waits for the conversation instead of cutting the voices off.
+      this.dialogue.playConversation(
+        ['finale', 'warehouse', 'siaThanks'],
+        () => setTimeout(() => { this.running = false; this.ui.completeGame(this.inventory.scrap, this.missions.totalMissions); }, 900),
+        { finale: 7, warehouse: 6, siaThanks: 5 },
+      );
     } else if (hit.type === 'npc') {
       this.dialogue.playText(hit.object.quote, 4);
     }

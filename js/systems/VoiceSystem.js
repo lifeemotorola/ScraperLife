@@ -1,8 +1,7 @@
-// The streets of Waterside speak back. VoiceSystem gives every dialogue line an audible
-// voice using the browser's built-in speech synthesis — no audio assets to ship, which
-// matters for a PWA installed from Cloudflare with an offline service worker. Each named
-// speaker keeps a consistent pitch/rate profile, and gets a distinct system voice when
-// the platform offers more than one.
+// The streets of Waterside speak back. VoiceSystem plays real recorded voice lines for
+// every character (assets/audio/*.mp3). If a clip is missing, blocked, or fails to load,
+// the line falls back to the browser's speech synthesis with per-character profiles, so
+// the conversation never goes silent.
 const PROFILES = {
   MARKIE: { gender: 'male', pitch: 1.0, rate: 1.0 },
   'OLD MAN KOLLIE': { gender: 'male', pitch: 0.7, rate: 0.85 },
@@ -19,6 +18,10 @@ const PROFILES = {
 
 const FEMALE_HINTS = ['female', 'woman', 'zira', 'hazel', 'susan', 'aria', 'jenny', 'samantha', 'victoria', 'karen', 'moira', 'tessa', 'fiona', 'serena', 'allison', 'sonia', 'libby', 'natasha', 'catherine', 'martha'];
 const MALE_HINTS = ['male', 'david', 'daniel', 'alex', 'fred', 'george', 'james', 'guy', 'ryan', 'eric', 'liam', 'oliver', 'thomas', 'aaron', 'arthur'];
+
+// One tiny silent WAV, used to unlock HTML audio inside the START-button gesture on
+// platforms (notably iOS Safari) that otherwise refuse to play the first voice line.
+const SILENCE_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
 
 function guessGender(voiceName) {
   const name = voiceName.toLowerCase();
@@ -42,13 +45,37 @@ export function splitSpeaker(line) {
   return { speaker, text };
 }
 
+// Real recorded lines, one clip per dialogue id. Static URLs so the bundler can hash them.
+const AUDIO_LINES = {
+  opening: new URL('../../assets/audio/opening.mp3', import.meta.url).href,
+  firstScrap: new URL('../../assets/audio/firstScrap.mp3', import.meta.url).href,
+  allScrap: new URL('../../assets/audio/allScrap.mp3', import.meta.url).href,
+  radioFixed: new URL('../../assets/audio/radioFixed.mp3', import.meta.url).href,
+  truth: new URL('../../assets/audio/truth.mp3', import.meta.url).href,
+  tenneh: new URL('../../assets/audio/tenneh.mp3', import.meta.url).href,
+  boakai: new URL('../../assets/audio/boakai.mp3', import.meta.url).href,
+  warehouse: new URL('../../assets/audio/warehouse.mp3', import.meta.url).href,
+  vardeeConfront: new URL('../../assets/audio/vardeeConfront.mp3', import.meta.url).href,
+  finale: new URL('../../assets/audio/finale.mp3', import.meta.url).href,
+  siaThanks: new URL('../../assets/audio/siaThanks.mp3', import.meta.url).href,
+  garmaiWhisper: new URL('../../assets/audio/garmaiWhisper.mp3', import.meta.url).href,
+  flomoSupport: new URL('../../assets/audio/flomoSupport.mp3', import.meta.url).href,
+  togarWarning: new URL('../../assets/audio/togarWarning.mp3', import.meta.url).href,
+  jallahRival: new URL('../../assets/audio/jallahRival.mp3', import.meta.url).href,
+};
+
 export class VoiceSystem {
   constructor() {
-    this.supported = typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
+    this.ttsSupported = typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
     this.enabled = true;
     this.voices = [];
     this.pendingTimer = null;
-    if (!this.supported) return;
+    this.currentAudio = null;
+    this.abortConversation = null;
+    // One shared element: unlocked once inside a user gesture, reused for every clip.
+    this.player = typeof window !== 'undefined' && typeof Audio !== 'undefined' ? new Audio() : null;
+    if (this.player) this.player.preload = 'auto';
+    if (!this.ttsSupported) return;
     try { this.enabled = window.localStorage.getItem('scraper-life-voices') !== 'off'; } catch { /* private mode */ }
     const refresh = () => {
       const list = window.speechSynthesis.getVoices();
@@ -63,16 +90,119 @@ export class VoiceSystem {
     }
   }
 
-  // Some browsers only allow speech inside/after a user gesture. Calling this from the
-  // START button click quietly clears that gate before the first real line plays.
+  // Called from the START button click: silently plays inside the gesture so later
+  // clips (and speech synthesis) are allowed without further interaction.
   unlock() {
-    if (!this.supported) return;
-    try {
-      const silent = new window.SpeechSynthesisUtterance(' ');
-      silent.volume = 0;
-      window.speechSynthesis.speak(silent);
-    } catch { /* never break the game over speech */ }
+    if (this.player) {
+      try {
+        this.player.src = SILENCE_WAV;
+        this.player.play().catch(() => { /* unlock failed; clips may still work later */ });
+      } catch { /* ignore */ }
+    }
+    if (this.ttsSupported) {
+      try {
+        const silent = new window.SpeechSynthesisUtterance(' ');
+        silent.volume = 0;
+        window.speechSynthesis.speak(silent);
+      } catch { /* never break the game over speech */ }
+    }
   }
+
+  // ---- Real audio first, TTS fallback -------------------------------
+
+  playLine(id, line, seconds = 4) {
+    if (!this.enabled) return;
+    const url = AUDIO_LINES[id];
+    if (url && this.player) {
+      this.playClip(url, line, seconds);
+      return;
+    }
+    this.speak(line);
+  }
+
+  playClip(url, line, seconds = 4) {
+    if (!this.player) { this.speak(line); return; }
+    this.stopPlayback();
+    const audio = this.player;
+    audio.src = url;
+    audio.currentTime = 0;
+    this.currentAudio = audio;
+    audio.play().catch(() => {
+      // Clip blocked or failed to load — the fallback keeps the line audible.
+      if (this.currentAudio === audio) this.currentAudio = null;
+      this.speak(line);
+    });
+  }
+
+  // A scripted multi-voice conversation. steps: [{ id, line, seconds }].
+  // onLine shows each subtitle; onDone fires once, after the last speaker finishes
+  // (or when the safety cap hits, so the game flow can never hang on audio).
+  playConversation(steps, { onLine, onDone } = {}) {
+    this.stop();
+    let finished = false;
+    let safetyTimer = null;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(safetyTimer);
+      this.abortConversation = null;
+      onDone?.();
+    };
+    this.abortConversation = finish;
+
+    let index = 0;
+    const playStep = () => {
+      if (finished) return;
+      if (index >= steps.length) { finish(); return; }
+      const step = steps[index]; index += 1;
+      onLine?.(step.line, step.seconds || 4);
+      const wait = (step.seconds || 4) * 1000;
+      const url = AUDIO_LINES[step.id];
+      if (this.enabled && url && this.player) {
+        const audio = this.player;
+        this.stopPlayback();
+        audio.src = url;
+        audio.currentTime = 0;
+        this.currentAudio = audio;
+        const advance = () => { if (this.currentAudio === audio) this.currentAudio = null; playStep(); };
+        audio.addEventListener('ended', advance, { once: true });
+        audio.addEventListener('error', () => { this.speak(step.line); setTimeout(playStep, wait); }, { once: true });
+        audio.play().catch(() => {
+          this.speak(step.line);
+          setTimeout(playStep, wait);
+        });
+      } else {
+        if (this.enabled) this.speak(step.line);
+        setTimeout(playStep, wait);
+      }
+    };
+    const totalSeconds = steps.reduce((sum, step) => sum + (step.seconds || 4), 0);
+    safetyTimer = setTimeout(finish, (totalSeconds + 14) * 1000);
+    playStep();
+  }
+
+  stopPlayback() {
+    if (this.currentAudio) {
+      try { this.currentAudio.pause(); } catch { /* ignore */ }
+      this.currentAudio = null;
+    }
+  }
+
+  stop() {
+    clearTimeout(this.pendingTimer);
+    this.stopPlayback();
+    if (this.abortConversation) { const abort = this.abortConversation; this.abortConversation = null; abort(); }
+    if (this.ttsSupported) { try { window.speechSynthesis.cancel(); } catch { /* ignore */ } }
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+    try { window.localStorage.setItem('scraper-life-voices', this.enabled ? 'on' : 'off'); } catch { /* ignore */ }
+    if (!this.enabled) this.stop();
+    return this.enabled;
+  }
+
+  // ---- Speech-synthesis fallback ------------------------------------
 
   pickVoice(speaker, gender) {
     const pool = this.voices.length ? this.voices : [];
@@ -88,7 +218,7 @@ export class VoiceSystem {
   }
 
   speak(line) {
-    if (!this.supported || !this.enabled) return;
+    if (!this.ttsSupported || !this.enabled) return;
     const { speaker, text } = splitSpeaker(line);
     if (!text) return;
     clearTimeout(this.pendingTimer);
@@ -109,17 +239,5 @@ export class VoiceSystem {
         } catch { /* never break the game over speech */ }
       }, 60);
     } catch { /* never break the game over speech */ }
-  }
-
-  stop() {
-    clearTimeout(this.pendingTimer);
-    if (this.supported) { try { window.speechSynthesis.cancel(); } catch { /* ignore */ } }
-  }
-
-  toggle() {
-    this.enabled = !this.enabled;
-    try { window.localStorage.setItem('scraper-life-voices', this.enabled ? 'on' : 'off'); } catch { /* ignore */ }
-    if (!this.enabled) this.stop();
-    return this.enabled;
   }
 }
