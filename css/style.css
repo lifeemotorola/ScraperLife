@@ -113,3 +113,12 @@ h1 { font:800 26px/.8 'Barlow Condensed',sans-serif; letter-spacing:.05em; margi
   .joystick-zone { bottom:34px; transform:scale(.82); transform-origin:bottom left; }
   .mobile-actions { bottom:28px; transform:scale(.82); transform-origin:bottom right; }
 }
+
+/* Boot-failure screen: a frozen intro with no explanation is worse than a clear one. */
+#fatal-overlay{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 50% 30%,rgba(25,68,67,.35),rgba(4,10,11,.97) 70%);color:var(--cream);text-align:center}
+#fatal-overlay .fatal-card{max-width:600px}
+#fatal-overlay h2{font:800 clamp(30px,5vw,58px)/.9 'Barlow Condensed';letter-spacing:.02em;color:var(--orange);margin:0 0 18px;text-transform:uppercase}
+#fatal-overlay p{margin:0 0 12px;font-size:13px;line-height:1.55;color:#d7ddd3;word-break:break-word}
+#fatal-overlay code{font:500 12px/1.6 'DM Mono',monospace;color:var(--teal);background:rgba(117,197,187,.08);border:1px solid rgba(117,197,187,.2);padding:3px 7px;border-radius:2px;word-break:break-all}
+#fatal-overlay .fatal-hint{color:#a5b8ae;font-size:11px}
+#fatal-overlay button{margin-top:14px}
