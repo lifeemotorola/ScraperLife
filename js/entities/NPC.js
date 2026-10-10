@@ -13,8 +13,8 @@ export function makeMarker(text, color = 0x75c5bb) {
 }
 
 export class NPC {
-  constructor(scene, { id, label, position, shirt, skin, quote }) {
-    this.id = id; this.quote = quote;
+  constructor(scene, { id, label, position, shirt, skin, quote, quoteId = null }) {
+    this.id = id; this.quote = quote; this.quoteId = quoteId;
     this.group = new THREE.Group();
     this.visual = makeHumanoid(shirt, skin);
     this.group.add(this.visual);

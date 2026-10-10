@@ -87,8 +87,19 @@ export class Player {
     if (moving) {
       const direction = new THREE.Vector3(x, 0, z).normalize();
       const speed = running ? 7.2 : 4.25;
-      const next = this.position.clone().addScaledVector(direction, speed * delta);
-      if (physics.canMove(next)) { this.position.copy(next); this.lastSafe.copy(this.position); }
+      const step = speed * delta;
+      const next = this.position.clone().addScaledVector(direction, step);
+      if (physics.canMove(next)) {
+        this.position.copy(next);
+      } else {
+        // Blocked head-on (wall corner): slide along whichever axis still has room.
+        // Without this, pushing toward a wall only turns Markie in place.
+        const slideX = this.position.clone(); slideX.x += direction.x * step;
+        const slideZ = this.position.clone(); slideZ.z += direction.z * step;
+        if (physics.canMove(slideX)) this.position.copy(slideX);
+        else if (physics.canMove(slideZ)) this.position.copy(slideZ);
+      }
+      this.lastSafe.copy(this.position);
       physics.constrain(this.position);
       this.group.rotation.y = Math.atan2(direction.x, direction.z);
       this.fallback.userData.legs.position.y = .52 + Math.sin(time * 13) * .035;
