@@ -10,7 +10,7 @@ export class UIManager {
       mapPlayer: $('map-player'), objective: document.querySelector('.map-objective'), finalScrap: $('final-scrap'), finalMissions: $('final-missions'),
       mapPanel: $('map-panel'), worldMap: $('world-map'), worldMapPlayer: $('world-map-player'), worldMapObjective: $('world-map-objective'), worldMapObjectiveLabel: $('world-map-objective-label'), closeWorldMap: $('close-world-map'), mapTitle: $('map-title'),
       missionList: $('mission-list'), missionCount: $('mission-count'), missionCountDetail: $('mission-count-detail'), completeCopy: $('complete-copy'),
-      touchMap: $('touch-map'),
+      touchMap: $('touch-map'), voiceToggle: $('voice-toggle'), touchVoice: $('touch-voice'),
     };
     this.worldBounds = 48; // matches PhysicsEngine limit + water offset; platform expanded to 92 units
     this.worldMapOpen = false;
@@ -29,6 +29,23 @@ export class UIManager {
       if (e.key.toLowerCase() === 'm') { e.preventDefault(); this.toggleWorldMap(); }
       if (e.key === 'Escape' && this.worldMapOpen) this.closeMap();
     });
+  }
+  // Voices toggle: status-panel button (desktop), VOX touch button (Android), V key.
+  bindVoiceToggle(onToggle) {
+    const flip = () => this.setVoiceState(onToggle());
+    this.el.voiceToggle?.addEventListener('click', (event) => { event.preventDefault(); flip(); });
+    this.el.touchVoice?.addEventListener('pointerdown', (event) => { event.preventDefault(); event.stopPropagation(); flip(); });
+    window.addEventListener('keydown', (event) => {
+      if (event.repeat || event.key.toLowerCase() !== 'v') return;
+      flip();
+    });
+  }
+  setVoiceState(on) {
+    if (this.el.voiceToggle) {
+      this.el.voiceToggle.textContent = on ? '◉ VOICES ON' : '○ VOICES OFF';
+      this.el.voiceToggle.classList.toggle('off', !on);
+    }
+    this.el.touchVoice?.classList.toggle('off', !on);
   }
   toggleWorldMap() { this.worldMapOpen ? this.closeMap() : this.openMap(); }
   openMap() { this.el.worldMap?.classList.remove('hidden'); this.worldMapOpen = true; this.el.mapTitle?.classList.add('expanded'); }

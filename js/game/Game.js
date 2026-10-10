@@ -11,6 +11,7 @@ import { City } from '../world/City.js';
 import { ClimateController, addGlowPoints, setupEnvironment, COLORS } from '../world/Environment.js';
 import { MissionSystem } from '../systems/MissionSystem.js';
 import { DialogueSystem } from '../systems/DialogueSystem.js';
+import { VoiceSystem } from '../systems/VoiceSystem.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { InventorySystem } from '../systems/InventorySystem.js';
 import { DIALOGUE } from '../data/dialogues.js';
@@ -50,11 +51,16 @@ export class Game {
     this.ui = new UIManager();
     this.inventory = new InventorySystem();
     this.missions = new MissionSystem(this.inventory);
-    this.dialogue = new DialogueSystem(this.ui, DIALOGUE);
+    this.voice = new VoiceSystem();
+    this.dialogue = new DialogueSystem(this.ui, DIALOGUE, this.voice);
     this.combat = new CombatSystem();
     this.physics = new PhysicsEngine({ limit: 48 });
     this.city = new City(this.scene, this.physics); this.city.build({ lampLightCount: this.isMobile ? 3 : 5 });
-    this.player = new Player(this.scene, new THREE.Vector3(-16, 0, 16));
+    // (-16, 0, 10) stands on the open street by Kollie Radio Works; findFree guarantees
+    // the spawn never lands inside a building collider again (that reads as Markie
+    // rotating in place, unable to move).
+    const spawn = this.physics.findFree(new THREE.Vector3(-16, 0, 10));
+    this.player = new Player(this.scene, spawn);
     this.pulse = new ScrapPulse(this.scene);
     this.npcs = this.createNPCs();
     this.enemies = [
@@ -76,6 +82,13 @@ export class Game {
     });
     this.mobileController = new MobileController(this.input);
     this.ui.bindStart(() => this.start(), () => location.reload());
+    this.ui.bindVoiceToggle(() => {
+      const on = this.voice.toggle();
+      this.ui.toast(on ? 'VOICES // ON' : 'VOICES // OFF');
+      if (on) this.voice.unlock();
+      return on;
+    });
+    this.ui.setVoiceState(this.voice.enabled);
     this.ui.setCameraView(this.cameraModes[this.cameraIndex].label);
     window.addEventListener('resize', () => this.resize());
     this.updateQuest();
@@ -126,7 +139,10 @@ export class Game {
   }
 
   start() {
-    this.running = true; this.ui.startGame(); this.ui.toast('JOB STARTED // THE WEIGHT OF TRUTH'); this.dialogue.play('opening', 6);
+    this.running = true; this.ui.startGame();
+    // Unlocks speech inside the start-button gesture so the opening line can play.
+    this.voice.unlock();
+    this.ui.toast('JOB STARTED // THE WEIGHT OF TRUTH'); this.dialogue.play('opening', 6);
   }
   resize() { this.camera.aspect = innerWidth / innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(innerWidth, innerHeight); }
   cycleCamera() {
@@ -229,9 +245,9 @@ export class Game {
         this.missions.phase = 'finale_complete';
       }
       this.ui.toast('LEDGER DELIVERED // THE MARKET WILL REMEMBER'); this.dialogue.play('finale', 7); this.updateQuest();
-      setTimeout(() => { this.running = false; this.ui.completeGame(this.inventory.scrap, this.missions.totalMissions); }, 3600);
+      setTimeout(() => { this.running = false; this.voice.stop(); this.ui.completeGame(this.inventory.scrap, this.missions.totalMissions); }, 3600);
     } else if (hit.type === 'npc') {
-      this.ui.subtitle(hit.object.quote, 4);
+      this.dialogue.playText(hit.object.quote, 4);
     }
   }
 
