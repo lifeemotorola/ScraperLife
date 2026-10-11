@@ -83,10 +83,55 @@ python3 tools/rig_and_animate.py build    --fbx fbx/Survival_Character.fbx \
   whose 19 takes the FBX importer in `bpy` 4.2 flattens to two keys each. Re-export such a donor
   from Blender and it will transfer.
 
+## The cast: one Markie rig, different people
+
+Every resident and member of Vardee’s crew is the same rigged character Markie uses. The game
+loads `survival_character.glb` once, clones its skeleton for each person, and shares the large
+vertex buffers; the copies have independent materials, outfits, skin tones, and animation mixers.
+That keeps the sixteen in-world actors to one character download rather than sixteen copies of the 5.3 MB GLB.
+
+`tools/character_palette.py` reads the GLB’s actual material names, groups them into skin, hair,
+shirt, pants, shoes, gloves, and bag slots, then generates a reproducible colour palette for each
+story character and Vardee’s crew. It uses only Python’s standard library:
+
+```bash
+python3 tools/character_palette.py inspect  # show real GLB materials and the palette by person
+python3 tools/character_palette.py build    # write assets/models/character_palettes.json
+python3 tools/character_palette.py check    # validate colours/materials and reproducibility
+npm run palette                             # same as build
+```
+
+Re-run `npm run palette` after rebuilding or renaming the GLB materials. Skin tones are a curated
+range; outfit colours are varied per character. Musu’s flashback palette is included for future
+memory scenes, and Kormah now walks his office district like the rest of the street cast.
+
+Residents stroll within their own Waterside district and avoid the real building colliders. When
+two people meet, they stop, face each other, and trade either a greeting or a short lecture based
+on character roles; a bubble appears over each speaker, and nearby players can hear the exchange.
+Vardee’s watch patrols too, and the scrap pulse still stuns them. A long pair cooldown prevents
+characters from greeting each other every few seconds. Their live positions also update the quest
+target and minimap.
+
+## Lighting: HDR, not a blanket of fog
+
+`tools/bake_hdr_sky.py` bakes a small, equirectangular Radiance RGBE sky at
+`assets/textures/waterside_sky.hdr`. It includes a high-range sun placed to match the day-cycle
+sun at the opening time. `RGBELoader` reads the map, `PMREMGenerator` convolves it into the
+scene’s image-based lighting, and ACES tone mapping preserves the bright sun and the darker
+street range. Clear weather uses a long linear fog distance; rain and Harmattan haze can pull the
+horizon closer, but the entire city is no longer hidden by permanent exponential fog.
+
+```bash
+python3 tools/bake_hdr_sky.py               # coastal-clear HDR (512 x 256)
+python3 tools/bake_hdr_sky.py --preset harmattan
+python3 tools/bake_hdr_sky.py check         # decode + verify sun direction and dynamic range
+npm run sky
+```
+
 ## Checks
 
 ```bash
-npm run check   # all three of the below
+npm run check   # controls, touch, rig, cast palettes, HDR and crowd behavior
 ```
 
 * `npm run check:controls` — drives the real `InputManager`, `Player` and
@@ -102,3 +147,10 @@ npm run check   # all three of the below
   and key times on the requested `fps` grid, and — measured from the *deformed* skin — that the
   silhouette stays on the floor and keeps its height while the walk clip plays. It skips quietly
   when `assets/models/` has not been generated yet.
+* `npm run check:palette` — loads the same GLB, clones the rig for every palette, checks every
+  material/skin/outfit tint, and asserts characters share vertex buffers but not skeletons.
+* `npm run check:lighting` — decodes the baked HDR with three.js’ `RGBELoader`, checks the sun
+  and radiance range, and verifies clear-weather sight distance stays long while rain/Harmattan
+  still have distinct, shorter horizons.
+* `npm run check:crowd` — drives the real `CrowdSystem`/`PhysicsEngine` outside a browser and
+  verifies roaming, building collisions, greetings, lectures, replies and pair cooldowns.

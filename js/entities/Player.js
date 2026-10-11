@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
-import { loadCharacter } from './CharacterRig.js';
+import { instantiateCharacter, loadSharedCharacter } from './CharacterRig.js';
 
 // The rigged COLLADA character (assets/textures/markie.dae) is authored facing +X,
 // not +Z like the rest of the game assumes (the group's +Z is the "forward" that
@@ -85,16 +85,25 @@ export class Player {
   }
 
   // Loads the rigged GLB produced by tools/rig_and_animate.py (fbx/Survival_Character.fbx
-  // authored to this repo's conventions: faces +Z, feet on y=0, `height` units tall). The
-  // manifest carries the clip names, so a re-export that renames a clip needs no JS change.
-  // On any failure it hands over to `fallback` (the COLLADA character), then to the
-  // procedural humanoid - the game must always show *a* Markie.
-  loadGLB(url, { manifest = null, fallback = null, onReady } = {}) {
-    loadCharacter(url, { manifest }).then(({ root, animator }) => {
+  // authored to this repo's conventions: faces +Z, feet on y=0, `height` units tall) through the
+  // SAME shared instance the whole cast is cloned from, so Markie and the fifteen NPCs cost one
+  // download and one glTF parse between them. `palettes` is assets/models/character_palettes.json;
+  // characters.markie gives him his own skin and outfit (the exported materials are leftover
+  // greys, pinks and greens, so without it Markie is the wrong colour too).
+  // On any failure it hands over to `fallback` (the COLLADA character), then to the procedural
+  // humanoid - the game must always show *a* Markie.
+  loadGLB(url, { manifest = null, palettes = null, fallback = null, onReady } = {}) {
+    Promise.all([
+      loadSharedCharacter(url, { manifest }),
+      Promise.resolve(palettes).catch(() => null),
+    ]).then(([shared, paletteData]) => {
+      const palette = paletteData?.characters?.markie || null;
+      const instance = instantiateCharacter(shared, { palette, paletteData, cull: false });
       this.fallback.visible = false;
-      this.model = root;
-      this.animator = animator?.hasClips ? animator : null;
-      this.group.add(root);
+      this.model = instance.root;
+      this.materials = instance.materials;
+      this.animator = instance.animator?.hasClips ? instance.animator : null;
+      this.group.add(instance.root);
       onReady?.(this.getCharacterHeight());
     }).catch(() => {
       if (fallback) fallback();

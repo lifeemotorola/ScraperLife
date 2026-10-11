@@ -85,7 +85,7 @@ export class UIManager {
       `<div class="mission-item ${item.state}"><b>${String(item.order).padStart(2,'0')}</b> ${item.title}</div>`
     ).join('');
   }
-  updateStatus({ resolve, pulse, player, target, missionTitle }) {
+  updateStatus({ resolve, pulse, player, target, missionTitle, npcs = null }) {
     this.el.resolveBar.style.width = `${resolve}%`;
     this.el.resolveNumber.textContent = Math.ceil(resolve);
     this.el.pulse.textContent = pulse >= 35 ? 'SCRAP PULSE READY' : 'PULSE RECHARGING';
@@ -114,10 +114,10 @@ export class UIManager {
     }
     // update small npc markers on minimap for platform visibility
     const npcMap = {
-      'kollie': { x: -4, z: -3 },
-      'tenneh': { x: 16, z: 13 },
-      'boakai': { x: 21, z: -3 },
-      'vardee': { x: -22, z: -16 },
+      kollie: npcs?.kollie?.position || { x: -4, z: -3 },
+      tenneh: npcs?.tenneh?.position || { x: 16, z: 13 },
+      boakai: npcs?.boakai?.position || { x: 32, z: -3 },
+      vardee: npcs?.vardee?.position || { x: -22, z: -16 },
     };
     Object.entries(npcMap).forEach(([id, pos]) => {
       const el = document.getElementById(`map-npc-${id}`);

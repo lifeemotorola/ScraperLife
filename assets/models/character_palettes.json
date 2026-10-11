@@ -1,0 +1,410 @@
+{
+  "generator": "tools/character_palette.py",
+  "version": 1,
+  "seed": "waterside-01",
+  "model": "survival_character",
+  "source": "/home/user/ScraperLife/assets/models/survival_character.glb",
+  "units": "sRGB hex, as read by three.js Color.set()",
+  "note": "One rigged body for the whole cast; per-character colour only. Do not edit by hand - re-run the generator.",
+  "materials": [
+    "Backpack2",
+    "Head",
+    "Body2",
+    "Arms",
+    "Body_Arkit:Eye",
+    "Brows_Leashes",
+    "Gloves1",
+    "Hair3",
+    "Jacket1",
+    "Jeans1",
+    "Mouth",
+    "Shoes1"
+  ],
+  "unmatchedMaterials": [],
+  "slots": {
+    "eyes": {
+      "materials": [
+        "Body_Arkit:Eye"
+      ],
+      "roughness": 0.12,
+      "tintable": false
+    },
+    "mouth": {
+      "materials": [
+        "Mouth"
+      ],
+      "roughness": 0.55,
+      "tintable": false
+    },
+    "brows": {
+      "materials": [
+        "Brows_Leashes"
+      ],
+      "roughness": 0.8,
+      "tintable": true
+    },
+    "hair": {
+      "materials": [
+        "Hair3"
+      ],
+      "roughness": 0.45,
+      "tintable": true
+    },
+    "skin": {
+      "materials": [
+        "Head",
+        "Body2",
+        "Arms"
+      ],
+      "roughness": 0.62,
+      "tintable": true
+    },
+    "shirt": {
+      "materials": [
+        "Jacket1"
+      ],
+      "roughness": 0.78,
+      "tintable": true
+    },
+    "pants": {
+      "materials": [
+        "Jeans1"
+      ],
+      "roughness": 0.88,
+      "tintable": true
+    },
+    "shoes": {
+      "materials": [
+        "Shoes1"
+      ],
+      "roughness": 0.5,
+      "tintable": true
+    },
+    "gloves": {
+      "materials": [
+        "Gloves1"
+      ],
+      "roughness": 0.7,
+      "tintable": true
+    },
+    "pack": {
+      "materials": [
+        "Backpack2"
+      ],
+      "roughness": 0.8,
+      "tintable": true
+    }
+  },
+  "shared": {
+    "eyes": "#f2ece0",
+    "mouth": "#6d3430"
+  },
+  "characters": {
+    "markie": {
+      "name": "Markie Kollie",
+      "label": "MARKIE",
+      "role": "Protagonist",
+      "voice": "greeter",
+      "accent": "#75c5bb",
+      "seed": "d696921b",
+      "colors": {
+        "skin": "#66412a",
+        "hair": "#181209",
+        "brows": "#130e07",
+        "shirt": "#33635c",
+        "pants": "#28383d",
+        "shoes": "#3d2d22",
+        "gloves": "#202c29",
+        "pack": "#ca873d"
+      }
+    },
+    "musu": {
+      "name": "Musu Kollie",
+      "label": "MUSU",
+      "role": "Mother \u2014 memory",
+      "voice": "greeter",
+      "accent": "#f4b07a",
+      "seed": "551050d1",
+      "colors": {
+        "skin": "#8f623d",
+        "hair": "#19120f",
+        "brows": "#140e0c",
+        "shirt": "#995050",
+        "pants": "#513446",
+        "shoes": "#442e28",
+        "gloves": "#68413f",
+        "pack": "#8d5c4f"
+      }
+    },
+    "kollie": {
+      "name": "Old Man Kollie",
+      "label": "OLD MAN KOLLIE",
+      "role": "Mentor",
+      "voice": "lecturer",
+      "accent": "#9fd7ff",
+      "seed": "3f9b3b3f",
+      "colors": {
+        "skin": "#4a2b18",
+        "hair": "#ddd4c9",
+        "brows": "#aca59d",
+        "shirt": "#415b6f",
+        "pants": "#37322d",
+        "shoes": "#291e19",
+        "gloves": "#44352b",
+        "pack": "#74673d"
+      }
+    },
+    "tenneh": {
+      "name": "Tenneh",
+      "label": "TENNEH",
+      "role": "Love interest",
+      "voice": "greeter",
+      "accent": "#ffb454",
+      "seed": "d8459414",
+      "colors": {
+        "skin": "#91633e",
+        "hair": "#19140b",
+        "brows": "#141009",
+        "shirt": "#c76928",
+        "pants": "#413328",
+        "shoes": "#623924",
+        "gloves": "#7f5838",
+        "pack": "#a33d26"
+      }
+    },
+    "flomo": {
+      "name": "Flomo",
+      "label": "FLOMO",
+      "role": "Best friend",
+      "voice": "greeter",
+      "accent": "#a8d26a",
+      "seed": "32bca77f",
+      "colors": {
+        "skin": "#77462f",
+        "hair": "#161109",
+        "brows": "#110d07",
+        "shirt": "#5e6b38",
+        "pants": "#344964",
+        "shoes": "#3a2f24",
+        "gloves": "#2e3828",
+        "pack": "#776c34"
+      }
+    },
+    "sia": {
+      "name": "Sia",
+      "label": "SIA",
+      "role": "Street kid",
+      "voice": "greeter",
+      "accent": "#ffd08a",
+      "seed": "1a80662c",
+      "colors": {
+        "skin": "#9b6c44",
+        "hair": "#161108",
+        "brows": "#110d06",
+        "shirt": "#ca673e",
+        "pants": "#42505e",
+        "shoes": "#a68547",
+        "gloves": "#444540",
+        "pack": "#c89035"
+      }
+    },
+    "garmai": {
+      "name": "Garmai",
+      "label": "GARMAI",
+      "role": "Information broker",
+      "voice": "lecturer",
+      "accent": "#c760b0",
+      "seed": "873d63a9",
+      "colors": {
+        "skin": "#824b2b",
+        "hair": "#181009",
+        "brows": "#130c07",
+        "shirt": "#5d3963",
+        "pants": "#312b3a",
+        "shoes": "#3d2f36",
+        "gloves": "#483844",
+        "pack": "#664563"
+      }
+    },
+    "boakai": {
+      "name": "Boakai",
+      "label": "BOAKAI",
+      "role": "Equipment fixer",
+      "voice": "greeter",
+      "accent": "#d8c07a",
+      "seed": "aa57788a",
+      "colors": {
+        "skin": "#542c1b",
+        "hair": "#171208",
+        "brows": "#120e06",
+        "shirt": "#826d43",
+        "pants": "#494839",
+        "shoes": "#453124",
+        "gloves": "#74653d",
+        "pack": "#726945"
+      }
+    },
+    "jallah": {
+      "name": "Jallah",
+      "label": "JALLAH",
+      "role": "Rival",
+      "voice": "greeter",
+      "accent": "#ff6b5e",
+      "seed": "7e0b8627",
+      "colors": {
+        "skin": "#603822",
+        "hair": "#17100a",
+        "brows": "#120c08",
+        "shirt": "#3d3d42",
+        "pants": "#2a2930",
+        "shoes": "#26211f",
+        "gloves": "#4f322d",
+        "pack": "#3d3836"
+      }
+    },
+    "togar": {
+      "name": "Togar",
+      "label": "TOGAR",
+      "role": "Lieutenant",
+      "voice": "lecturer",
+      "accent": "#9aa7b0",
+      "seed": "616068e7",
+      "colors": {
+        "skin": "#412318",
+        "hair": "#191108",
+        "brows": "#140d06",
+        "shirt": "#2f3437",
+        "pants": "#25282d",
+        "shoes": "#1b1d1e",
+        "gloves": "#313439",
+        "pack": "#272a2d"
+      }
+    },
+    "vardee": {
+      "name": "Vardee",
+      "label": "VARDEE",
+      "role": "Antagonist",
+      "voice": "lecturer",
+      "accent": "#ff3b3b",
+      "seed": "22bc11a0",
+      "colors": {
+        "skin": "#412217",
+        "hair": "#170f08",
+        "brows": "#120c06",
+        "shirt": "#471b22",
+        "pants": "#211b1d",
+        "shoes": "#211d1c",
+        "gloves": "#371f22",
+        "pack": "#2b1a1c"
+      }
+    },
+    "kormah": {
+      "name": "Kormah",
+      "label": "KORMAH",
+      "role": "Corrupt official",
+      "voice": "lecturer",
+      "accent": "#bca36a",
+      "seed": "acb93fcc",
+      "colors": {
+        "skin": "#6e4327",
+        "hair": "#231c18",
+        "brows": "#1b1613",
+        "shirt": "#3e4b46",
+        "pants": "#262b2c",
+        "shoes": "#241d19",
+        "gloves": "#343932",
+        "pack": "#413f37"
+      }
+    },
+    "watch-east-1": {
+      "name": "East Watch",
+      "label": "EAST WATCH",
+      "role": "Street watch",
+      "voice": "greeter",
+      "accent": "#ff7041",
+      "seed": "12466076",
+      "colors": {
+        "skin": "#a3714d",
+        "hair": "#18110a",
+        "brows": "#130d08",
+        "shirt": "#6c2d2a",
+        "pants": "#36282f",
+        "shoes": "#221b1b",
+        "gloves": "#412224",
+        "pack": "#3d2327"
+      }
+    },
+    "watch-market-2": {
+      "name": "Market Watch",
+      "label": "MARKET WATCH",
+      "role": "Street watch",
+      "voice": "greeter",
+      "accent": "#ff8a50",
+      "seed": "7d4c024a",
+      "colors": {
+        "skin": "#6d4326",
+        "hair": "#171208",
+        "brows": "#120e06",
+        "shirt": "#6e4435",
+        "pants": "#352e32",
+        "shoes": "#211b1b",
+        "gloves": "#402a27",
+        "pack": "#4c333d"
+      }
+    },
+    "watch-docks-3": {
+      "name": "Docks Watch",
+      "label": "DOCKS WATCH",
+      "role": "Street watch",
+      "voice": "greeter",
+      "accent": "#e85f43",
+      "seed": "241c4f3d",
+      "colors": {
+        "skin": "#865436",
+        "hair": "#161208",
+        "brows": "#110e06",
+        "shirt": "#763b32",
+        "pants": "#303037",
+        "shoes": "#241f22",
+        "gloves": "#57302f",
+        "pack": "#48262d"
+      }
+    },
+    "watch-harbor-4": {
+      "name": "Harbor Watch",
+      "label": "HARBOR WATCH",
+      "role": "Street watch",
+      "voice": "greeter",
+      "accent": "#dc5740",
+      "seed": "e1100ca8",
+      "colors": {
+        "skin": "#402017",
+        "hair": "#161009",
+        "brows": "#110c07",
+        "shirt": "#602b2e",
+        "pants": "#302c2f",
+        "shoes": "#221f1d",
+        "gloves": "#3c2422",
+        "pack": "#3c2528"
+      }
+    },
+    "watch-warehouse-5": {
+      "name": "Warehouse Watch",
+      "label": "WAREHOUSE WATCH",
+      "role": "Street watch",
+      "voice": "greeter",
+      "accent": "#ff8054",
+      "seed": "bbfe5e49",
+      "colors": {
+        "skin": "#7c4d33",
+        "hair": "#161008",
+        "brows": "#110c06",
+        "shirt": "#8d4231",
+        "pants": "#3d3537",
+        "shoes": "#231c1c",
+        "gloves": "#582b2d",
+        "pack": "#4e2a2a"
+      }
+    }
+  }
+}
