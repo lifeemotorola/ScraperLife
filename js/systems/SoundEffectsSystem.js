@@ -149,6 +149,16 @@ export class SoundEffectsSystem {
       return true;
     }
 
+    if (name === 'footstep') {
+      this.footstepSide = -(this.footstepSide || 1);
+      const pan = this.footstepSide * 0.12;
+      this.tone({ frequency: 112, endFrequency: 64, start: now, duration: 0.10,
+        volume: 0.18 * energy, type: 'sine', attack: 0.003, pan });
+      this.noise({ start: now, duration: 0.06, volume: 0.10 * energy,
+        cutoff: 620, filter: 'lowpass', pan });
+      return true;
+    }
+
     if (name === 'interact') {
       this.tone({ frequency: 390, endFrequency: 245, start: now, duration: 0.085,
         volume: 0.095 * energy, type: 'triangle', attack: 0.003, pan: -0.05 });

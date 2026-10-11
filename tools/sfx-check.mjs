@@ -66,8 +66,8 @@ check('scrap pickup queues a metallic chime and clink', sfx.play('pickup'),
 const beforePulse = nodes.length;
 check('scrap pulse queues a low sweep and airy burst', sfx.play('pulse', 0.9),
   `${nodes.length - beforePulse} audio nodes`);
-check('radio repair, interaction, and impact sounds are available',
-  sfx.play('repair') && sfx.play('interact') && sfx.play('impact'),
+check('footsteps, repair, interaction, and impact sounds are available',
+  sfx.play('footstep') && sfx.play('repair') && sfx.play('interact') && sfx.play('impact'),
   `${nodes.filter((node) => node.kind === 'oscillator' && node.startedAt !== undefined).length} scheduled tones`);
 const scheduled = nodes.filter((node) => node.startedAt !== undefined);
 check('all synthesized sounds schedule safe positive durations',
@@ -87,4 +87,4 @@ if (failures.length) {
   console.error(`\n${failures.length} SFX check(s) failed: ${failures.join('; ')}`);
   process.exit(1);
 }
-console.log('\nall checks passed — pickup, pulse, repair, interaction, and impact SFX');
+console.log('\nall checks passed — footsteps, pickup, pulse, repair, interaction, and impact SFX');

@@ -35,6 +35,7 @@ export class Game {
   init() {
     this.running = false;
     this.time = 0;
+    this.footstepTimer = 0;
     this.isMobile = matchMedia('(pointer: coarse)').matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, .1, 180);
@@ -450,7 +451,21 @@ export class Game {
     // Stick/keys are read in the camera's frame (see InputManager.getMovement), using the
     // yaw the player can actually see, so up/right on the pad are up/right on screen.
     this.input.setCameraYaw(this.viewYaw ?? this.cameraYaw);
+    const moveState = this.input.getMovement();
+    const previousX = this.player.position.x;
+    const previousZ = this.player.position.z;
     this.player.update(delta, this.input, this.physics, this.time);
+    const travel = Math.hypot(this.player.position.x - previousX, this.player.position.z - previousZ);
+    if (travel > 0.002) {
+      const stepInterval = moveState.running ? 0.34 : 0.48;
+      this.footstepTimer += delta;
+      if (this.footstepTimer >= stepInterval) {
+        this.footstepTimer %= stepInterval;
+        this.sfx.play('footstep', moveState.running ? 1 : 0.78);
+      }
+    } else {
+      this.footstepTimer = 0;
+    }
     for (const scrap of this.scrap) { if (!scrap.userData.collected) { scrap.position.y = scrap.userData.baseY + Math.sin(this.time * 2 + scrap.userData.phase) * .11; scrap.rotation.y += delta * .85; } }
     // ledger hover
     if (this.city.ledger?.ledger?.visible) {

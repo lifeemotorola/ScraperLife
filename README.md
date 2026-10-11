@@ -138,9 +138,9 @@ Python’s standard library. The soft keys, bass, and light hand percussion star
 presses **START**, stay quiet under story dialogue, and loop across the platform. Toggle the music
 with `B` on desktop or `MUS` on touch; the preference is saved locally.
 
-`SoundEffectsSystem` synthesizes short Web Audio effects for salvaged scrap pickups, the scrap pulse,
-radio repair, interactions, and enemy impacts. It unlocks on **START** for mobile browser audio
-policies; if Web Audio is unavailable, the game continues without effects.
+`SoundEffectsSystem` synthesizes short Web Audio effects for Markie’s footsteps, salvaged scrap
+pickups, the scrap pulse, radio repair, interactions, and enemy impacts. It unlocks on **START** for
+mobile browser audio policies; if Web Audio is unavailable, the game continues without effects.
 
 ```bash
 python3 tools/bake_platform_music.py  # regenerate assets/audio/platform-loop.wav
