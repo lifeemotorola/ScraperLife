@@ -35,9 +35,15 @@ export class MissionSystem {
   }
   completeToDocks() { if (this.phase !== 'complete') return false; this.phase = 'docks'; return true; }
   speakWithBoakai() { if (this.phase !== 'docks') return false; this.phase = 'boakai'; return true; }
-  enterWarehouse() { if (this.phase !== 'boakai') return false; this.phase = 'warehouse'; return true; }
-  collectLedger() { if (this.phase !== 'warehouse') return false; this.ledgerCollected = true; this.phase = 'vardee'; return true; }
-  confrontVardee() { if (this.phase !== 'vardee') return false; this.vardeeConfronted = true; this.phase = 'finale'; return true; }
+  // Boakai names the ledger's location; the road to Warehouse 6 runs through Jallah.
+  askBoakaiLocation() { if (this.phase !== 'boakai') return false; this.phase = 'rival'; return true; }
+  speakWithJallah() { if (this.phase !== 'rival') return false; this.phase = 'warehouse'; return true; }
+  collectLedger() { if (this.phase !== 'warehouse') return false; this.ledgerCollected = true; this.phase = 'copies'; return true; }
+  // Boakai copies every page and Kormah's warning lands; the confrontation is next.
+  makeCopies() { if (this.phase !== 'copies') return false; this.phase = 'vardee'; return true; }
+  confrontVardee() { if (this.phase !== 'vardee') return false; this.vardeeConfronted = true; this.phase = 'loose_end'; return true; }
+  // Togar gives up where the runner hid the delivery slips.
+  speakWithTogar() { if (this.phase !== 'loose_end') return false; this.phase = 'finale'; return true; }
   is(phase) { return this.phase === phase; }
   isComplete() { return this.phase === 'finale_complete'; }
 }

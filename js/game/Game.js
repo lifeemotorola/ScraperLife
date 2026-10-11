@@ -258,7 +258,7 @@ export class Game {
     this.sfx.unlock();
     // Unlocks speech inside the same gesture so the opening line can play over the music.
     this.voice.unlock();
-    this.ui.toast('JOB STARTED // THE WEIGHT OF TRUTH'); this.dialogue.play('opening', 6);
+    this.ui.toast('JOB STARTED // SEVEN PIECES'); this.dialogue.play('opening', 6);
   }
   resize() { this.camera.aspect = innerWidth / innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(innerWidth, innerHeight); }
   cycleCamera() {
@@ -293,11 +293,13 @@ export class Game {
     }
     else if (this.missions.is('docks') && this.npcs.boakai.distanceTo(this.player.position) < 2.8) closest = { type: 'boakai', text: 'TALK TO BOAKAI — DOCKS' };
     else if (this.missions.is('boakai') && this.npcs.boakai.distanceTo(this.player.position) < 2.5) closest = { type: 'boakai2', text: 'ASK ABOUT WAREHOUSE 6' };
-    else if (this.missions.is('warehouse') || this.missions.is('boakai')) {
+    else if (this.missions.is('rival') && this.npcs.jallah.distanceTo(this.player.position) < 2.8) closest = { type: 'jallah', text: 'ASK JALLAH ABOUT THE ROAD' };
+    else if (this.missions.is('warehouse')) {
       const ledgerDist = this.player.position.distanceTo(this.city.ledgerPos);
-      if (ledgerDist < 2.6) closest = { type: 'ledger', text: this.missions.is('warehouse') ? 'RETRIEVE RUSTED LEDGER' : 'INVESTIGATE WAREHOUSE 6' };
-      // also catch Boakai if warehouse phase but close to him
+      if (ledgerDist < 2.6) closest = { type: 'ledger', text: 'RETRIEVE RUSTED LEDGER' };
     }
+    else if (this.missions.is('copies') && this.npcs.boakai.distanceTo(this.player.position) < 2.8) closest = { type: 'boakai_copies', text: 'HAVE BOAKAI COPY THE LEDGER' };
+    else if (this.missions.is('loose_end') && this.npcs.togar.distanceTo(this.player.position) < 2.8) closest = { type: 'togar', text: 'TALK TO TOGAR' };
     else if (this.missions.is('vardee') && this.npcs.vardee.distanceTo(this.player.position) < 2.8) closest = { type: 'vardee', text: 'CONFRONT VARDEE' };
     else if (this.missions.is('finale') && this.npcs.tenneh.distanceTo(this.player.position) < 2.8) closest = { type: 'finale', text: 'DELIVER LEDGER TO TENNEH' };
     else if (this.missions.is('finale') && this.npcs.sia.distanceTo(this.player.position) < 2.2) closest = { type: 'finale_sia', text: 'REASSURE SIA' };
@@ -345,21 +347,19 @@ export class Game {
       }
     } else if (hit.type === 'boakai' && this.missions.speakWithBoakai()) {
       this.ui.toast('BOAKAI: WAREHOUSE 6 HOLDS THE PROOF'); this.dialogue.play('boakai', 6); this.updateQuest();
-      // Immediately push to warehouse phase after acknowledging
-      setTimeout(() => { if (this.missions.enterWarehouse()) { this.ui.toast('OBJECTIVE // ENTER WAREHOUSE 6'); this.updateQuest(); } }, 1200);
-    } else if (hit.type === 'boakai2' && this.missions.enterWarehouse()) {
-      this.ui.toast('WAREHOUSE 6 // LEDGER INSIDE'); this.updateQuest();
-      this.dialogue.playConversation(['boakai', 'boakaiProof'], null, { boakai: 6, boakaiProof: 7 });
+    } else if (hit.type === 'boakai2' && this.missions.askBoakaiLocation()) {
+      // Boakai gives the location, then the road to Warehouse 6 runs through Jallah.
+      this.ui.toast('OBJECTIVE // FIND JALLAH ON THE OLD HARBOR ROAD'); this.updateQuest();
+      this.dialogue.playText(DIALOGUE.boakaiLocation, 7, 'boakaiLocation');
+    } else if (hit.type === 'jallah' && this.missions.speakWithJallah()) {
+      this.ui.toast('JALLAH: THE ROAD TO WAREHOUSE 6'); this.updateQuest();
+      this.dialogue.playConversation(['jallahWarehouse', 'jallahNight'], null, { jallahWarehouse: 6, jallahNight: 7 });
     } else if (hit.type === 'ledger') {
-      // Ledger pickup: supports both boakai->warehouse entry and warehouse->vardee collection
-      if (this.missions.is('boakai') && this.missions.enterWarehouse()) {
-        this.ui.toast('ENTERED WAREHOUSE 6 // SEARCHING...'); this.updateQuest();
-        setTimeout(() => this.tryCollectLedger(), 600);
-      } else if (this.missions.is('warehouse')) {
-        this.tryCollectLedger();
-      } else if (this.missions.is('boakai')) {
-        this.tryCollectLedger();
-      }
+      this.tryCollectLedger();
+    } else if (hit.type === 'boakai_copies' && this.missions.makeCopies()) {
+      // Every page is copied by hand; Kormah's warning arrives the same day.
+      this.ui.toast('COPIES MADE // KORMAH IS WATCHING'); this.updateQuest();
+      this.dialogue.playConversation(['boakaiProof', 'kormah'], null, { boakaiProof: 7, kormah: 6 });
     } else if (hit.type === 'vardee' && this.missions.confrontVardee()) {
       this.ui.toast('VARDEE CONFRONTED // TRUTH HAS A PRICE'); this.updateQuest();
       // A three-voice standoff: Vardee threatens, Togar warns, Markie stands his ground.
@@ -369,6 +369,9 @@ export class Game {
         { vardeeConfront: 6, togarWarning: 5, markieResolve: 6 },
       );
       this.city.ledger?.light && (this.city.ledger.light.intensity = 0);
+    } else if (hit.type === 'togar' && this.missions.speakWithTogar()) {
+      this.ui.toast('TOGAR: THE RUNNER’S SLIPS // TAKE THEM TO THE MARKET'); this.updateQuest();
+      this.dialogue.playText(DIALOGUE.togarSlips, 8, 'togarSlips');
     } else if ((hit.type === 'finale' || hit.type === 'finale_sia') && this.missions.speakWithTenneh()) {
       // finale -> finale_complete is handled via MissionSystem speakWithTenneh when in finale
       // Our MissionSystem expects speakWithTenneh for finale as well
@@ -399,7 +402,7 @@ export class Game {
     if (this.missions.collectLedger()) {
       this.sfx.play('pickup', 0.82);
       this.city.collectLedger();
-      this.ui.toast('LEDGER SECURED // TAKE IT TO VARDEE'); this.dialogue.play('warehouse', 6); this.updateQuest();
+      this.ui.toast('LEDGER SECURED // TAKE COPIES TO BOAKAI'); this.dialogue.play('warehouse', 6); this.updateQuest();
     }
   }
 
@@ -440,9 +443,12 @@ export class Game {
     if (this.missions.is('market')) return this.npcs.tenneh.position;
     if (this.missions.is('complete')) return this.npcs.tenneh.position;
     if (this.missions.is('docks')) return this.npcs.boakai.position;
-    if (this.missions.is('boakai')) return this.city.warehousePos;
+    if (this.missions.is('boakai')) return this.npcs.boakai.position;
+    if (this.missions.is('rival')) return this.npcs.jallah.position;
     if (this.missions.is('warehouse')) return this.city.ledgerPos;
+    if (this.missions.is('copies')) return this.npcs.boakai.position;
     if (this.missions.is('vardee')) return this.npcs.vardee.position;
+    if (this.missions.is('loose_end')) return this.npcs.togar.position;
     if (this.missions.is('finale')) return this.npcs.tenneh.position;
     if (this.missions.is('gather')) return this.scrap.find((piece) => !piece.userData.collected)?.position || this.city.generatorPosition;
     return this.npcs.tenneh.position;

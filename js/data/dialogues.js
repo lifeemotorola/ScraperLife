@@ -20,6 +20,11 @@ export const DIALOGUE = {
   togarWarning: 'TOGAR: “Vardee does not forgive loose ends. Walk away, Markie.”',
   jallahRival: 'JALLAH: “You want respect? Take it from Vardee, not from me.”',
   kormah: 'KORMAH: “Keep a copy of every paper, Markie. The city has a habit of losing things.”',
+  // Season One draft beats without a recorded clip yet; they play through the browser voice.
+  boakaiLocation: 'BOAKAI: “Warehouse 6, past the old harbor road. Paper does not lie. People do. And paper can be made to lie too.”',
+  jallahWarehouse: 'JALLAH: “You’re asking the wrong person. But maybe you’re finally asking the right question.”',
+  jallahNight: 'JALLAH: “A few years ago, people were told to clear a route. Some went. Some didn’t. The papers said everybody had been warned.”',
+  togarSlips: 'TOGAR: “I saw a copy of that warning before it vanished. I should have spoken. A runner kept the delivery slips. Don’t make me into a good man because I finally did one right thing.”',
 };
 
 // Story roster is data-driven so future missions can use the same names and roles.
