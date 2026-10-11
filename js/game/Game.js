@@ -16,6 +16,7 @@ import { MissionSystem } from '../systems/MissionSystem.js';
 import { DialogueSystem } from '../systems/DialogueSystem.js';
 import { VoiceSystem } from '../systems/VoiceSystem.js';
 import { MusicSystem } from '../systems/MusicSystem.js';
+import { SoundEffectsSystem } from '../systems/SoundEffectsSystem.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { InventorySystem } from '../systems/InventorySystem.js';
 import { DIALOGUE } from '../data/dialogues.js';
@@ -77,6 +78,7 @@ export class Game {
     this.missions = new MissionSystem(this.inventory);
     this.voice = new VoiceSystem();
     this.music = new MusicSystem();
+    this.sfx = new SoundEffectsSystem();
     this.dialogue = new DialogueSystem(this.ui, DIALOGUE, this.voice);
     this.combat = new CombatSystem();
     this.physics = new PhysicsEngine({ limit: 48 });
@@ -252,6 +254,7 @@ export class Game {
     this.running = true; this.ui.startGame();
     // Music must begin inside the start-button gesture so mobile browsers permit playback.
     this.music.start();
+    this.sfx.unlock();
     // Unlocks speech inside the same gesture so the opening line can play over the music.
     this.voice.unlock();
     this.ui.toast('JOB STARTED // THE WEIGHT OF TRUTH'); this.dialogue.play('opening', 6);
@@ -308,6 +311,9 @@ export class Game {
   interact() {
     if (!this.running || !this.interaction) return;
     const hit = this.interaction;
+    if (hit.type === 'scrap') this.sfx.play('pickup');
+    else if (hit.type === 'radio') this.sfx.play('repair');
+    else this.sfx.play('interact', 0.8);
     if (hit.type === 'scrap') {
       hit.object.userData.collected = true; hit.object.visible = false; this.scrapGlow.setColor(hit.object.userData.glowIndex, 0);
       const total = this.inventory.collectScrap(); this.ui.toast(`SALVAGE SECURED // ${total} PIECE${total === 1 ? '' : 'S'}`);
@@ -390,6 +396,7 @@ export class Game {
   tryCollectLedger() {
     if (!this.missions.is('warehouse')) return;
     if (this.missions.collectLedger()) {
+      this.sfx.play('pickup', 0.82);
       this.city.collectLedger();
       this.ui.toast('LEDGER SECURED // TAKE IT TO VARDEE'); this.dialogue.play('warehouse', 6); this.updateQuest();
     }
@@ -399,6 +406,7 @@ export class Game {
     if (!this.running) return;
     const stunned = this.pulse.activate(this.player.position, this.enemies);
     if (stunned === null) return;
+    this.sfx.play('pulse', stunned > 0 ? 1 : 0.82);
     this.player.play('pulse');
     this.ui.toast(stunned ? `SCRAP PULSE // ${stunned} WATCH${stunned > 1 ? 'ES' : ''} DISRUPTED` : 'SCRAP PULSE // AREA CLEAR');
   }
@@ -453,6 +461,7 @@ export class Game {
     this.combat.update(delta); this.pulse.update(delta);
     this.enemies.forEach((enemy) => {
       if (enemy.threaten(delta, this.time, this.player.position) && this.combat.takePressure(12)) {
+        this.sfx.play('impact');
         this.player.play('hit');   // recoil clip; ignored when the model has no clips
         this.ui.toast('VARDEE’S WATCH // STAY MOVING');
         if (this.combat.resolve <= 0) { this.player.recover(); this.combat.recover(); this.ui.toast('MARKIE TAKES A BREATH // BACK ON YOUR FEET'); }

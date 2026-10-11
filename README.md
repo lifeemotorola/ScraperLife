@@ -131,12 +131,16 @@ python3 tools/bake_hdr_sky.py check         # decode + verify sun direction and 
 npm run sky
 ```
 
-## Platform music
+## Platform audio
 
 `tools/bake_platform_music.py` composes an original, vocal-free 16-bar instrumental loop using only
 Python’s standard library. The soft keys, bass, and light hand percussion start after the player
-presses **START**, stay quiet under story dialogue, and loop across the platform. Toggle it with
-`B` on desktop or `MUS` on touch; the preference is saved locally.
+presses **START**, stay quiet under story dialogue, and loop across the platform. Toggle the music
+with `B` on desktop or `MUS` on touch; the preference is saved locally.
+
+`SoundEffectsSystem` synthesizes short Web Audio effects for salvaged scrap pickups, the scrap pulse,
+radio repair, interactions, and enemy impacts. It unlocks on **START** for mobile browser audio
+policies; if Web Audio is unavailable, the game continues without effects.
 
 ```bash
 python3 tools/bake_platform_music.py  # regenerate assets/audio/platform-loop.wav
@@ -147,7 +151,7 @@ npm run check:music                  # verify WAV format, duration, and signal l
 ## Checks
 
 ```bash
-npm run check   # controls, touch, rig, cast palettes, HDR, music, and crowd behavior
+npm run check   # controls, touch, rig, cast palettes, HDR, music, SFX, and crowd behavior
 ```
 
 * `npm run check:controls` — drives the real `InputManager`, `Player` and
@@ -169,5 +173,7 @@ npm run check   # controls, touch, rig, cast palettes, HDR, music, and crowd beh
 * `npm run check:lighting` — decodes the baked HDR with three.js’ `RGBELoader`, checks the sun
   and radiance range, verifies the 15-minute day/night timing, and confirms weather visibility.
 * `npm run check:music` — checks the generated platform loop’s PCM format, duration, and signal level.
+* `npm run check:sfx` — exercises synthesized pickup, pulse, repair, interaction and impact sounds
+  against a fake Web Audio graph, including the unsupported-audio fallback.
 * `npm run check:crowd` — drives the real `CrowdSystem`/`PhysicsEngine` outside a browser and
   verifies roaming, building collisions, greetings, lectures, replies and pair cooldowns.
