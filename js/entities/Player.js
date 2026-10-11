@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
+import { loadCharacter } from './CharacterRig.js';
 
 // The rigged COLLADA character (assets/textures/markie.dae) is authored facing +X,
 // not +Z like the rest of the game assumes (the group's +Z is the "forward" that
@@ -83,6 +84,32 @@ export class Player {
     });
   }
 
+  // Loads the rigged GLB produced by tools/rig_and_animate.py (fbx/Survival_Character.fbx
+  // authored to this repo's conventions: faces +Z, feet on y=0, `height` units tall). The
+  // manifest carries the clip names, so a re-export that renames a clip needs no JS change.
+  // On any failure it hands over to `fallback` (the COLLADA character), then to the
+  // procedural humanoid - the game must always show *a* Markie.
+  loadGLB(url, { manifest = null, fallback = null, onReady } = {}) {
+    loadCharacter(url, { manifest }).then(({ root, animator }) => {
+      this.fallback.visible = false;
+      this.model = root;
+      this.animator = animator?.hasClips ? animator : null;
+      this.group.add(root);
+      onReady?.(this.getCharacterHeight());
+    }).catch(() => {
+      if (fallback) fallback();
+      else {
+        this.fallback.visible = true;
+        onReady?.(this.getCharacterHeight());
+      }
+    });
+  }
+
+  // One-shot reaction ("pulse", "hit", "interact", "celebrate"); no-ops on a model with no clips.
+  play(state) {
+    this.animator?.trigger?.(state);
+  }
+
   getCharacterHeight() {
     const character = this.model || this.fallback;
     character.updateMatrixWorld(true);
@@ -112,9 +139,14 @@ export class Player {
       physics.constrain(this.position);
       this.group.rotation.y = Math.atan2(direction.x, direction.z);
       this.fallback.userData.legs.position.y = .52 + Math.sin(time * 13) * .035;
-      if (this.model) this.model.position.y = Math.abs(Math.sin(time * 13)) * .018;
+      // The procedural bob stands in for leg animation; a real rig already has knee bend in
+      // its walk clip, so adding the bob on top would double it.
+      if (this.model && !this.animator) this.model.position.y = Math.abs(Math.sin(time * 13)) * .018;
     }
-    if (this.mixer) {
+    if (this.animator) {
+      this.animator.setLocomotion({ moving, running });
+      this.animator.update(delta);
+    } else if (this.mixer) {
       this.walkAction.paused = !moving;
       this.walkAction.timeScale = running ? 1.35 : 1;
       this.mixer.update(delta);
