@@ -1,3 +1,19 @@
+// Android / touch gamepad: one floating thumbstick for movement plus the action
+// cluster. The stick only produces a direction; InputManager turns that into a
+// camera-relative world direction so "up" is always up on screen.
+const DEAD_ZONE = .16;
+
+// Raw knob offset (in units of the stick's radius) -> input vector.
+// A resting thumb inside the dead zone produces nothing; the rest of the travel is
+// re-scaled so the player still gets a full 0..1 range for slow walking.
+export function stickVector(deltaX, deltaY, range) {
+  const nx = deltaX / range; const nz = deltaY / range;
+  const magnitude = Math.hypot(nx, nz);
+  if (magnitude <= DEAD_ZONE) return { x: 0, z: 0 };
+  const scaled = Math.min(1, (magnitude - DEAD_ZONE) / (1 - DEAD_ZONE));
+  return { x: (nx / magnitude) * scaled, z: (nz / magnitude) * scaled };
+}
+
 export class MobileController {
   constructor(input) {
     this.input = input;
@@ -43,7 +59,10 @@ export class MobileController {
   }
 
   onJoystickDown(event) {
+    // Ignore extra fingers: only the pointer that grabbed the stick steers it.
+    if (this.activePointer !== null) return;
     this.activePointer = event.pointerId;
+    this.zone.classList.add('active');
     this.zone.setPointerCapture?.(event.pointerId);
     this.updateJoystick(event);
     event.preventDefault(); event.stopPropagation();
@@ -58,6 +77,7 @@ export class MobileController {
   onJoystickUp(event) {
     if (event.pointerId !== this.activePointer) return;
     this.activePointer = null;
+    this.zone.classList.remove('active');
     this.input.setVirtualMove(0, 0);
     this.knob.style.transform = 'translate(-50%, -50%)';
     if (this.zone.hasPointerCapture?.(event.pointerId)) this.zone.releasePointerCapture(event.pointerId);
@@ -74,6 +94,7 @@ export class MobileController {
     const length = Math.hypot(deltaX, deltaY);
     if (length > range) { deltaX = (deltaX / length) * range; deltaY = (deltaY / length) * range; }
     this.knob.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
-    this.input.setVirtualMove(deltaX / range, deltaY / range);
+    const { x, z } = stickVector(deltaX, deltaY, range);
+    this.input.setVirtualMove(x, z);
   }
 }

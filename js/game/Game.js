@@ -16,6 +16,16 @@ import { CombatSystem } from '../systems/CombatSystem.js';
 import { InventorySystem } from '../systems/InventorySystem.js';
 import { DIALOGUE } from '../data/dialogues.js';
 
+// Camera rigs, expressed as an offset from Markie. Negative Z is BEHIND him, so the
+// camera looks the way he is heading and "up" on the stick always walks away from the
+// camera (up the screen). Keep both conventions in sync with InputManager.getMovement().
+export const CAMERA_MODES = [
+  { label: 'ACTION VIEW', offset: new THREE.Vector3(1.7, 4.8, -8.6), lookHeight: 1.65, ahead: 2.3, fov: 58, smooth: .10 },
+  { label: 'WIDE VIEW', offset: new THREE.Vector3(0, 10.4, -14.5), lookHeight: 1.0, ahead: 2.4, fov: 60, smooth: .075 },
+  { label: 'CITY VIEW', offset: new THREE.Vector3(0, 22, -24), lookHeight: .3, ahead: 1.4, fov: 66, smooth: .055 },
+  { label: 'PLATFORM VIEW', offset: new THREE.Vector3(0, 32, -32), lookHeight: -1.2, ahead: 0.5, fov: 70, smooth: .045 },
+];
+
 export class Game {
   init() {
     this.running = false;
@@ -25,17 +35,14 @@ export class Game {
     this.lighting = setupEnvironment(this.scene);
     this.climate = new ClimateController(this.scene, this.lighting, { mobile: this.isMobile });
     this.camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, .1, 180);
-    this.camera.position.set(-16, 12, 25);
+    this.camera.position.set(-16, 12, -4);
     this.cameraTarget = new THREE.Vector3(); this.cameraLook = new THREE.Vector3();
-    this.cameraModes = [
-      { label: 'ACTION VIEW', offset: new THREE.Vector3(1.7, 4.8, 8.6), lookHeight: 1.65, ahead: 2.3, fov: 58, smooth: .10 },
-      { label: 'WIDE VIEW', offset: new THREE.Vector3(0, 10.4, 14.5), lookHeight: 1.0, ahead: 2.4, fov: 60, smooth: .075 },
-      { label: 'CITY VIEW', offset: new THREE.Vector3(0, 22, 24), lookHeight: .3, ahead: 1.4, fov: 66, smooth: .055 },
-      { label: 'PLATFORM VIEW', offset: new THREE.Vector3(0, 32, 32), lookHeight: -1.2, ahead: 0.5, fov: 70, smooth: .045 },
-    ];
+    this.cameraModes = CAMERA_MODES;
     this.cameraIndex = 1;
-    this.cameraOrbitYaw = 0;
-    this.cameraOrbitPitch = 0;
+    // Camera yaw is a world angle owned by the player (drag to look / CAM to recenter).
+    // It is NOT welded to Markie's facing, so the view never whips around when he turns.
+    this.cameraYaw = 0;
+    this.cameraPitch = 0;
     this.renderer = new THREE.WebGLRenderer({ antialias: !this.isMobile, powerPreference: 'high-performance' });
     // Pixel ratio drives fill-rate cost (x4 at DPR 2), so desktop is capped at 1.5 for smoother frames.
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, this.isMobile ? 1.25 : 1.5)); this.renderer.setSize(innerWidth, innerHeight);
@@ -148,12 +155,16 @@ export class Game {
   cycleCamera() {
     this.cameraIndex = (this.cameraIndex + 1) % this.cameraModes.length;
     const view = this.cameraModes[this.cameraIndex];
+    // Cycling the view also swings the camera back behind Markie, so a lost player can
+    // always recover the "forward = up the screen" framing with one tap.
+    this.cameraYaw = this.player.group.rotation.y;
     this.ui.setCameraView(view.label);
     if (this.running) this.ui.toast(`CAMERA // ${view.label}`);
   }
   dragCamera(deltaX, deltaY) {
-    this.cameraOrbitYaw -= deltaX * .008;
-    this.cameraOrbitPitch = THREE.MathUtils.clamp(this.cameraOrbitPitch - deltaY * .005, -.42, .38);
+    this.cameraYaw -= deltaX * .008;
+    // Drag down = look down at Markie, drag up = level out toward the horizon.
+    this.cameraPitch = THREE.MathUtils.clamp(this.cameraPitch + deltaY * .005, -.42, .38);
   }
 
   getInteraction() {
@@ -288,16 +299,21 @@ export class Game {
   updateCamera() {
     const view = this.cameraModes[this.cameraIndex];
     const up = new THREE.Vector3(0, 1, 0);
-    const yaw = this.player.group.rotation.y + this.cameraOrbitYaw;
-    const playerForward = new THREE.Vector3(0, 0, 1).applyAxisAngle(up, this.player.group.rotation.y);
+    const yaw = this.cameraYaw;
     const offset = view.offset.clone().applyAxisAngle(up, yaw);
     const horizontalDistance = Math.hypot(view.offset.x, view.offset.z);
-    offset.y += this.cameraOrbitPitch * horizontalDistance;
+    offset.y += this.cameraPitch * horizontalDistance;
     this.cameraTarget.copy(this.player.position).add(offset);
     this.camera.position.lerp(this.cameraTarget, view.smooth);
-    this.cameraLook.copy(this.player.position).addScaledVector(playerForward, view.ahead);
-    this.cameraLook.y += view.lookHeight + this.cameraOrbitPitch * 2.2;
+    // Aim a little past Markie along the direction the camera faces, so he stays framed
+    // even when he runs across the screen instead of straight away from the camera.
+    const cameraForward = new THREE.Vector3(0, 0, 1).applyAxisAngle(up, yaw);
+    this.cameraLook.copy(this.player.position).addScaledVector(cameraForward, view.ahead);
+    this.cameraLook.y += view.lookHeight + this.cameraPitch * 2.2;
     this.camera.lookAt(this.cameraLook);
+    // Yaw the player actually sees through — this is the frame stick/key input is read in
+    // (see update), so "up" is exactly up the screen even in the off-centre ACTION VIEW.
+    this.viewYaw = Math.atan2(this.cameraLook.x - this.camera.position.x, this.cameraLook.z - this.camera.position.z);
     const nextFov = this.camera.fov + (view.fov - this.camera.fov) * .12;
     if (Math.abs(nextFov - this.camera.fov) > .01) { this.camera.fov = nextFov; this.camera.updateProjectionMatrix(); }
   }
@@ -315,6 +331,9 @@ export class Game {
     return this.npcs.tenneh.position;
   }
   update(delta) {
+    // Stick/keys are read in the camera's frame (see InputManager.getMovement), using the
+    // yaw the player can actually see, so up/right on the pad are up/right on screen.
+    this.input.setCameraYaw(this.viewYaw ?? this.cameraYaw);
     this.player.update(delta, this.input, this.physics, this.time);
     for (const scrap of this.scrap) { if (!scrap.userData.collected) { scrap.position.y = scrap.userData.baseY + Math.sin(this.time * 2 + scrap.userData.phase) * .11; scrap.rotation.y += delta * .85; } }
     // ledger hover

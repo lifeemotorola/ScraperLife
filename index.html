@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1" />
     <meta name="theme-color" content="#101a1c" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -79,18 +79,21 @@
         <span><kbd>C</kbd> <b id="camera-label">WIDE VIEW</b></span>
       </footer>
 
-      <section id="mobile-controller" class="mobile-controller" aria-label="Android touch controller">
+      <!-- Touch gamepad: left thumb walks, right thumb acts, system keys stay up top. -->
+      <section id="mobile-controller" class="mobile-controller" aria-label="Touch controller">
         <div id="joystick-zone" class="joystick-zone" aria-label="Move Markie">
           <div id="joystick-base" class="joystick-base"><i id="joystick-knob" class="joystick-knob"></i></div>
-          <span>MOVE</span>
+          <span class="joystick-label">MOVE</span>
         </div>
-        <div class="mobile-actions">
+        <div class="mobile-actions" aria-label="Actions">
           <button id="touch-run" class="touch-button touch-run" aria-label="Hold to run">RUN</button>
-          <button id="touch-camera" class="touch-button touch-camera" aria-label="Change camera view">CAM</button>
-          <button id="touch-map" class="touch-button touch-map" aria-label="Open map">MAP</button>
-          <button id="touch-voice" class="touch-button touch-voice" aria-label="Toggle character voices">VOX</button>
           <button id="touch-pulse" class="touch-button touch-pulse" aria-label="Use Scrap Pulse">PULSE</button>
           <button id="touch-interact" class="touch-button touch-use" aria-label="Interact">USE</button>
+        </div>
+        <div class="mobile-system" aria-label="System">
+          <button id="touch-camera" class="touch-button touch-camera" aria-label="Change camera view">CAM</button>
+          <button id="touch-voice" class="touch-button touch-voice" aria-label="Toggle character voices">VOX</button>
+          <button id="touch-map" class="touch-button touch-map" aria-label="Open map">MAP</button>
         </div>
       </section>
     </div>
