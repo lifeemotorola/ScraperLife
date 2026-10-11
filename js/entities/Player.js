@@ -36,6 +36,11 @@ export class Player {
     this.group.position.copy(spawn);
     this.fallback = makeHumanoid(0x31595b, 0xe2a071, { backpack: true });
     this.group.add(this.fallback);
+    // Which playable character this player wears (multiplayer picks; Markie by default).
+    this.characterId = 'markie';
+    this.sharedRig = null;
+    this.paletteData = null;
+    this.instance = null;
     this.lastSafe = spawn.clone();
     this.glow = new THREE.PointLight(0x75c5bb, .55, 5);
     this.glow.position.set(0, 2, 0); this.group.add(this.glow);
@@ -97,13 +102,9 @@ export class Player {
       loadSharedCharacter(url, { manifest }),
       Promise.resolve(palettes).catch(() => null),
     ]).then(([shared, paletteData]) => {
-      const palette = paletteData?.characters?.markie || null;
-      const instance = instantiateCharacter(shared, { palette, paletteData, cull: false });
-      this.fallback.visible = false;
-      this.model = instance.root;
-      this.materials = instance.materials;
-      this.animator = instance.animator?.hasClips ? instance.animator : null;
-      this.group.add(instance.root);
+      this.sharedRig = shared;
+      this.paletteData = paletteData;
+      this.installCharacter();
       onReady?.(this.getCharacterHeight());
     }).catch(() => {
       if (fallback) fallback();
@@ -112,6 +113,34 @@ export class Player {
         onReady?.(this.getCharacterHeight());
       }
     });
+  }
+
+  // Puts the body for `this.characterId` on the group, replacing any body already there. Returns
+  // false until the shared rig has loaded; loadGLB calls it again when the rig arrives, so a pick
+  // made during loading still applies.
+  installCharacter() {
+    if (!this.sharedRig) return false;
+    const palette = this.paletteData?.characters?.[this.characterId] || null;
+    if (this.instance) {
+      this.group.remove(this.instance.root);
+      for (const list of this.instance.materials?.values?.() || []) {
+        for (const material of list) material?.dispose?.();
+      }
+    }
+    const instance = instantiateCharacter(this.sharedRig, { palette, paletteData: this.paletteData, cull: false });
+    this.instance = instance;
+    this.fallback.visible = false;
+    this.model = instance.root;
+    this.materials = instance.materials;
+    this.animator = instance.animator?.hasClips ? instance.animator : null;
+    this.group.add(instance.root);
+    return true;
+  }
+
+  // Multiplayer: change which character this player is. Position and story progress are untouched.
+  setCharacter(characterId) {
+    this.characterId = characterId;
+    return this.installCharacter();
   }
 
   // One-shot reaction ("pulse", "hit", "interact", "celebrate"); no-ops on a model with no clips.

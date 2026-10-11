@@ -50,6 +50,20 @@
         <span class="map-platform-badge">PLATFORM MAP</span>
       </section>
 
+      <aside id="session-roster" class="session-roster glass hidden" aria-label="Players in this session">
+        <div class="roster-head"><span class="panel-heading">SESSION <b id="roster-code"></b></span><span id="roster-count">1/9</span></div>
+        <ul id="roster-list" class="roster-list"></ul>
+        <div class="roster-foot"><span id="roster-status" class="roster-status"></span><button id="session-wave" type="button" class="roster-wave">WAVE</button></div>
+      </aside>
+
+      <section id="session-chat" class="session-chat glass hidden" aria-label="Session chat">
+        <div id="chat-log" class="chat-log" aria-live="polite"></div>
+        <form id="chat-form" class="chat-form">
+          <input id="chat-input" maxlength="240" placeholder="Press ENTER to chat" autocomplete="off" aria-label="Chat message" />
+          <button type="submit" class="chat-send">SEND</button>
+        </form>
+      </section>
+
       <div id="interaction" class="interaction hidden"><kbd>E</kbd><span id="interaction-text">PICK UP SCRAP</span></div>
       <div id="toast" class="toast hidden"></div>
       <div id="subtitle" class="subtitle hidden"></div>
@@ -68,6 +82,7 @@
         <div class="mobile-system" aria-label="System controls">
           <button id="touch-camera" class="touch-button touch-camera" type="button" aria-label="Change camera view">CAM</button>
           <button id="touch-map" class="touch-button touch-map" type="button" aria-label="Open map">MAP</button>
+          <button id="chat-toggle" class="touch-button touch-chat hidden" type="button" aria-label="Open session chat">CHAT</button>
         </div>
       </section>
     </div>
@@ -92,6 +107,7 @@
             <div class="settings-row"><kbd>E</kbd><span>Interact</span></div>
             <div class="settings-row"><kbd>DRAG</kbd><span>Look around</span></div>
             <div class="settings-row"><kbd>C</kbd><span>Cycle camera <small id="camera-label">WIDE VIEW</small></span></div>
+            <div class="settings-row"><kbd>ENTER</kbd><span>Chat with your session</span></div>
             <div class="settings-row"><kbd>M</kbd><span>Open / close map</span></div>
             <div class="settings-row"><kbd>V</kbd><span>Toggle character voices</span></div>
             <div class="settings-row"><kbd>B</kbd><span>Toggle background music</span></div>
@@ -106,6 +122,7 @@
             <div class="settings-row"><kbd>DRAG</kbd><span>Look around</span></div>
             <div class="settings-row"><kbd>CAM</kbd><span>Cycle camera</span></div>
             <div class="settings-row"><kbd>MAP</kbd><span>Open the platform map</span></div>
+            <div class="settings-row"><kbd>CHAT</kbd><span>Chat with your session</span></div>
           </section>
 
           <section class="settings-section settings-audio" aria-labelledby="audio-settings-title">
@@ -174,6 +191,39 @@
       </div>
     </div>
 
+    <section id="session-lobby" class="session-lobby hidden" role="dialog" aria-modal="true" aria-labelledby="session-title">
+      <div class="session-card glass">
+        <p class="eyebrow">WATERSIDE // PLAY TOGETHER</p>
+        <h2 id="session-title">SESSION</h2>
+        <p class="session-intro">Everyone in a session walks the same city and sees each other’s characters. Each person picks one character, and nobody else in the session can take it. Your story progress stays yours.</p>
+
+        <div id="session-join" class="session-join">
+          <label class="session-field"><span>YOUR NAME</span><input id="session-name" maxlength="16" placeholder="Player" autocomplete="off" /></label>
+          <button id="session-create" type="button" class="session-primary">CREATE A SESSION</button>
+          <div class="session-or"><span>or join one</span></div>
+          <div class="session-join-row">
+            <input id="session-code" maxlength="6" placeholder="CODE" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Session code" />
+            <button id="session-join-button" type="button">JOIN</button>
+          </div>
+        </div>
+
+        <div id="session-room" class="session-room hidden">
+          <div class="session-code-row"><span>SESSION CODE</span><b id="session-code-display">------</b><button id="session-copy" type="button">COPY LINK</button></div>
+          <h3>CHOOSE YOUR CHARACTER</h3>
+          <div id="character-grid" class="character-grid"></div>
+          <p id="session-members" class="session-members"></p>
+          <p id="session-hint" class="session-hint"></p>
+          <div class="session-footer">
+            <button id="session-leave" type="button" class="ghost">LEAVE</button>
+            <button id="session-start" type="button" class="session-primary" disabled>START TOGETHER</button>
+          </div>
+        </div>
+
+        <p id="session-error" class="session-error hidden" role="alert"></p>
+        <button id="session-back" type="button" class="session-back">← BACK</button>
+      </div>
+    </section>
+
     <main id="intro" class="overlay">
       <div class="intro-noise"></div>
       <section class="intro-card">
@@ -182,7 +232,8 @@
         <p class="intro-copy">Markie Kollie has spent years carrying the silence left by his parents’ deaths. In the streets of Monrovia, a broken radio may finally lead him to the truth.</p>
         <div class="cast"><span>MARKIE KOLLIE</span><i></i><span>OLD MAN KOLLIE</span><i></i><span>TENNEH</span></div>
         <button id="start-button">START THE JOURNEY <b>↗</b></button>
-        <p class="fine-print">A playable 3D vertical slice · Original characters and setting · 10-mission platform chain · Expanded 280×190 platform map · Fully voiced characters</p>
+        <button id="play-together-button" class="ghost-button" type="button">PLAY TOGETHER <b>◎</b></button>
+        <p class="fine-print">A playable 3D vertical slice · Original characters and setting · 13-mission platform chain · Expanded 280×190 platform map · Fully voiced characters</p>
       </section>
     </main>
 
@@ -191,7 +242,7 @@
         <p class="eyebrow">JOB COMPLETE</p>
         <h2>THE CITY<br /><em>REMEMBERS.</em></h2>
         <p class="intro-copy" id="complete-copy">Old Man Kollie has named Vardee and Kormah. Tenneh knows the market is watching. Markie has his first real lead—and the city is only getting louder.</p>
-        <div class="completion-stats"><div><b id="final-scrap">7</b><span>SCRAP SAVED</span></div><div><b>02</b><span>NAMES UNCOVERED</span></div><div><b id="final-missions">09</b><span>MISSIONS</span></div></div>
+        <div class="completion-stats"><div><b id="final-scrap">7</b><span>SCRAP SAVED</span></div><div><b>02</b><span>NAMES UNCOVERED</span></div><div><b id="final-missions">13</b><span>MISSIONS</span></div></div>
         <button id="restart-button">PLAY AGAIN <b>↻</b></button>
       </section>
     </main>

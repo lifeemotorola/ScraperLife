@@ -1,3 +1,5 @@
+import { isEditableTarget } from './InputManager.js';
+
 export class UIManager {
   constructor() {
     const $ = (id) => document.getElementById(id);
@@ -44,6 +46,8 @@ export class UIManager {
     });
     this.el.touchMap?.addEventListener('click', () => this.toggleWorldMap());
     window.addEventListener('keydown', (event) => {
+      // Typing a name or code must not open the map.
+      if (isEditableTarget(event.target)) return;
       if (event.key === 'Escape') {
         if (this.settingsOpen) { event.preventDefault(); this.closeSettings(); return; }
         if (this.worldMapOpen) { event.preventDefault(); this.closeMap(); return; }
@@ -57,6 +61,7 @@ export class UIManager {
     const flip = () => this.setVoiceState(onToggle());
     this.el.voiceToggle?.addEventListener('click', (event) => { event.preventDefault(); flip(); });
     window.addEventListener('keydown', (event) => {
+      if (isEditableTarget(event.target)) return;
       if (event.repeat || event.key.toLowerCase() !== 'v') return;
       flip();
     });
@@ -71,6 +76,7 @@ export class UIManager {
     const flip = () => this.setMusicState(onToggle());
     this.el.musicToggle?.addEventListener('click', (event) => { event.preventDefault(); flip(); });
     window.addEventListener('keydown', (event) => {
+      if (isEditableTarget(event.target)) return;
       if (event.repeat || event.key.toLowerCase() !== 'b') return;
       flip();
     });
@@ -118,6 +124,45 @@ export class UIManager {
     this.el.progressLabel.textContent = mission.progress(scrap);
     this.el.progressBar.style.width = `${mission.percent(scrap)}%`;
   }
+  // Other players as dots on the minimap and the expanded map. Dots are created on demand and
+  // removed when that player leaves; positions use the same mapping as Markie's marker.
+  setRemoteDots(players) {
+    const B = this.worldBounds;
+    const range = B * 2;
+    const minimap = this.el.mapPlayer?.parentElement;
+    const grid = document.getElementById('world-map-grid');
+    if (!this.remoteDots) this.remoteDots = new Map();
+    const seen = new Set();
+    for (const player of players) {
+      seen.add(player.id);
+      let dots = this.remoteDots.get(player.id);
+      if (!dots) {
+        const mini = document.createElement('i');
+        mini.className = 'map-remote';
+        const world = document.createElement('div');
+        world.className = 'world-map-point remote';
+        const pin = document.createElement('b');
+        const label = document.createElement('span');
+        world.append(pin, label);
+        minimap?.append(mini);
+        grid?.append(world);
+        dots = { mini, world, label };
+        this.remoteDots.set(player.id, dots);
+      }
+      const left = `${((player.x + B) / range) * 100}%`;
+      const top = `${((player.z + B) / range) * 100}%`;
+      dots.mini.style.left = left; dots.mini.style.top = top;
+      dots.world.style.left = left; dots.world.style.top = top;
+      dots.label.textContent = `${player.name.toUpperCase()} · ${(player.characterId || '').toUpperCase()}`;
+    }
+    for (const [id, dots] of this.remoteDots) {
+      if (seen.has(id)) continue;
+      dots.mini.remove();
+      dots.world.remove();
+      this.remoteDots.delete(id);
+    }
+  }
+
   updateStatus({ resolve, pulse, player, target, missionTitle, npcs = null }) {
     this.el.resolveBar.style.width = `${resolve}%`;
     this.el.resolveNumber.textContent = Math.ceil(resolve);

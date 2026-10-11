@@ -20,6 +20,10 @@ import { SoundEffectsSystem } from '../systems/SoundEffectsSystem.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { InventorySystem } from '../systems/InventorySystem.js';
 import { DIALOGUE } from '../data/dialogues.js';
+import { PortraitStudio } from '../multiplayer/Portraits.js';
+import { RemotePlayers, SpeechBubbleSlot, characterName } from '../multiplayer/RemotePlayers.js';
+import { SessionPanel } from '../multiplayer/SessionPanel.js';
+import { MAX_MEMBERS } from '../../shared/session-protocol.js';
 
 // Camera rigs, expressed as an offset from Markie. Negative Z is BEHIND him, so the
 // camera looks the way he is heading and "up" on the stick always walks away from the
@@ -183,6 +187,7 @@ export class Game {
     this.ui.setCameraView(this.cameraModes[this.cameraIndex].label);
     window.addEventListener('resize', () => this.resize());
     this.updateQuest();
+    this.multiplayerInit();
     this.animate();
   }
 
@@ -251,6 +256,82 @@ export class Game {
     return scrap;
   }
 
+  // Multiplayer: presence only. Other players see where this player is, what they look like, what
+  // they say and how they gesture. Missions, scrap and NPC state stay on this player's own game.
+  multiplayerInit() {
+    this.remote = new RemotePlayers(this.scene, { height: this.player.getCharacterHeight() });
+    this.ownBubble = new SpeechBubbleSlot(this.player.group, 0x75c5bb, this.player.getCharacterHeight());
+    this.portraits = new PortraitStudio();
+    this.presence = { timer: 0, last: null, lastSent: -10 };
+    this.session = null;
+    this.sessionPanel = new SessionPanel({
+      portraits: this.portraits,
+      getAssets: () => Promise.all([this.sharedCharacterPromise, this.characterPalettesPromise])
+        .then(([shared, palettes]) => ({ shared, palettes })),
+      hooks: {
+        onRoster: (members, me) => this.remote.syncRoster(members, me?.id),
+        onState: (state) => this.remote.applyState(state),
+        onChat: (message, isMe) => {
+          if (isMe) this.ownBubble.say(message.text, 6);
+          else this.remote.say(message.id, message.text, 6);
+        },
+        onGesture: (message) => this.remote.gesture(message.id, message.name),
+        onWaveSelf: () => this.player.play('celebrate'),
+        onStart: (info) => this.startSession(info),
+      },
+    });
+    Promise.all([this.sharedCharacterPromise, this.characterPalettesPromise])
+      .then(([shared, palettes]) => this.remote.setRig(shared, palettes))
+      .catch(() => { /* placeholders stay if the rig fails; the game already warned */ });
+  }
+
+  // Starts the game as the character the player picked in the session lobby.
+  startSession({ code, characterId, name, seat }) {
+    this.session = { code, characterId, name };
+    this.player.setCharacter(characterId);
+    // Own nameplate/HUD label follows the picked character; the story itself stays the same.
+    const label = document.querySelector('.status-row span');
+    if (label) label.textContent = characterName(characterId).toUpperCase();
+    // Players start spread around the same spot instead of stacking on one another.
+    const angle = ((seat ?? 0) / MAX_MEMBERS) * Math.PI * 2;
+    const spot = this.physics.findFree(new THREE.Vector3(-16 + Math.cos(angle) * 2.6, 0, 10 + Math.sin(angle) * 2.6));
+    this.player.position.copy(spot);
+    this.player.lastSafe.copy(spot);
+    this.start();
+    this.ui.toast(`SESSION ${code} // PLAYING AS ${characterName(characterId).toUpperCase()}`);
+  }
+
+  // Sends this player's position to the session at most 10 times a second, and only when it changed.
+  syncPresence(delta) {
+    const client = this.sessionPanel?.client;
+    if (!this.session || !client?.connected) return;
+    this.presence.timer += delta;
+    if (this.presence.timer < 0.1) return;
+    this.presence.timer = 0;
+    const position = this.player.position;
+    const facing = this.player.group.rotation.y;
+    const movement = this.input.getMovement();
+    const state = {
+      x: position.x,
+      z: position.z,
+      f: facing,
+      m: movement.x || movement.z ? 1 : 0,
+      r: movement.running ? 1 : 0,
+    };
+    const last = this.presence.last;
+    const turned = last ? Math.abs(Math.atan2(Math.sin(facing - last.f), Math.cos(facing - last.f))) > 0.03 : true;
+    const moved = !last || Math.hypot(state.x - last.x, state.z - last.z) > 0.02 || turned || state.m !== last.m || state.r !== last.r;
+    const stale = this.time - this.presence.lastSent > 1;
+    if (!moved && !stale) return;
+    client.sendState(state);
+    this.presence.last = state;
+    this.presence.lastSent = this.time;
+  }
+
+  refreshRemoteDots() {
+    this.ui.setRemoteDots(this.remote.positions());
+  }
+
   start() {
     this.running = true; this.ui.startGame();
     // Music must begin inside the start-button gesture so mobile browsers permit playback.
@@ -258,7 +339,7 @@ export class Game {
     this.sfx.unlock();
     // Unlocks speech inside the same gesture so the opening line can play over the music.
     this.voice.unlock();
-    this.ui.toast('JOB STARTED // THE WEIGHT OF TRUTH'); this.dialogue.play('opening', 6);
+    this.ui.toast('JOB STARTED // SEVEN PIECES'); this.dialogue.play('opening', 6);
   }
   resize() { this.camera.aspect = innerWidth / innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(innerWidth, innerHeight); }
   cycleCamera() {
@@ -293,11 +374,13 @@ export class Game {
     }
     else if (this.missions.is('docks') && this.npcs.boakai.distanceTo(this.player.position) < 2.8) closest = { type: 'boakai', text: 'TALK TO BOAKAI — DOCKS' };
     else if (this.missions.is('boakai') && this.npcs.boakai.distanceTo(this.player.position) < 2.5) closest = { type: 'boakai2', text: 'ASK ABOUT WAREHOUSE 6' };
-    else if (this.missions.is('warehouse') || this.missions.is('boakai')) {
+    else if (this.missions.is('rival') && this.npcs.jallah.distanceTo(this.player.position) < 2.8) closest = { type: 'jallah', text: 'ASK JALLAH ABOUT THE ROAD' };
+    else if (this.missions.is('warehouse')) {
       const ledgerDist = this.player.position.distanceTo(this.city.ledgerPos);
-      if (ledgerDist < 2.6) closest = { type: 'ledger', text: this.missions.is('warehouse') ? 'RETRIEVE RUSTED LEDGER' : 'INVESTIGATE WAREHOUSE 6' };
-      // also catch Boakai if warehouse phase but close to him
+      if (ledgerDist < 2.6) closest = { type: 'ledger', text: 'RETRIEVE RUSTED LEDGER' };
     }
+    else if (this.missions.is('copies') && this.npcs.boakai.distanceTo(this.player.position) < 2.8) closest = { type: 'boakai_copies', text: 'HAVE BOAKAI COPY THE LEDGER' };
+    else if (this.missions.is('loose_end') && this.npcs.togar.distanceTo(this.player.position) < 2.8) closest = { type: 'togar', text: 'TALK TO TOGAR' };
     else if (this.missions.is('vardee') && this.npcs.vardee.distanceTo(this.player.position) < 2.8) closest = { type: 'vardee', text: 'CONFRONT VARDEE' };
     else if (this.missions.is('finale') && this.npcs.tenneh.distanceTo(this.player.position) < 2.8) closest = { type: 'finale', text: 'DELIVER LEDGER TO TENNEH' };
     else if (this.missions.is('finale') && this.npcs.sia.distanceTo(this.player.position) < 2.2) closest = { type: 'finale_sia', text: 'REASSURE SIA' };
@@ -345,21 +428,19 @@ export class Game {
       }
     } else if (hit.type === 'boakai' && this.missions.speakWithBoakai()) {
       this.ui.toast('BOAKAI: WAREHOUSE 6 HOLDS THE PROOF'); this.dialogue.play('boakai', 6); this.updateQuest();
-      // Immediately push to warehouse phase after acknowledging
-      setTimeout(() => { if (this.missions.enterWarehouse()) { this.ui.toast('OBJECTIVE // ENTER WAREHOUSE 6'); this.updateQuest(); } }, 1200);
-    } else if (hit.type === 'boakai2' && this.missions.enterWarehouse()) {
-      this.ui.toast('WAREHOUSE 6 // LEDGER INSIDE'); this.updateQuest();
-      this.dialogue.playConversation(['boakai', 'boakaiProof'], null, { boakai: 6, boakaiProof: 7 });
+    } else if (hit.type === 'boakai2' && this.missions.askBoakaiLocation()) {
+      // Boakai gives the location, then the road to Warehouse 6 runs through Jallah.
+      this.ui.toast('OBJECTIVE // FIND JALLAH ON THE OLD HARBOR ROAD'); this.updateQuest();
+      this.dialogue.playText(DIALOGUE.boakaiLocation, 7, 'boakaiLocation');
+    } else if (hit.type === 'jallah' && this.missions.speakWithJallah()) {
+      this.ui.toast('JALLAH: THE ROAD TO WAREHOUSE 6'); this.updateQuest();
+      this.dialogue.playConversation(['jallahWarehouse', 'jallahNight'], null, { jallahWarehouse: 6, jallahNight: 7 });
     } else if (hit.type === 'ledger') {
-      // Ledger pickup: supports both boakai->warehouse entry and warehouse->vardee collection
-      if (this.missions.is('boakai') && this.missions.enterWarehouse()) {
-        this.ui.toast('ENTERED WAREHOUSE 6 // SEARCHING...'); this.updateQuest();
-        setTimeout(() => this.tryCollectLedger(), 600);
-      } else if (this.missions.is('warehouse')) {
-        this.tryCollectLedger();
-      } else if (this.missions.is('boakai')) {
-        this.tryCollectLedger();
-      }
+      this.tryCollectLedger();
+    } else if (hit.type === 'boakai_copies' && this.missions.makeCopies()) {
+      // Every page is copied by hand; Kormah's warning arrives the same day.
+      this.ui.toast('COPIES MADE // KORMAH IS WATCHING'); this.updateQuest();
+      this.dialogue.playConversation(['boakaiProof', 'kormah'], null, { boakaiProof: 7, kormah: 6 });
     } else if (hit.type === 'vardee' && this.missions.confrontVardee()) {
       this.ui.toast('VARDEE CONFRONTED // TRUTH HAS A PRICE'); this.updateQuest();
       // A three-voice standoff: Vardee threatens, Togar warns, Markie stands his ground.
@@ -369,6 +450,9 @@ export class Game {
         { vardeeConfront: 6, togarWarning: 5, markieResolve: 6 },
       );
       this.city.ledger?.light && (this.city.ledger.light.intensity = 0);
+    } else if (hit.type === 'togar' && this.missions.speakWithTogar()) {
+      this.ui.toast('TOGAR: THE RUNNER’S SLIPS // TAKE THEM TO THE MARKET'); this.updateQuest();
+      this.dialogue.playText(DIALOGUE.togarSlips, 8, 'togarSlips');
     } else if ((hit.type === 'finale' || hit.type === 'finale_sia') && this.missions.speakWithTenneh()) {
       // finale -> finale_complete is handled via MissionSystem speakWithTenneh when in finale
       // Our MissionSystem expects speakWithTenneh for finale as well
@@ -399,7 +483,7 @@ export class Game {
     if (this.missions.collectLedger()) {
       this.sfx.play('pickup', 0.82);
       this.city.collectLedger();
-      this.ui.toast('LEDGER SECURED // TAKE IT TO VARDEE'); this.dialogue.play('warehouse', 6); this.updateQuest();
+      this.ui.toast('LEDGER SECURED // TAKE COPIES TO BOAKAI'); this.dialogue.play('warehouse', 6); this.updateQuest();
     }
   }
 
@@ -440,9 +524,12 @@ export class Game {
     if (this.missions.is('market')) return this.npcs.tenneh.position;
     if (this.missions.is('complete')) return this.npcs.tenneh.position;
     if (this.missions.is('docks')) return this.npcs.boakai.position;
-    if (this.missions.is('boakai')) return this.city.warehousePos;
+    if (this.missions.is('boakai')) return this.npcs.boakai.position;
+    if (this.missions.is('rival')) return this.npcs.jallah.position;
     if (this.missions.is('warehouse')) return this.city.ledgerPos;
+    if (this.missions.is('copies')) return this.npcs.boakai.position;
     if (this.missions.is('vardee')) return this.npcs.vardee.position;
+    if (this.missions.is('loose_end')) return this.npcs.togar.position;
     if (this.missions.is('finale')) return this.npcs.tenneh.position;
     if (this.missions.is('gather')) return this.scrap.find((piece) => !piece.userData.collected)?.position || this.city.generatorPosition;
     return this.npcs.tenneh.position;
@@ -473,6 +560,8 @@ export class Game {
       this.city.ledger.ledger.position.y = 1.42 + Math.sin(this.time * 2.5) * 0.07;
     }
     this.crowd.update(delta, this.player.position);
+    this.syncPresence(delta);
+    this.ownBubble.update(delta);
     this.combat.update(delta); this.pulse.update(delta);
     this.enemies.forEach((enemy) => {
       if (enemy.threaten(delta, this.time, this.player.position) && this.combat.takePressure(12)) {
@@ -484,6 +573,8 @@ export class Game {
     });
     this.interaction = this.getInteraction();
     if (this.interaction) this.ui.showInteraction(this.interaction.text); else this.ui.hideInteraction();
+    this.dotTimer = (this.dotTimer || 0) + delta;
+    if (this.dotTimer > 0.1) { this.dotTimer = 0; this.refreshRemoteDots(); }
     this.ui.updateStatus({
       resolve: this.combat.resolve,
       pulse: this.pulse.charge,
@@ -503,6 +594,7 @@ export class Game {
     requestAnimationFrame(() => this.animate());
     const delta = Math.min(this.clock.getDelta(), .05); this.time += delta;
     const climate = this.climate.update(delta, this.player.position);
+    this.remote?.update(delta, this.time);
     this.ui.updateWorldInfo(climate);
     if (climate.changed && this.running) this.ui.toast(`CLIMATE SHIFT // ${climate.label}`);
     if (this.running) this.update(delta);

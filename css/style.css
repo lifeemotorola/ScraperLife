@@ -197,3 +197,113 @@ body { font-family:Outfit,Arial,sans-serif; }
 #fatal-overlay code{font:500 12px/1.6 'DM Mono',monospace;color:var(--teal);background:rgba(117,197,187,.08);border:1px solid rgba(117,197,187,.2);padding:3px 7px;border-radius:2px;word-break:break-all}
 #fatal-overlay .fatal-hint{color:#a5b8ae;font-size:11px}
 #fatal-overlay button{margin-top:14px}
+
+/* ---------------------------------------------------------------------------
+   Play together: session lobby, character picker, roster, chat, remote map dots.
+   --------------------------------------------------------------------------- */
+.ghost-button { margin-top:12px; padding:11px 16px; background:transparent; border:1px solid rgba(117,197,187,.5); color:var(--teal); font:700 11px/1 'DM Mono',monospace; letter-spacing:.14em; cursor:pointer; display:flex; align-items:center; gap:10px; }
+.ghost-button:hover { background:rgba(117,197,187,.12); color:#d8f5ee; transform:translateY(-1px); }
+.ghost-button b { font-weight:700; }
+
+.session-lobby { position:fixed; inset:0; z-index:14; display:flex; align-items:center; justify-content:center; padding:18px; background:radial-gradient(ellipse at 50% 40%,rgba(25,68,67,.3),rgba(4,10,11,.94) 70%); overflow-y:auto; }
+.session-card { width:min(94vw,700px); max-height:calc(100vh - 36px); overflow-y:auto; padding:22px 24px; position:relative; border-top:3px solid var(--teal); }
+.session-card h2 { margin:6px 0 8px; color:var(--cream); font:800 clamp(30px,5vw,44px)/.9 'Barlow Condensed'; letter-spacing:.03em; text-transform:uppercase; }
+.session-card h3 { margin:16px 0 8px; color:#b6c3bb; font:500 10px/1 'DM Mono',monospace; letter-spacing:.14em; }
+.session-intro { margin:0 0 16px; color:#c5cec4; font:400 14px/1.5 Outfit,Arial,sans-serif; }
+.session-field { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+.session-field span { color:#b6c3bb; font:500 10px/1 'DM Mono',monospace; letter-spacing:.12em; }
+.session-card input { width:100%; box-sizing:border-box; padding:11px 12px; background:rgba(4,12,13,.7); border:1px solid rgba(117,197,187,.3); color:var(--cream); font:600 15px/1 'DM Mono',monospace; letter-spacing:.08em; outline:none; }
+.session-card input:focus { border-color:var(--teal); box-shadow:0 0 0 2px rgba(117,197,187,.2); }
+.session-primary { width:100%; padding:13px 16px; background:linear-gradient(120deg,#ff7041,#ffb454); border:0; color:#1a100a; font:800 12px/1 'DM Mono',monospace; letter-spacing:.14em; cursor:pointer; }
+.session-primary:disabled { opacity:.42; cursor:not-allowed; }
+.session-primary:not(:disabled):hover { transform:translateY(-1px); filter:brightness(1.06); }
+.session-or { display:flex; align-items:center; gap:10px; margin:16px 0; color:#7f9189; font:500 10px/1 'DM Mono',monospace; letter-spacing:.1em; text-transform:uppercase; }
+.session-or:before,.session-or:after { content:""; flex:1; height:1px; background:rgba(229,244,229,.14); }
+.session-join-row { display:grid; grid-template-columns:1fr auto; gap:10px; }
+.session-join-row input { text-transform:uppercase; }
+.session-join-row button,.session-code-row button,.session-footer .ghost,.session-back,.roster-wave,.chat-send { padding:11px 14px; background:rgba(117,197,187,.12); border:1px solid rgba(117,197,187,.45); color:var(--teal); font:700 11px/1 'DM Mono',monospace; letter-spacing:.12em; cursor:pointer; }
+.session-join-row button:hover,.session-code-row button:hover,.session-footer .ghost:hover,.session-back:hover,.roster-wave:hover,.chat-send:hover { background:rgba(117,197,187,.24); color:#d8f5ee; }
+.session-back { margin-top:14px; border-color:transparent; background:transparent; padding-left:0; color:#9fb1a8; }
+.session-error { margin:14px 0 0; padding:9px 11px; border-left:3px solid var(--orange); background:rgba(255,112,65,.1); color:#ffd1c0; font:500 12px/1.4 'DM Mono',monospace; }
+.session-code-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 14px; background:rgba(4,12,13,.6); border:1px solid rgba(251,179,74,.3); }
+.session-code-row > span { color:#b6c3bb; font:500 10px/1 'DM Mono',monospace; letter-spacing:.12em; }
+.session-code-row b { color:var(--amber); font:800 26px/1 'DM Mono',monospace; letter-spacing:.24em; }
+.session-code-row button { margin-left:auto; }
+.character-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(132px,1fr)); gap:10px; }
+.character-card { display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 8px 9px; background:rgba(4,12,13,.6); border:1px solid rgba(229,244,229,.14); color:var(--cream); cursor:pointer; text-align:center; font:inherit; transition:transform .15s, border-color .15s; }
+.character-card:hover:not(:disabled) { transform:translateY(-2px); border-color:rgba(117,197,187,.6); }
+.character-card.mine { border-color:var(--orange); box-shadow:0 0 0 2px rgba(255,112,65,.25); }
+.character-card.taken { opacity:.45; cursor:not-allowed; }
+.character-card .card-name { font:800 15px/1.1 'Barlow Condensed',sans-serif; letter-spacing:.04em; text-transform:uppercase; }
+.character-card .card-role { color:#9fb1a8; font:500 9px/1.3 'DM Mono',monospace; letter-spacing:.06em; text-transform:uppercase; min-height:24px; }
+.character-card .card-state { color:var(--teal); font:700 9px/1 'DM Mono',monospace; letter-spacing:.1em; }
+.character-card.mine .card-state { color:var(--orange); }
+/* Keep the picked card readable: a dark tint instead of the global orange button fill. */
+.character-card.mine { background:rgba(255,112,65,.14); }
+.character-card.mine .card-role { color:#f1ddd2; }
+.character-card.mine .card-state { color:#ffb49a; }
+.character-card.taken .card-state { color:#e8a183; }
+.session-members { margin:12px 0 0; color:#c5cec4; font:500 11px/1.4 'DM Mono',monospace; }
+.session-hint { margin:8px 0 0; color:var(--teal); font:500 12px/1.4 Outfit,Arial,sans-serif; }
+.session-footer { display:grid; grid-template-columns:auto 1fr; gap:10px; margin-top:16px; }
+.session-footer .ghost { padding:13px 16px; }
+
+/* Portraits: the close-up renders are the faces people see in the picker and roster. */
+.portrait,.card-portrait,.roster-portrait { display:block; flex:0 0 auto; overflow:hidden; background:radial-gradient(circle at 50% 35%,rgba(117,197,187,.25),rgba(4,12,13,.9)); border:1px solid rgba(229,244,229,.2); }
+.card-portrait { width:104px; height:104px; }
+.roster-portrait { width:52px; height:52px; border-radius:2px; }
+.portrait img,.card-portrait img,.roster-portrait img { display:block; width:100%; height:100%; object-fit:cover; }
+.portrait-empty { display:flex; align-items:center; justify-content:center; color:var(--teal); font:800 30px/1 'Barlow Condensed',sans-serif; }
+.roster-portrait.portrait-empty { font-size:20px; }
+
+/* In-game roster, top right (below the settings button). */
+.session-roster { position:absolute; top:84px; right:31px; width:248px; padding:11px 12px; pointer-events:auto; border-left:3px solid var(--teal); }
+.roster-head { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:9px; }
+.roster-head b { color:var(--amber); font:700 10px/1 'DM Mono',monospace; letter-spacing:.14em; margin-left:4px; }
+.roster-head > span:last-child { color:#c5cec4; font:600 10px/1 'DM Mono',monospace; }
+.roster-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; max-height:330px; overflow:auto; }
+.roster-item { display:flex; align-items:center; gap:10px; padding:5px; background:rgba(4,12,13,.4); border:1px solid rgba(229,244,229,.08); }
+.roster-item.me { border-color:rgba(255,112,65,.55); }
+.roster-text { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.roster-text b { color:var(--cream); font:700 13px/1.1 'Barlow Condensed',sans-serif; letter-spacing:.03em; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.roster-text small { color:#9fb1a8; font:500 9px/1.2 'DM Mono',monospace; letter-spacing:.05em; text-transform:uppercase; }
+.roster-foot { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:9px; }
+.roster-status { color:#e8a183; font:600 9px/1.2 'DM Mono',monospace; letter-spacing:.06em; }
+.roster-wave { padding:7px 10px; font-size:10px; }
+
+/* Chat, bottom left (desktop). */
+.session-chat { position:absolute; left:32px; bottom:28px; width:340px; padding:10px; pointer-events:auto; border-left:3px solid var(--amber); }
+.chat-log { height:170px; overflow-y:auto; display:flex; flex-direction:column; gap:5px; padding-right:4px; margin-bottom:8px; }
+.chat-line { margin:0; color:#e5e8dd; font:500 12px/1.4 Outfit,Arial,sans-serif; word-break:break-word; }
+.chat-line b { color:var(--amber); font-weight:700; }
+.chat-line.me b { color:var(--orange); }
+.chat-line.system { color:#9fb1a8; font:500 10px/1.4 'DM Mono',monospace; }
+.chat-form { display:grid; grid-template-columns:1fr auto; gap:8px; }
+.chat-form input { padding:9px 10px; background:rgba(4,12,13,.7); border:1px solid rgba(117,197,187,.3); color:var(--cream); font:500 12px/1 'DM Mono',monospace; outline:none; }
+.chat-form input:focus { border-color:var(--teal); }
+.chat-send { padding:9px 12px; }
+
+/* Remote players on the minimap and the expanded map. */
+.map-remote { position:absolute; z-index:2; width:7px; height:7px; border-radius:50%; background:#ffb454; border:1px solid #1a2426; transform:translate(-50%,-50%); box-shadow:0 0 6px rgba(255,180,84,.7); }
+.world-map-point.remote b { background:#ffb454; color:#ffb454; box-shadow:0 0 10px #ffb454; }
+
+@media (max-width: 900px) {
+  .session-roster { width:196px; }
+  .roster-list { max-height:260px; }
+  .session-card { padding:16px; }
+  .character-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+  .card-portrait { width:84px; height:84px; }
+}
+
+/* Touch screens: chat folds away behind the CHAT key so it does not cover the thumb controls. */
+@media (pointer: coarse), (hover: none) {
+  .session-roster { top:max(74px, calc(env(safe-area-inset-top) + 70px)); width:176px; }
+  .roster-list { max-height:190px; }
+  .roster-portrait { width:40px; height:40px; }
+  .roster-text b { font-size:12px; }
+  .session-chat { left:12px; right:12px; width:auto; bottom:calc(max(12px, env(safe-area-inset-bottom)) + 150px); display:none; }
+  .session-chat.open { display:block; }
+  .chat-log { height:110px; }
+  .touch-chat { position:static; width:52px; height:52px; font-size:10px; pointer-events:auto; }
+  .touch-chat.active { border-color:rgba(255,180,84,.7); }
+}
