@@ -1,19 +1,40 @@
 // The streets of Waterside speak back. VoiceSystem plays real recorded voice lines for
-// every character (assets/audio/*.mp3). If a clip is missing, blocked, or fails to load,
-// the line falls back to the browser's speech synthesis with per-character profiles, so
-// the conversation never goes silent.
-const PROFILES = {
-  MARKIE: { gender: 'male', pitch: 1.0, rate: 1.0 },
-  'OLD MAN KOLLIE': { gender: 'male', pitch: 0.7, rate: 0.85 },
-  TENNEH: { gender: 'female', pitch: 1.08, rate: 0.97 },
-  FLOMO: { gender: 'male', pitch: 1.14, rate: 1.08 },
-  VARDEE: { gender: 'male', pitch: 0.6, rate: 0.9 },
-  BOAKAI: { gender: 'male', pitch: 0.84, rate: 0.95 },
-  SIA: { gender: 'female', pitch: 1.4, rate: 1.06 },
-  GARMAI: { gender: 'female', pitch: 0.92, rate: 0.88 },
-  TOGAR: { gender: 'male', pitch: 0.74, rate: 0.92 },
-  JALLAH: { gender: 'male', pitch: 0.96, rate: 1.02 },
+// every character (assets/audio/*.mp3). Anything without a clip — the ambient street talk,
+// the Season One draft beats, or a blocked/failed download — falls back to the browser's
+// speech synthesis, and there every character on the platform keeps a voice of their own:
+// a per-character pitch/rate profile (PROFILES below) plus a distinct system voice dealt
+// out deterministically (dealVoices), so no two residents ever sound alike — even on a
+// browser that only ships one or two voices.
+
+// One voice per speaker tag the game can produce — every character walking the platform,
+// plus the narrator for untagged lines and Musu, whose flashback palette already ships.
+// Key ORDER is load-bearing: when a browser offers only a few system voices the deal in
+// dealVoices walks this order, so the story cast is guaranteed a voice before the narrator,
+// and Vardee's watch comes last. Within a gender every (pitch, rate) pair is unique, so
+// even two characters forced to share one system voice never sound alike.
+export const PROFILES = {
+  // The story cast, in the order the player hears them.
+  MARKIE: { gender: 'male', pitch: 1.0, rate: 1.0 },            // the player: neutral, present
+  'OLD MAN KOLLIE': { gender: 'male', pitch: 0.7, rate: 0.85 },  // elder: low, unhurried
+  TENNEH: { gender: 'female', pitch: 1.08, rate: 0.97 },        // market woman: warm, direct
+  FLOMO: { gender: 'male', pitch: 1.14, rate: 1.08 },           // best friend: quick, excitable
+  SIA: { gender: 'female', pitch: 1.4, rate: 1.06 },            // street kid: bright, fast
+  GARMAI: { gender: 'female', pitch: 0.92, rate: 0.88 },        // broker: low, deliberate
+  BOAKAI: { gender: 'male', pitch: 0.84, rate: 0.95 },          // fixer: measured
+  JALLAH: { gender: 'male', pitch: 0.96, rate: 1.02 },          // rival: level, clipped
+  TOGAR: { gender: 'male', pitch: 0.74, rate: 0.92 },           // enforcer: low, wary
+  VARDEE: { gender: 'male', pitch: 0.6, rate: 0.9 },            // antagonist: the deepest voice on the street
+  KORMAH: { gender: 'male', pitch: 0.78, rate: 0.88 },          // corrupt official: slow, oily
+  // The narrator speaks untagged lines; Musu exists so far only in the flashback palette.
   NARRATOR: { gender: 'female', pitch: 1.0, rate: 0.95 },
+  MUSU: { gender: 'female', pitch: 1.05, rate: 0.9 },           // mother: soft, remembering
+  // Vardee's watch patrols the districts; two of the five are women, so the crew does not
+  // sound like five copies of one man.
+  'EAST WATCH': { gender: 'male', pitch: 0.88, rate: 1.05 },
+  'MARKET WATCH': { gender: 'female', pitch: 1.12, rate: 1.0 },
+  'DOCKS WATCH': { gender: 'male', pitch: 0.66, rate: 0.94 },
+  'HARBOR WATCH': { gender: 'female', pitch: 0.95, rate: 1.1 },
+  'WAREHOUSE WATCH': { gender: 'male', pitch: 1.06, rate: 0.96 },
 };
 
 const FEMALE_HINTS = ['female', 'woman', 'zira', 'hazel', 'susan', 'aria', 'jenny', 'samantha', 'victoria', 'karen', 'moira', 'tessa', 'fiona', 'serena', 'allison', 'sonia', 'libby', 'natasha', 'catherine', 'martha'];
@@ -23,7 +44,7 @@ const MALE_HINTS = ['male', 'david', 'daniel', 'alex', 'fred', 'george', 'james'
 // platforms (notably iOS Safari) that otherwise refuse to play the first voice line.
 const SILENCE_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
 
-function guessGender(voiceName) {
+export function guessGender(voiceName) {
   const name = voiceName.toLowerCase();
   // Check female hints first: "female" contains "male".
   if (FEMALE_HINTS.some((hint) => name.includes(hint))) return 'female';
@@ -31,12 +52,76 @@ function guessGender(voiceName) {
   return null;
 }
 
+// A speaker tag's stable starting point in a candidate ring. Only ever used to pick an
+// index — the same name must always hash the same way, nothing more.
+function hashSpeaker(speaker) {
+  let hash = 0;
+  for (const char of speaker) hash = (hash * 31 + char.charCodeAt(0)) % 997;
+  return hash;
+}
+
+// A system voice's identity. name+lang stays unique on the Android builds that ship
+// several voices under the same voiceURI.
+function voiceKey(voice) { return `${voice.name}::${voice.lang}`; }
+
+// Every speaker tag the game can produce is in PROFILES. Anything else — a character added
+// after this list, a visiting player's display name — still gets a deterministic voice of
+// its own, nudged until it matches no shipped profile, so two speakers never sound alike
+// by accident.
+const derivedProfiles = new Map();
+export function profileFor(speaker) {
+  if (PROFILES[speaker]) return PROFILES[speaker];
+  if (derivedProfiles.has(speaker)) return derivedProfiles.get(speaker);
+  const hash = hashSpeaker(speaker);
+  let pitch = Math.round((0.75 + (hash % 51) / 100) * 100) / 100;   // 0.75 .. 1.25
+  let rate = 0.88 + ((hash * 7) % 23) / 100;                        // 0.88 .. 1.10
+  const taken = Object.values(PROFILES).concat([...derivedProfiles.values()]);
+  while (taken.some((profile) => profile.pitch === pitch && profile.rate === rate)) {
+    pitch = Math.round((pitch + 0.01) * 100) / 100;
+  }
+  const profile = { gender: null, pitch, rate };
+  derivedProfiles.set(speaker, profile);
+  return profile;
+}
+
+// Deal the browser's system voices out to the cast so no two characters share one while
+// supplies last. Each speaker starts at a hash of their name and walks the candidate ring
+// until they reach a voice nobody was dealt; when the browser runs out, they keep the
+// hash-stable pick and stay distinguishable through their pitch/rate profile. The same
+// voice list always produces the same deal. `taken` (a set of voiceKey()s) lets a caller
+// keep an earlier deal exclusive. speakers are roster names looked up in PROFILES, or
+// { speaker, gender } objects for anyone the roster does not know yet.
+export function dealVoices(speakers, voices, taken = new Set()) {
+  const english = voices.filter((voice) => /^en/i.test(voice.lang));
+  const base = english.length ? english : voices;
+  const used = new Set(taken);
+  const map = new Map();
+  for (const entry of speakers) {
+    const speaker = typeof entry === 'string' ? entry : entry.speaker;
+    const gender = typeof entry === 'string' ? PROFILES[speaker]?.gender : entry.gender;
+    const gendered = gender ? base.filter((voice) => guessGender(voice.name) === gender) : [];
+    const candidates = gendered.length ? gendered : base;
+    if (!candidates.length) continue;
+    const start = hashSpeaker(speaker) % candidates.length;
+    let pick = candidates[start];
+    for (let step = 1; step < candidates.length; step += 1) {
+      if (!used.has(voiceKey(pick))) break;
+      pick = candidates[(start + step) % candidates.length];
+    }
+    map.set(speaker, pick);
+    used.add(voiceKey(pick));
+  }
+  return map;
+}
+
 // Dialogue lines carry a speaker tag like `TENNEH: "..."`. Split it off so the subtitle
-// keeps the tag while the spoken line is the character's words only.
+// keeps the tag while the spoken line is the character's words only. Digits are allowed in
+// the tag so numbered crews and visiting players ("WATCH 2", "PLAYER 1") keep their own
+// voice instead of collapsing into the narrator's.
 export function splitSpeaker(line) {
   let text = String(line || '').trim();
   let speaker = 'NARRATOR';
-  const match = text.match(/^([A-Z][A-Z .'’-]*):\s*/);
+  const match = text.match(/^([A-Z][A-Z0-9 .'’-]*):\s*/);
   if (match) {
     speaker = match[1].trim().toUpperCase();
     text = text.slice(match[0].length);
@@ -75,6 +160,12 @@ export class VoiceSystem {
     this.ttsSupported = typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
     this.enabled = true;
     this.voices = [];
+    // The dealt-out system voices: one per speaker, no two speakers sharing while the
+    // browser has enough to go around. Rebuilt whenever the voice list changes (see
+    // pickVoice); until then it stays empty and speak() falls back to the default voice.
+    this.voiceList = null;
+    this.voiceAssignments = new Map();
+    this.voicesTaken = new Set();
     this.pendingTimer = null;
     this.currentAudio = null;
     this.clipGeneration = 0;
@@ -226,16 +317,23 @@ export class VoiceSystem {
   // ---- Speech-synthesis fallback ------------------------------------
 
   pickVoice(speaker, gender) {
-    const pool = this.voices.length ? this.voices : [];
-    if (!pool.length) return null;
-    const english = pool.filter((voice) => /^en/i.test(voice.lang));
-    const base = english.length ? english : pool;
-    const gendered = base.filter((voice) => guessGender(voice.name) === gender);
-    const candidates = gendered.length ? gendered : base;
-    // Deterministic per speaker, so a character keeps the same voice across sessions.
-    let hash = 0;
-    for (const char of speaker) hash = (hash * 31 + char.charCodeAt(0)) % 997;
-    return candidates[hash % candidates.length];
+    if (!this.voices.length) return null;
+    // Chrome fills the voice list asynchronously, so rebuild the deal whenever a new list
+    // arrives. The deal is deterministic, so a rebuild never swaps anyone's voice.
+    if (this.voiceList !== this.voices) {
+      this.voiceList = this.voices;
+      this.voiceAssignments = dealVoices(Object.keys(PROFILES), this.voices);
+      this.voicesTaken = new Set([...this.voiceAssignments.values()].map(voiceKey));
+    }
+    if (this.voiceAssignments.has(speaker)) return this.voiceAssignments.get(speaker);
+    // A speaker outside the roster — a character added later, a visiting player's name —
+    // is still dealt a voice of their own, skipping the ones the cast already owns.
+    const dealt = dealVoices([{ speaker, gender }], this.voices, this.voicesTaken).get(speaker) || null;
+    if (dealt) {
+      this.voiceAssignments.set(speaker, dealt);
+      this.voicesTaken.add(voiceKey(dealt));
+    }
+    return dealt;
   }
 
   speak(line) {
@@ -250,7 +348,7 @@ export class VoiceSystem {
       this.pendingTimer = setTimeout(() => {
         try {
           const utterance = new window.SpeechSynthesisUtterance(text);
-          const profile = PROFILES[speaker] || PROFILES.NARRATOR;
+          const profile = profileFor(speaker);
           utterance.pitch = profile.pitch;
           utterance.rate = profile.rate;
           const voice = this.pickVoice(speaker, profile.gender);

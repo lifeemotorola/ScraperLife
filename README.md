@@ -147,16 +147,34 @@ with `B` or from **Settings** on any device; the preference is saved locally.
 pickups, the scrap pulse, radio repair, interactions, and enemy impacts. It unlocks on **START** for
 mobile browser audio policies; if Web Audio is unavailable, the game continues without effects.
 
+`VoiceSystem` gives every character on the platform a voice of their own. Recorded mp3 lines play
+first; everything else — the ambient street talk, the Season One draft beats, a blocked download —
+falls back to browser speech synthesis, where two things keep the cast distinguishable:
+
+* **A per-character profile** (`PROFILES` in `js/systems/VoiceSystem.js`) — one gender/pitch/rate
+  triple per speaker tag, including Kormah, Musu and all five of Vardee’s watch, who previously
+  borrowed the narrator’s voice. No two profiles are alike, so even on a one-voice browser nobody
+  sounds like anybody else.
+* **A dealt-out system voice** (`dealVoices`) — the browser’s installed voices are handed out
+  deterministically, one per character, walking `PROFILES` order so the story cast is served before
+  the narrator and the watch. A voiceschanged refresh re-deals the same list to the same people,
+  and a speaker the roster does not know yet (a visiting player, a character added later) is still
+  dealt a voice nobody owns, with a derived pitch/rate that matches no shipped profile.
+
+Speaker tags may contain digits (`WATCH 2:`), so numbered crews and visiting players keep their own
+voice instead of collapsing into the narrator’s.
+
 ```bash
 python3 tools/bake_platform_music.py  # regenerate assets/audio/platform-loop.wav
 npm run music                        # same as above
 npm run check:music                  # verify WAV format, duration, and signal level
+npm run check:voices                 # verify the voice roster, the deal, and the speak() path
 ```
 
 ## Checks
 
 ```bash
-npm run check   # controls, touch, rig, cast palettes, HDR, music, SFX, and crowd behavior
+npm run check   # controls, touch, rig, cast palettes, HDR, music, SFX, voices, and crowd behavior
 ```
 
 * `npm run check:controls` — drives the real `InputManager`, `Player` and
@@ -180,5 +198,10 @@ npm run check   # controls, touch, rig, cast palettes, HDR, music, SFX, and crow
 * `npm run check:music` — checks the generated platform loop’s PCM format, duration, and signal level.
 * `npm run check:sfx` — exercises synthesized pickup, pulse, repair, interaction and impact sounds
   against a fake Web Audio graph, including the unsupported-audio fallback.
+* `npm run check:voices` — drives the real `VoiceSystem` against a fake `speechSynthesis` stocked
+  like a desktop browser (and a two-voice one), and asserts every speaker tag the game can produce
+  has a distinct profile, that the dealt system voices are unique per character, gender-matched and
+  stable across refreshes, and that unrecorded lines fall back to the character’s voice — never a
+  shared narrator.
 * `npm run check:crowd` — drives the real `CrowdSystem`/`PhysicsEngine` outside a browser and
   verifies roaming, building collisions, greetings, lectures, replies and pair cooldowns.
