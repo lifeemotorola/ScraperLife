@@ -20,6 +20,10 @@ import { SoundEffectsSystem } from '../systems/SoundEffectsSystem.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { InventorySystem } from '../systems/InventorySystem.js';
 import { DIALOGUE } from '../data/dialogues.js';
+import { PortraitStudio } from '../multiplayer/Portraits.js';
+import { RemotePlayers, SpeechBubbleSlot, characterName } from '../multiplayer/RemotePlayers.js';
+import { SessionPanel } from '../multiplayer/SessionPanel.js';
+import { MAX_MEMBERS } from '../../shared/session-protocol.js';
 
 // Camera rigs, expressed as an offset from Markie. Negative Z is BEHIND him, so the
 // camera looks the way he is heading and "up" on the stick always walks away from the
@@ -183,6 +187,7 @@ export class Game {
     this.ui.setCameraView(this.cameraModes[this.cameraIndex].label);
     window.addEventListener('resize', () => this.resize());
     this.updateQuest();
+    this.multiplayerInit();
     this.animate();
   }
 
@@ -249,6 +254,82 @@ export class Game {
     });
     this.scrapGlow = addGlowPoints(this.scene, glows, { size: 1.6, opacity: .9 });
     return scrap;
+  }
+
+  // Multiplayer: presence only. Other players see where this player is, what they look like, what
+  // they say and how they gesture. Missions, scrap and NPC state stay on this player's own game.
+  multiplayerInit() {
+    this.remote = new RemotePlayers(this.scene, { height: this.player.getCharacterHeight() });
+    this.ownBubble = new SpeechBubbleSlot(this.player.group, 0x75c5bb, this.player.getCharacterHeight());
+    this.portraits = new PortraitStudio();
+    this.presence = { timer: 0, last: null, lastSent: -10 };
+    this.session = null;
+    this.sessionPanel = new SessionPanel({
+      portraits: this.portraits,
+      getAssets: () => Promise.all([this.sharedCharacterPromise, this.characterPalettesPromise])
+        .then(([shared, palettes]) => ({ shared, palettes })),
+      hooks: {
+        onRoster: (members, me) => this.remote.syncRoster(members, me?.id),
+        onState: (state) => this.remote.applyState(state),
+        onChat: (message, isMe) => {
+          if (isMe) this.ownBubble.say(message.text, 6);
+          else this.remote.say(message.id, message.text, 6);
+        },
+        onGesture: (message) => this.remote.gesture(message.id, message.name),
+        onWaveSelf: () => this.player.play('celebrate'),
+        onStart: (info) => this.startSession(info),
+      },
+    });
+    Promise.all([this.sharedCharacterPromise, this.characterPalettesPromise])
+      .then(([shared, palettes]) => this.remote.setRig(shared, palettes))
+      .catch(() => { /* placeholders stay if the rig fails; the game already warned */ });
+  }
+
+  // Starts the game as the character the player picked in the session lobby.
+  startSession({ code, characterId, name, seat }) {
+    this.session = { code, characterId, name };
+    this.player.setCharacter(characterId);
+    // Own nameplate/HUD label follows the picked character; the story itself stays the same.
+    const label = document.querySelector('.status-row span');
+    if (label) label.textContent = characterName(characterId).toUpperCase();
+    // Players start spread around the same spot instead of stacking on one another.
+    const angle = ((seat ?? 0) / MAX_MEMBERS) * Math.PI * 2;
+    const spot = this.physics.findFree(new THREE.Vector3(-16 + Math.cos(angle) * 2.6, 0, 10 + Math.sin(angle) * 2.6));
+    this.player.position.copy(spot);
+    this.player.lastSafe.copy(spot);
+    this.start();
+    this.ui.toast(`SESSION ${code} // PLAYING AS ${characterName(characterId).toUpperCase()}`);
+  }
+
+  // Sends this player's position to the session at most 10 times a second, and only when it changed.
+  syncPresence(delta) {
+    const client = this.sessionPanel?.client;
+    if (!this.session || !client?.connected) return;
+    this.presence.timer += delta;
+    if (this.presence.timer < 0.1) return;
+    this.presence.timer = 0;
+    const position = this.player.position;
+    const facing = this.player.group.rotation.y;
+    const movement = this.input.getMovement();
+    const state = {
+      x: position.x,
+      z: position.z,
+      f: facing,
+      m: movement.x || movement.z ? 1 : 0,
+      r: movement.running ? 1 : 0,
+    };
+    const last = this.presence.last;
+    const turned = last ? Math.abs(Math.atan2(Math.sin(facing - last.f), Math.cos(facing - last.f))) > 0.03 : true;
+    const moved = !last || Math.hypot(state.x - last.x, state.z - last.z) > 0.02 || turned || state.m !== last.m || state.r !== last.r;
+    const stale = this.time - this.presence.lastSent > 1;
+    if (!moved && !stale) return;
+    client.sendState(state);
+    this.presence.last = state;
+    this.presence.lastSent = this.time;
+  }
+
+  refreshRemoteDots() {
+    this.ui.setRemoteDots(this.remote.positions());
   }
 
   start() {
@@ -479,6 +560,8 @@ export class Game {
       this.city.ledger.ledger.position.y = 1.42 + Math.sin(this.time * 2.5) * 0.07;
     }
     this.crowd.update(delta, this.player.position);
+    this.syncPresence(delta);
+    this.ownBubble.update(delta);
     this.combat.update(delta); this.pulse.update(delta);
     this.enemies.forEach((enemy) => {
       if (enemy.threaten(delta, this.time, this.player.position) && this.combat.takePressure(12)) {
@@ -490,6 +573,8 @@ export class Game {
     });
     this.interaction = this.getInteraction();
     if (this.interaction) this.ui.showInteraction(this.interaction.text); else this.ui.hideInteraction();
+    this.dotTimer = (this.dotTimer || 0) + delta;
+    if (this.dotTimer > 0.1) { this.dotTimer = 0; this.refreshRemoteDots(); }
     this.ui.updateStatus({
       resolve: this.combat.resolve,
       pulse: this.pulse.charge,
@@ -509,6 +594,7 @@ export class Game {
     requestAnimationFrame(() => this.animate());
     const delta = Math.min(this.clock.getDelta(), .05); this.time += delta;
     const climate = this.climate.update(delta, this.player.position);
+    this.remote?.update(delta, this.time);
     this.ui.updateWorldInfo(climate);
     if (climate.changed && this.running) this.ui.toast(`CLIMATE SHIFT // ${climate.label}`);
     if (this.running) this.update(delta);

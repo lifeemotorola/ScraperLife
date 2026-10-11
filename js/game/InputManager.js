@@ -1,3 +1,10 @@
+// True for text fields and content-editable areas, where keys belong to the user, not the game.
+export function isEditableTarget(target) {
+  if (!target || typeof target !== 'object') return false;
+  if (target.isContentEditable) return true;
+  return target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT';
+}
+
 export class InputManager {
   constructor({ onInteract, onPulse, onCamera, onLook, element } = {}) {
     this.keys = new Set();
@@ -35,6 +42,8 @@ export class InputManager {
   }
 
   onKeyDown(event) {
+    // Typing in a text field (lobby name, chat) must not walk Markie or eat spaces.
+    if (isEditableTarget(event.target)) return;
     const blocked = ['Space', 'KeyE', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
     if (this.isUiModalOpen()) {
       const gameKeys = [...blocked, 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyC', 'ShiftLeft', 'ShiftRight'];
@@ -50,7 +59,10 @@ export class InputManager {
     if (event.code === 'KeyC') this.handlers.onCamera?.();
   }
 
-  onKeyUp(event) { this.keys.delete(event.code); }
+  onKeyUp(event) {
+    if (isEditableTarget(event.target)) return;
+    this.keys.delete(event.code);
+  }
 
   onPointerDown(event) {
     if (event.pointerType !== 'touch' && event.button !== 0) return;
