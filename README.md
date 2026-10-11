@@ -147,7 +147,7 @@ with `B` or from **Settings** on any device; the preference is saved locally.
 pickups, the scrap pulse, radio repair, interactions, and enemy impacts. It unlocks on **START** for
 mobile browser audio policies; if Web Audio is unavailable, the game continues without effects.
 
-`VoiceSystem` gives every character on the platform a voice of their own. Recorded mp3 lines play
+`VoiceSystem` gives every character on the platform a voice of their own. Recorded `.wav` lines play
 first; everything else — the ambient street talk, the Season One draft beats, a blocked download —
 falls back to browser speech synthesis, where two things keep the cast distinguishable:
 
@@ -166,10 +166,16 @@ voice instead of collapsing into the narrator’s.
 
 ```bash
 python3 tools/bake_platform_music.py  # regenerate assets/audio/platform-loop.wav
-npm run music                        # same as above
+python3 tools/voice_clips_to_wav.py   # convert recorded voice mp3s to verified PCM-16 wav
+npm run music                        # same as bake_platform_music.py
 npm run check:music                  # verify WAV format, duration, and signal level
-npm run check:voices                 # verify the voice roster, the deal, and the speak() path
+npm run check:voices                 # verify the voice roster, the deal, the wav clips, and the speak() path
 ```
+
+Every voice clip in `assets/audio/` is 16-bit PCM wav (converted from the recorded mp3s by
+`tools/voice_clips_to_wav.py`, which re-reads and verifies each written file and only then removes
+its source), so the whole platform — story lines and the music loop — ships one uncompressed audio
+format.
 
 ## Checks
 

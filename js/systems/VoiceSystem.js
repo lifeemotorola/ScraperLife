@@ -1,5 +1,5 @@
 // The streets of Waterside speak back. VoiceSystem plays real recorded voice lines for
-// every character (assets/audio/*.mp3). Anything without a clip — the ambient street talk,
+// every character (assets/audio/*.wav). Anything without a clip — the ambient street talk,
 // the Season One draft beats, or a blocked/failed download — falls back to the browser's
 // speech synthesis, and there every character on the platform keeps a voice of their own:
 // a per-character pitch/rate profile (PROFILES below) plus a distinct system voice dealt
@@ -130,29 +130,30 @@ export function splitSpeaker(line) {
   return { speaker, text };
 }
 
-// Real recorded lines, one clip per dialogue id. Static URLs so the bundler can hash them.
-const AUDIO_LINES = {
-  opening: new URL('../../assets/audio/opening.mp3', import.meta.url).href,
-  firstScrap: new URL('../../assets/audio/firstScrap.mp3', import.meta.url).href,
-  allScrap: new URL('../../assets/audio/allScrap.mp3', import.meta.url).href,
-  radioFixed: new URL('../../assets/audio/radioFixed.mp3', import.meta.url).href,
-  truth: new URL('../../assets/audio/truth.mp3', import.meta.url).href,
-  tenneh: new URL('../../assets/audio/tenneh.mp3', import.meta.url).href,
-  boakai: new URL('../../assets/audio/boakai.mp3', import.meta.url).href,
-  warehouse: new URL('../../assets/audio/warehouse.mp3', import.meta.url).href,
-  vardeeConfront: new URL('../../assets/audio/vardeeConfront.mp3', import.meta.url).href,
-  finale: new URL('../../assets/audio/finale.mp3', import.meta.url).href,
-  siaThanks: new URL('../../assets/audio/siaThanks.mp3', import.meta.url).href,
-  garmaiWhisper: new URL('../../assets/audio/garmaiWhisper.mp3', import.meta.url).href,
-  flomoSupport: new URL('../../assets/audio/flomoSupport.mp3', import.meta.url).href,
-  togarWarning: new URL('../../assets/audio/togarWarning.mp3', import.meta.url).href,
-  jallahRival: new URL('../../assets/audio/jallahRival.mp3', import.meta.url).href,
+// Real recorded lines, one clip per dialogue id, all PCM-16 wav (tools/voice_clips_to_wav.py
+// converts and verifies them). Static URLs so the bundler can hash them.
+export const AUDIO_LINES = {
+  opening: new URL('../../assets/audio/opening.wav', import.meta.url).href,
+  firstScrap: new URL('../../assets/audio/firstScrap.wav', import.meta.url).href,
+  allScrap: new URL('../../assets/audio/allScrap.wav', import.meta.url).href,
+  radioFixed: new URL('../../assets/audio/radioFixed.wav', import.meta.url).href,
+  truth: new URL('../../assets/audio/truth.wav', import.meta.url).href,
+  tenneh: new URL('../../assets/audio/tenneh.wav', import.meta.url).href,
+  boakai: new URL('../../assets/audio/boakai.wav', import.meta.url).href,
+  warehouse: new URL('../../assets/audio/warehouse.wav', import.meta.url).href,
+  vardeeConfront: new URL('../../assets/audio/vardeeConfront.wav', import.meta.url).href,
+  finale: new URL('../../assets/audio/finale.wav', import.meta.url).href,
+  siaThanks: new URL('../../assets/audio/siaThanks.wav', import.meta.url).href,
+  garmaiWhisper: new URL('../../assets/audio/garmaiWhisper.wav', import.meta.url).href,
+  flomoSupport: new URL('../../assets/audio/flomoSupport.wav', import.meta.url).href,
+  togarWarning: new URL('../../assets/audio/togarWarning.wav', import.meta.url).href,
+  jallahRival: new URL('../../assets/audio/jallahRival.wav', import.meta.url).href,
   // New conversation lines
-  markieResolve: new URL('../../assets/audio/markieResolve.mp3', import.meta.url).href,
-  kollieParents: new URL('../../assets/audio/kollieParents.mp3', import.meta.url).href,
-  boakaiProof: new URL('../../assets/audio/boakaiProof.mp3', import.meta.url).href,
-  siaHope: new URL('../../assets/audio/siaHope.mp3', import.meta.url).href,
-  tennehTogether: new URL('../../assets/audio/tennehTogether.mp3', import.meta.url).href,
+  markieResolve: new URL('../../assets/audio/markieResolve.wav', import.meta.url).href,
+  kollieParents: new URL('../../assets/audio/kollieParents.wav', import.meta.url).href,
+  boakaiProof: new URL('../../assets/audio/boakaiProof.wav', import.meta.url).href,
+  siaHope: new URL('../../assets/audio/siaHope.wav', import.meta.url).href,
+  tennehTogether: new URL('../../assets/audio/tennehTogether.wav', import.meta.url).href,
 };
 
 export class VoiceSystem {

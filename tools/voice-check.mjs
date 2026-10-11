@@ -4,8 +4,9 @@
 //
 //   node tools/voice-check.mjs
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { DIALOGUE } from '../js/data/dialogues.js';
-import { PROFILES, profileFor, dealVoices, guessGender, splitSpeaker, VoiceSystem } from '../js/systems/VoiceSystem.js';
+import { PROFILES, profileFor, dealVoices, guessGender, splitSpeaker, AUDIO_LINES, VoiceSystem } from '../js/systems/VoiceSystem.js';
 
 const failures = [];
 const check = (label, ok, detail = '') => {
@@ -78,6 +79,55 @@ check('numbered speaker tags keep their own identity',
     && splitSpeaker('EAST WATCH: “Move along, my friend.”').speaker === 'EAST WATCH'
     && splitSpeaker('No tag in this line.').speaker === 'NARRATOR',
   'digits no longer collapse into the narrator');
+
+// ---- The clips: recorded lines ship as wav -------------------------------
+
+// Minimal RIFF/WAVE reader: enough to prove a file is a playable PCM wav and to
+// measure its length. Not a decoder — the browser still does the real work.
+function readWavInfo(path) {
+  let buffer;
+  try { buffer = readFileSync(path); } catch { return null; }
+  if (buffer.length < 44 || buffer.toString('ascii', 0, 4) !== 'RIFF'
+    || buffer.toString('ascii', 8, 12) !== 'WAVE') return null;
+  let offset = 12;
+  let fmt = null;
+  let dataSize = 0;
+  while (offset + 8 <= buffer.length) {
+    const chunkId = buffer.toString('ascii', offset, offset + 4);
+    const chunkSize = buffer.readUInt32LE(offset + 4);
+    if (chunkId === 'fmt ') {
+      fmt = {
+        audioFormat: buffer.readUInt16LE(offset + 8),
+        channels: buffer.readUInt16LE(offset + 10),
+        sampleRate: buffer.readUInt32LE(offset + 12),
+        bitsPerSample: buffer.readUInt16LE(offset + 22),
+      };
+    } else if (chunkId === 'data') dataSize = chunkSize;
+    offset += 8 + chunkSize + (chunkSize % 2);
+  }
+  if (!fmt || !dataSize) return null;
+  const byteRate = fmt.sampleRate * fmt.channels * (fmt.bitsPerSample / 8);
+  return { ...fmt, seconds: byteRate ? dataSize / byteRate : 0 };
+}
+
+const clipEntries = Object.entries(AUDIO_LINES);
+check('recorded voice lines ship as .wav clips',
+  clipEntries.length > 0 && clipEntries.every(([, url]) => url.endsWith('.wav')),
+  `${clipEntries.length} clips, no mp3 left behind`);
+
+const clipInfos = clipEntries.map(([id, url]) => [id, readWavInfo(fileURLToPath(url))]);
+const unreadable = clipInfos.filter(([id, info]) => {
+  if (!info) return true;
+  return (info.audioFormat !== 1 && info.audioFormat !== 3)
+    || info.channels < 1 || info.channels > 2
+    || info.sampleRate < 8000 || info.sampleRate > 96000
+    || info.bitsPerSample !== 16
+    || info.seconds < 0.5;
+});
+const recordedSeconds = clipInfos.reduce((sum, [, info]) => sum + (info?.seconds || 0), 0);
+check('every voice wav is a playable 16-bit PCM file',
+  unreadable.length === 0,
+  unreadable.length ? `${unreadable.map(([id]) => id).join(', ')} unreadable` : `${clipInfos.length} clips, ${recordedSeconds.toFixed(1)}s of recorded dialogue`);
 
 // ---- The deal: one system voice per character ---------------------------
 
