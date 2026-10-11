@@ -5,13 +5,18 @@ import { PhysicsEngine } from './PhysicsEngine.js';
 import { UIManager } from './UIManager.js';
 import { Player } from '../entities/Player.js';
 import { NPC } from '../entities/NPC.js';
+import { PlayerCrowdActor } from '../entities/PlayerCrowdActor.js';
 import { Enemy } from '../entities/Enemy.js';
 import { ScrapPulse } from '../entities/Weapon.js';
 import { City } from '../world/City.js';
-import { ClimateController, addGlowPoints, setupEnvironment, COLORS } from '../world/Environment.js';
+import { ClimateController, addGlowPoints, setupEnvironment, loadHDREnvironment, COLORS } from '../world/Environment.js';
+import { loadPalettes, loadSharedCharacter } from '../entities/CharacterRig.js';
+import { CrowdSystem, CROWD_TUNING } from '../systems/CrowdSystem.js';
 import { MissionSystem } from '../systems/MissionSystem.js';
 import { DialogueSystem } from '../systems/DialogueSystem.js';
 import { VoiceSystem } from '../systems/VoiceSystem.js';
+import { MusicSystem } from '../systems/MusicSystem.js';
+import { SoundEffectsSystem } from '../systems/SoundEffectsSystem.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { InventorySystem } from '../systems/InventorySystem.js';
 import { DIALOGUE } from '../data/dialogues.js';
@@ -30,10 +35,9 @@ export class Game {
   init() {
     this.running = false;
     this.time = 0;
+    this.footstepTimer = 0;
     this.isMobile = matchMedia('(pointer: coarse)').matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     this.scene = new THREE.Scene();
-    this.lighting = setupEnvironment(this.scene);
-    this.climate = new ClimateController(this.scene, this.lighting, { mobile: this.isMobile });
     this.camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, .1, 180);
     this.camera.position.set(-16, 12, -4);
     this.cameraTarget = new THREE.Vector3(); this.cameraLook = new THREE.Vector3();
@@ -52,6 +56,21 @@ export class Game {
     this.renderer.shadowMap.needsUpdate = !this.isMobile;
     this.shadowTimer = 0;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.lighting = setupEnvironment(this.scene, this.renderer);
+    this.climate = new ClimateController(this.scene, this.lighting, { mobile: this.isMobile });
+    this.hdrReady = false;
+    this.hdrPromise = loadHDREnvironment(this.scene, this.renderer).then((result) => {
+      this.hdrReady = Boolean(result?.environment);
+      this.hdrSource = result?.source || 'fallback';
+      return result;
+    }).catch((error) => {
+      // The procedural environment is the normal failure fallback; this is only a last-ditch
+      // guard for a WebGL/context error during PMREM generation.
+      console.warn('HDR lighting could not initialize:', error);
+      this.hdrReady = false;
+      this.hdrSource = 'flat fallback';
+      return null;
+    });
     document.getElementById('game').appendChild(this.renderer.domElement);
     this.clock = new THREE.Clock();
 
@@ -59,6 +78,8 @@ export class Game {
     this.inventory = new InventorySystem();
     this.missions = new MissionSystem(this.inventory);
     this.voice = new VoiceSystem();
+    this.music = new MusicSystem();
+    this.sfx = new SoundEffectsSystem();
     this.dialogue = new DialogueSystem(this.ui, DIALOGUE, this.voice);
     this.combat = new CombatSystem();
     this.physics = new PhysicsEngine({ limit: 48 });
@@ -71,22 +92,70 @@ export class Game {
     this.pulse = new ScrapPulse(this.scene);
     this.npcs = this.createNPCs();
     this.enemies = [
-      new Enemy(this.scene, { position: [19, -7] }),
-      new Enemy(this.scene, { position: [10, 1] }),
-      new Enemy(this.scene, { position: [34, -12] }),
-      new Enemy(this.scene, { position: [-28, -18] }),
-      new Enemy(this.scene, { position: [5, -28] }),
+      new Enemy(this.scene, { id: 'watch-east-1', position: [19, -7] }),
+      new Enemy(this.scene, { id: 'watch-market-2', position: [10, 1] }),
+      new Enemy(this.scene, { id: 'watch-docks-3', position: [34, -12] }),
+      new Enemy(this.scene, { id: 'watch-harbor-4', position: [-28, -18] }),
+      new Enemy(this.scene, { id: 'watch-warehouse-5', position: [5, -28] }),
     ];
+    this.enemies.forEach((enemy) => {
+      const free = this.physics.findFree(enemy.position, 0.35, 12);
+      enemy.position.copy(free);
+      enemy.home.copy(free);
+    });
+    // All ten story residents and all five of Vardee's watch share the same AI: stroll, stop
+    // inside a pair's greeting radius, turn to face each other, and speak a greeting or lecture.
+    // Markie is included as a non-wandering actor so a player who walks up to a resident gets a
+    // greeting too; the adapter cannot take over the actual player input.
+    this.markieCrowdActor = new PlayerCrowdActor(this.player);
+    this.crowd = new CrowdSystem([this.markieCrowdActor, ...Object.values(this.npcs), ...this.enemies], this.physics, {
+      onExchange: ({ kind, opener, responder, position }) => {
+        if (position.distanceTo(this.player.position) > CROWD_TUNING.hearRadius) return;
+        if (this.voice.abortConversation || (this.voice.currentAudio && this.voice.player && !this.voice.player.paused)) return;
+        this.ui.toast(kind === 'lecture'
+          ? `${opener.label} HAS A WORD FOR ${responder.label}`
+          : `${opener.label} AND ${responder.label} // STREET TALK`, 2300);
+      },
+      onLine: ({ person, text, seconds, exchange }) => {
+        if (exchange.position.distanceTo(this.player.position) > CROWD_TUNING.hearRadius) return;
+        // Ambient talk never cuts across a recorded story line or an active voice conversation.
+        if (this.voice.abortConversation || (this.voice.currentAudio && this.voice.player && !this.voice.player.paused)) return;
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking) return;
+        // Recorded story clips stay mission-only; ambient chatter uses the voice profile/TTS so
+        // the same line can belong to any resident.
+        this.dialogue.playText(`${person.label}: “${text}”`, seconds);
+      },
+    });
     this.matchCharacterHeights(this.player.getCharacterHeight());
-    // Rigged GLB first (tools/rig_and_animate.py), the COLLADA character if it is missing,
-    // the procedural humanoid last: the game always renders a Markie, and a re-export of the
-    // GLB never needs a code change.
+    // The single rig every character uses (tools/rig_and_animate.py) and the generated colour
+    // sheet (tools/character_palette.py). loadSharedCharacter caches the promise, so Markie and
+    // every NPC share one 5.3 MB GLB download and one parse; each gets only a skeleton+material
+    // instance. The authored DAE remains Markie's fallback if the GLB is missing.
+    this.characterModelUrl = new URL('../../assets/models/survival_character.glb', import.meta.url).href;
+    this.characterManifestUrl = new URL('../../assets/models/survival_character.character.json', import.meta.url).href;
+    this.characterPaletteUrl = new URL('../../assets/models/character_palettes.json', import.meta.url).href;
     const daeUrl = new URL('../../assets/textures/markie.dae', import.meta.url).href;
     const loadDAE = () => this.player.loadDAE(daeUrl, (height) => this.matchCharacterHeights(height));
-    this.player.loadGLB(new URL('../../assets/models/survival_character.glb', import.meta.url).href, {
-      manifest: new URL('../../assets/models/survival_character.character.json', import.meta.url).href,
+    this.characterPalettesPromise = loadPalettes(this.characterPaletteUrl);
+    this.sharedCharacterPromise = loadSharedCharacter(this.characterModelUrl, {
+      manifest: this.characterManifestUrl,
+    });
+    this.player.loadGLB(this.characterModelUrl, {
+      manifest: this.characterManifestUrl,
+      palettes: this.characterPalettesPromise,
       fallback: loadDAE,
       onReady: (height) => this.matchCharacterHeights(height),
+    });
+    Promise.all([this.sharedCharacterPromise, this.characterPalettesPromise]).then(([shared, palettes]) => {
+      const everyone = [...Object.values(this.npcs), ...this.enemies];
+      for (const character of everyone) {
+        character.adoptRig(shared, palettes?.characters?.[character.paletteId] || null, palettes);
+      }
+      this.matchCharacterHeights(shared.height || this.player.getCharacterHeight());
+    }).catch((error) => {
+      // Keep the procedural models visible if the GLB is genuinely unavailable. This also makes
+      // the cause observable in the console instead of failing silently behind the intro screen.
+      console.warn('Shared character rig could not load; keeping placeholder people:', error);
     });
     this.scrap = this.createScrap();
     this.input = new InputManager({
@@ -105,6 +174,12 @@ export class Game {
       return on;
     });
     this.ui.setVoiceState(this.voice.enabled);
+    this.ui.bindMusicToggle(() => {
+      const on = this.music.toggle();
+      this.ui.toast(on ? 'MUSIC // ON' : 'MUSIC // OFF');
+      return on;
+    });
+    this.ui.setMusicState(this.music.enabled);
     this.ui.setCameraView(this.cameraModes[this.cameraIndex].label);
     window.addEventListener('resize', () => this.resize());
     this.updateQuest();
@@ -113,22 +188,44 @@ export class Game {
 
   createNPCs() {
     const people = [
-      { id: 'kollie', label: 'OLD MAN KOLLIE', position: [-4, -3], shirt: 0x6a5540, skin: 0x6d4432, quote: DIALOGUE.truth, quoteId: 'truth' },
-      { id: 'tenneh', label: 'TENNEH', position: [16, 13], shirt: 0x783d73, skin: 0x8a4d43, quote: DIALOGUE.tenneh, quoteId: 'tenneh' },
-      { id: 'flomo', label: 'FLOMO', position: [-18, 13], shirt: 0x3b6781, skin: 0x6b382a, quote: DIALOGUE.flomoSupport, quoteId: 'flomoSupport' },
-      { id: 'sia', label: 'SIA', position: [-11, 4], shirt: 0xd28942, skin: 0x6d4432, quote: DIALOGUE.siaThanks, quoteId: 'siaThanks' },
-      { id: 'garmai', label: 'GARMAI', position: [4, 13], shirt: 0x4d6a91, skin: 0x7f4638, quote: DIALOGUE.garmaiWhisper, quoteId: 'garmaiWhisper' },
-      { id: 'boakai', label: 'BOAKAI', position: [32, -3], shirt: 0x6b6540, skin: 0x57301f, quote: DIALOGUE.boakai, quoteId: 'boakai' },
-      { id: 'jallah', label: 'JALLAH', position: [-22, 1], shirt: 0x407665, skin: 0x6a3825, quote: DIALOGUE.jallahRival, quoteId: 'jallahRival' },
-      { id: 'togar', label: 'TOGAR', position: [13, -4], shirt: 0x5e3030, skin: 0x4a291f, quote: DIALOGUE.togarWarning, quoteId: 'togarWarning' },
-      { id: 'vardee', label: 'VARDEE', position: [-22, -16], shirt: 0x54252a, skin: 0x4a291f, quote: DIALOGUE.vardeeConfront, quoteId: 'vardeeConfront' },
+      { id: 'kollie', label: 'OLD MAN KOLLIE', role: 'Mentor', voice: 'lecturer', accent: 0x9fd7ff,
+        position: [-4, -3], home: [-4, -3], wanderRadius: 8, quote: DIALOGUE.truth, quoteId: 'truth' },
+      { id: 'tenneh', label: 'TENNEH', role: 'Love interest', voice: 'greeter', accent: 0xffb454,
+        position: [16, 13], home: [16, 13], wanderRadius: 7, quote: DIALOGUE.tenneh, quoteId: 'tenneh' },
+      { id: 'flomo', label: 'FLOMO', role: 'Best friend', voice: 'greeter', accent: 0xa8d26a,
+        position: [-18, 13], home: [-18, 13], wanderRadius: 8, quote: DIALOGUE.flomoSupport, quoteId: 'flomoSupport' },
+      { id: 'sia', label: 'SIA', role: 'Street kid', voice: 'greeter', accent: 0xffd08a,
+        position: [-11, 4], home: [-11, 4], wanderRadius: 6, quote: DIALOGUE.siaThanks, quoteId: 'siaThanks' },
+      { id: 'garmai', label: 'GARMAI', role: 'Information broker', voice: 'lecturer', accent: 0xc760b0,
+        position: [4, 13], home: [4, 13], wanderRadius: 7, quote: DIALOGUE.garmaiWhisper, quoteId: 'garmaiWhisper' },
+      { id: 'boakai', label: 'BOAKAI', role: 'Equipment fixer', voice: 'greeter', accent: 0xd8c07a,
+        position: [32, -3], home: [32, -3], wanderRadius: 8, quote: DIALOGUE.boakai, quoteId: 'boakai' },
+      // Jallah's authored position sat inside the Night Clinic collision box; move his anchor to
+      // the Old Harbor side of the same district so he can actually take a step.
+      { id: 'jallah', label: 'JALLAH', role: 'Rival', voice: 'greeter', accent: 0xff6b5e,
+        position: [-29, 12], home: [-29, 12], wanderRadius: 8, quote: DIALOGUE.jallahRival, quoteId: 'jallahRival' },
+      { id: 'togar', label: 'TOGAR', role: 'Lieutenant', voice: 'lecturer', accent: 0x9aa7b0,
+        position: [13, -4], home: [13, -4], wanderRadius: 9, quote: DIALOGUE.togarWarning, quoteId: 'togarWarning' },
+      { id: 'vardee', label: 'VARDEE', role: 'Antagonist', voice: 'lecturer', accent: 0xff3b3b,
+        position: [-22, -16], home: [-22, -16], wanderRadius: 9, quote: DIALOGUE.vardeeConfront, quoteId: 'vardeeConfront' },
+      { id: 'kormah', label: 'KORMAH', role: 'Corrupt official', voice: 'lecturer', accent: 0xbca36a,
+        position: [24, -7], home: [24, -7], wanderRadius: 7, quote: DIALOGUE.kormah, quoteId: 'kormah' },
     ];
-    return Object.fromEntries(people.map((data) => [data.id, new NPC(this.scene, data)]));
+    return Object.fromEntries(people.map((data) => {
+      const npc = new NPC(this.scene, data);
+      // Any authored position inside a building gets nudged to the nearest walkable point before
+      // it becomes the home anchor. The residents can always move from where they spawn.
+      const free = this.physics.findFree(npc.position, 0.35, 12);
+      npc.position.copy(free);
+      npc.home.copy(free);
+      return [data.id, npc];
+    }));
   }
 
   matchCharacterHeights(markieHeight) {
     const everyone = [...Object.values(this.npcs || {}), ...(this.enemies || [])];
     everyone.forEach((character) => character.setHeight(markieHeight));
+    this.markieCrowdActor?.setHeight(markieHeight);
   }
 
   createScrap() {
@@ -156,7 +253,10 @@ export class Game {
 
   start() {
     this.running = true; this.ui.startGame();
-    // Unlocks speech inside the start-button gesture so the opening line can play.
+    // Music must begin inside the start-button gesture so mobile browsers permit playback.
+    this.music.start();
+    this.sfx.unlock();
+    // Unlocks speech inside the same gesture so the opening line can play over the music.
     this.voice.unlock();
     this.ui.toast('JOB STARTED // THE WEIGHT OF TRUTH'); this.dialogue.play('opening', 6);
   }
@@ -212,6 +312,9 @@ export class Game {
   interact() {
     if (!this.running || !this.interaction) return;
     const hit = this.interaction;
+    if (hit.type === 'scrap') this.sfx.play('pickup');
+    else if (hit.type === 'radio') this.sfx.play('repair');
+    else this.sfx.play('interact', 0.8);
     if (hit.type === 'scrap') {
       hit.object.userData.collected = true; hit.object.visible = false; this.scrapGlow.setColor(hit.object.userData.glowIndex, 0);
       const total = this.inventory.collectScrap(); this.ui.toast(`SALVAGE SECURED // ${total} PIECE${total === 1 ? '' : 'S'}`);
@@ -294,6 +397,7 @@ export class Game {
   tryCollectLedger() {
     if (!this.missions.is('warehouse')) return;
     if (this.missions.collectLedger()) {
+      this.sfx.play('pickup', 0.82);
       this.city.collectLedger();
       this.ui.toast('LEDGER SECURED // TAKE IT TO VARDEE'); this.dialogue.play('warehouse', 6); this.updateQuest();
     }
@@ -303,11 +407,12 @@ export class Game {
     if (!this.running) return;
     const stunned = this.pulse.activate(this.player.position, this.enemies);
     if (stunned === null) return;
+    this.sfx.play('pulse', stunned > 0 ? 1 : 0.82);
     this.player.play('pulse');
     this.ui.toast(stunned ? `SCRAP PULSE // ${stunned} WATCH${stunned > 1 ? 'ES' : ''} DISRUPTED` : 'SCRAP PULSE // AREA CLEAR');
   }
 
-  updateQuest() { this.ui.updateQuest(this.missions.mission, this.inventory.scrap, this.missions); }
+  updateQuest() { this.ui.updateQuest(this.missions.mission, this.inventory.scrap); }
   updateCamera() {
     const view = this.cameraModes[this.cameraIndex];
     const up = new THREE.Vector3(0, 1, 0);
@@ -346,17 +451,32 @@ export class Game {
     // Stick/keys are read in the camera's frame (see InputManager.getMovement), using the
     // yaw the player can actually see, so up/right on the pad are up/right on screen.
     this.input.setCameraYaw(this.viewYaw ?? this.cameraYaw);
+    const moveState = this.input.getMovement();
+    const previousX = this.player.position.x;
+    const previousZ = this.player.position.z;
     this.player.update(delta, this.input, this.physics, this.time);
+    const travel = Math.hypot(this.player.position.x - previousX, this.player.position.z - previousZ);
+    if (travel > 0.002) {
+      const stepInterval = moveState.running ? 0.34 : 0.48;
+      this.footstepTimer += delta;
+      if (this.footstepTimer >= stepInterval) {
+        this.footstepTimer %= stepInterval;
+        this.sfx.play('footstep', moveState.running ? 1 : 0.78);
+      }
+    } else {
+      this.footstepTimer = 0;
+    }
     for (const scrap of this.scrap) { if (!scrap.userData.collected) { scrap.position.y = scrap.userData.baseY + Math.sin(this.time * 2 + scrap.userData.phase) * .11; scrap.rotation.y += delta * .85; } }
     // ledger hover
     if (this.city.ledger?.ledger?.visible) {
       this.city.ledger.ledger.rotation.y += delta * 0.6;
       this.city.ledger.ledger.position.y = 1.42 + Math.sin(this.time * 2.5) * 0.07;
     }
-    Object.values(this.npcs).forEach((npc, index) => npc.update(this.time, index));
+    this.crowd.update(delta, this.player.position);
     this.combat.update(delta); this.pulse.update(delta);
     this.enemies.forEach((enemy) => {
-      if (enemy.update(delta, this.time, this.player.position) && this.combat.takePressure(12)) {
+      if (enemy.threaten(delta, this.time, this.player.position) && this.combat.takePressure(12)) {
+        this.sfx.play('impact');
         this.player.play('hit');   // recoil clip; ignored when the model has no clips
         this.ui.toast('VARDEE’S WATCH // STAY MOVING');
         if (this.combat.resolve <= 0) { this.player.recover(); this.combat.recover(); this.ui.toast('MARKIE TAKES A BREATH // BACK ON YOUR FEET'); }
@@ -364,7 +484,14 @@ export class Game {
     });
     this.interaction = this.getInteraction();
     if (this.interaction) this.ui.showInteraction(this.interaction.text); else this.ui.hideInteraction();
-    this.ui.updateStatus({ resolve: this.combat.resolve, pulse: this.pulse.charge, player: this.player.position, target: this.objectiveTarget(), missionTitle: this.missions.mission.title });
+    this.ui.updateStatus({
+      resolve: this.combat.resolve,
+      pulse: this.pulse.charge,
+      player: this.player.position,
+      target: this.objectiveTarget(),
+      missionTitle: this.missions.mission.title,
+      npcs: this.npcs,
+    });
   }
   // The sun moves slowly, so its shadow map does not need a full re-render every frame.
   updateShadows(delta) {

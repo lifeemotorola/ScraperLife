@@ -1,6 +1,6 @@
-// End-to-end check of the touch pad against the real index.html markup:
-// synthetic pointer events on the joystick must produce the documented input vector,
-// and the MAP / VOX / CAM buttons must be wired.
+// End-to-end check of the touch pad and cleaned HUD against the real index.html markup:
+// synthetic pointer events on the joystick produce the documented input vector, while
+// map, camera, and Settings controls stay wired and the always-on control legend is gone.
 import { JSDOM } from 'jsdom';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +15,7 @@ globalThis.matchMedia = dom.window.matchMedia?.bind(dom.window) ?? (() => ({ mat
 dom.window.matchMedia ??= () => ({ matches: false });
 
 const { MobileController } = await import(join(root, 'js/game/MobileController.js'));
+const { InputManager } = await import(join(root, 'js/game/InputManager.js'));
 const { UIManager } = await import(join(root, 'js/game/UIManager.js'));
 
 const failures = [];
@@ -36,6 +37,52 @@ const ui = new UIManager();
 ui.bindStart(() => {}, () => {});
 let voiceOn = true;
 ui.bindVoiceToggle(() => (voiceOn = !voiceOn));
+let musicOn = true;
+ui.bindMusicToggle(() => (musicOn = !musicOn));
+ui.setMusicState(musicOn);
+
+const settingsButton = dom.window.document.getElementById('settings-button');
+const settingsPanel = dom.window.document.getElementById('settings-panel');
+const playerInput = new InputManager({ element: dom.window.document.body });
+playerInput.setVirtualMove(.8, 0);
+check('Markie can move while Settings is closed', playerInput.getMovement().x < -.7);
+check('game title and always-on control legend are removed',
+  !dom.window.document.querySelector('.brand')
+    && !dom.window.document.querySelector('h1')
+    && !dom.window.document.querySelector('.controls'));
+check('map and Markie progress stay on the game HUD',
+  Boolean(dom.window.document.getElementById('map-panel')
+    && dom.window.document.querySelector('.quest-panel')
+    && dom.window.document.getElementById('progress-bar')));
+const progressPanel = dom.window.document.querySelector('.quest-panel');
+check('mission chain and current-job prose are removed; scrap count stays',
+  !dom.window.document.getElementById('mission-log')
+    && !dom.window.document.getElementById('quest-title')
+    && !dom.window.document.getElementById('quest-description')
+    && progressPanel.textContent.trim() === 'SCRAP 0 / 7');
+ui.updateQuest({ progress: (scrap) => `SCRAP ${scrap} / 7`, percent: (scrap) => (scrap / 7) * 100 }, 3);
+check('scrap progress still updates the item count and bar',
+  dom.window.document.getElementById('progress-label').textContent === 'SCRAP 3 / 7'
+    && dom.window.document.getElementById('progress-bar').style.width === `${(3 / 7) * 100}%`);
+settingsButton.click();
+check('Settings opens the relocated keyboard, touch, and audio guide',
+  ui.settingsOpen && !settingsPanel.classList.contains('hidden')
+    && settingsPanel.textContent.includes('W A S D')
+    && settingsPanel.textContent.includes('LEFT STICK')
+    && settingsPanel.textContent.includes('Background music'));
+const moveKey = new dom.window.KeyboardEvent('keydown', {
+  key: 'w', code: 'KeyW', bubbles: true, cancelable: true,
+});
+dom.window.dispatchEvent(moveKey);
+check('open Settings blocks gameplay movement', playerInput.getMovement().x === 0
+  && !playerInput.keys.has('KeyW'));
+dom.window.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'm', bubbles: true, cancelable: true }));
+check('map shortcut does not stack over the open Settings panel',
+  !ui.worldMapOpen && dom.window.document.getElementById('world-map').classList.contains('hidden'));
+dom.window.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+check('Escape closes Settings', !ui.settingsOpen && settingsPanel.classList.contains('hidden'));
+check('Markie movement resumes after closing Settings', playerInput.getMovement().x < -.7);
+playerInput.dispose();
 
 const controller = new MobileController(input);
 check('MobileController found the pad elements', Boolean(controller.zone && controller.base && controller.knob));
@@ -103,13 +150,23 @@ mapButton.dispatchEvent(new dom.window.Event('click', { bubbles: true }));
 const closed = dom.window.document.getElementById('world-map').classList.contains('hidden');
 check('MAP button opens and closes the platform map', opened && closed, `opened=${opened} closed=${closed}`);
 
-const vox = dom.window.document.getElementById('touch-voice');
-vox.dispatchEvent(pointer('pointerdown', 800, 40, 13));
-vox.dispatchEvent(pointer('pointerup', 800, 40, 13));
-check('VOX button toggles voices off', vox.classList.contains('off') === true, `classes="${vox.className}"`);
-check('desktop voice button mirrors the state',
-  dom.window.document.getElementById('voice-toggle').textContent.includes('OFF'),
-  dom.window.document.getElementById('voice-toggle').textContent);
+settingsButton.click();
+const voiceButton = dom.window.document.getElementById('voice-toggle');
+voiceButton.click();
+check('Settings button toggles character voices off', voiceOn === false
+  && voiceButton.classList.contains('off')
+  && voiceButton.getAttribute('aria-pressed') === 'false',
+  `${voiceButton.textContent}, aria-pressed=${voiceButton.getAttribute('aria-pressed')}`);
+
+const musicButton = dom.window.document.getElementById('music-toggle');
+musicButton.click();
+check('Settings button toggles background music off', musicOn === false
+  && musicButton.classList.contains('off')
+  && musicButton.getAttribute('aria-pressed') === 'false',
+  `${musicButton.textContent}, aria-pressed=${musicButton.getAttribute('aria-pressed')}`);
+dom.window.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'b', bubbles: true }));
+check('B key toggles music back on from Settings', musicOn === true
+  && musicButton.getAttribute('aria-pressed') === 'true', `enabled=${musicOn}`);
 
 console.log(failures.length ? `\n${failures.length} touch-wiring check(s) failed.` : '\nAll touch-wiring checks passed.');
 process.exit(failures.length ? 1 : 0);

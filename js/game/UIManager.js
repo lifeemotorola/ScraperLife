@@ -4,16 +4,18 @@ export class UIManager {
     this.el = {
       intro: $('intro'), complete: $('complete'), start: $('start-button'), restart: $('restart-button'),
       interaction: $('interaction'), interactionText: $('interaction-text'), toast: $('toast'), subtitle: $('subtitle'),
-      questTitle: $('quest-title'), questDescription: $('quest-description'), progressLabel: $('progress-label'), progressBar: $('progress-bar'),
+      progressLabel: $('progress-label'), progressBar: $('progress-bar'),
       resolveBar: $('resolve-bar'), resolveNumber: $('resolve-number'), pulse: $('pulse-status'),
       worldTime: $('world-time'), weather: $('weather-label'), camera: $('camera-label'),
       mapPlayer: $('map-player'), objective: document.querySelector('.map-objective'), finalScrap: $('final-scrap'), finalMissions: $('final-missions'),
       mapPanel: $('map-panel'), worldMap: $('world-map'), worldMapPlayer: $('world-map-player'), worldMapObjective: $('world-map-objective'), worldMapObjectiveLabel: $('world-map-objective-label'), closeWorldMap: $('close-world-map'), mapTitle: $('map-title'),
-      missionList: $('mission-list'), missionCount: $('mission-count'), missionCountDetail: $('mission-count-detail'), completeCopy: $('complete-copy'),
-      touchMap: $('touch-map'), voiceToggle: $('voice-toggle'), touchVoice: $('touch-voice'),
+      settingsButton: $('settings-button'), settingsPanel: $('settings-panel'), settingsClose: $('settings-close'),
+      completeCopy: $('complete-copy'),
+      touchMap: $('touch-map'), voiceToggle: $('voice-toggle'), musicToggle: $('music-toggle'),
     };
     this.worldBounds = 48; // matches PhysicsEngine limit + water offset; platform expanded to 92 units
     this.worldMapOpen = false;
+    this.settingsOpen = false;
     // Touch players have no E key; the interaction prompt should name the button they do have.
     if (matchMedia('(pointer: coarse)').matches) {
       const key = this.el.interaction?.querySelector('kbd');
@@ -24,36 +26,82 @@ export class UIManager {
   bindStart(onStart, onRestart) {
     this.el.start.addEventListener('click', onStart);
     this.el.restart.addEventListener('click', onRestart);
-    // Platform map: click minimap, press M/ESC, mobile MAP button
+
+    this.el.settingsButton?.addEventListener('click', () => this.toggleSettings());
+    this.el.settingsClose?.addEventListener('click', () => this.closeSettings());
+    this.el.settingsPanel?.addEventListener('click', (event) => {
+      if (event.target === this.el.settingsPanel) this.closeSettings();
+    });
+
+    // Platform map: click minimap, press M, or use the mobile MAP button.
     this.el.mapPanel?.addEventListener('click', () => this.toggleWorldMap());
-    this.el.mapPanel?.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggleWorldMap(); }});
+    this.el.mapPanel?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.toggleWorldMap(); }
+    });
     this.el.closeWorldMap?.addEventListener('click', () => this.closeMap());
-    this.el.worldMap?.addEventListener('click', (e) => { if (e.target === this.el.worldMap) this.closeMap(); });
+    this.el.worldMap?.addEventListener('click', (event) => {
+      if (event.target === this.el.worldMap) this.closeMap();
+    });
     this.el.touchMap?.addEventListener('click', () => this.toggleWorldMap());
-    window.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === 'm') { e.preventDefault(); this.toggleWorldMap(); }
-      if (e.key === 'Escape' && this.worldMapOpen) this.closeMap();
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        if (this.settingsOpen) { event.preventDefault(); this.closeSettings(); return; }
+        if (this.worldMapOpen) { event.preventDefault(); this.closeMap(); return; }
+      }
+      if (this.settingsOpen) return;
+      if (event.key.toLowerCase() === 'm') { event.preventDefault(); this.toggleWorldMap(); }
     });
   }
-  // Voices toggle: status-panel button (desktop), VOX touch button (Android), V key.
+  // Settings button on desktop and touch; V remains an optional keyboard shortcut.
   bindVoiceToggle(onToggle) {
     const flip = () => this.setVoiceState(onToggle());
     this.el.voiceToggle?.addEventListener('click', (event) => { event.preventDefault(); flip(); });
-    this.el.touchVoice?.addEventListener('pointerdown', (event) => { event.preventDefault(); event.stopPropagation(); flip(); });
     window.addEventListener('keydown', (event) => {
       if (event.repeat || event.key.toLowerCase() !== 'v') return;
       flip();
     });
   }
   setVoiceState(on) {
-    if (this.el.voiceToggle) {
-      this.el.voiceToggle.textContent = on ? '◉ VOICES ON' : '○ VOICES OFF';
-      this.el.voiceToggle.classList.toggle('off', !on);
-    }
-    this.el.touchVoice?.classList.toggle('off', !on);
+    if (!this.el.voiceToggle) return;
+    this.el.voiceToggle.textContent = on ? '◉ VOICES ON' : '○ VOICES OFF';
+    this.el.voiceToggle.classList.toggle('off', !on);
+    this.el.voiceToggle.setAttribute('aria-pressed', String(Boolean(on)));
+  }
+  bindMusicToggle(onToggle) {
+    const flip = () => this.setMusicState(onToggle());
+    this.el.musicToggle?.addEventListener('click', (event) => { event.preventDefault(); flip(); });
+    window.addEventListener('keydown', (event) => {
+      if (event.repeat || event.key.toLowerCase() !== 'b') return;
+      flip();
+    });
+  }
+  setMusicState(on) {
+    if (!this.el.musicToggle) return;
+    this.el.musicToggle.textContent = on ? '♫ MUSIC ON' : '♫ MUSIC OFF';
+    this.el.musicToggle.classList.toggle('off', !on);
+    this.el.musicToggle.setAttribute('aria-pressed', String(Boolean(on)));
+  }
+  toggleSettings() { this.settingsOpen ? this.closeSettings() : this.openSettings(); }
+  openSettings() {
+    if (this.worldMapOpen) this.closeMap();
+    this.el.settingsPanel?.classList.remove('hidden');
+    this.settingsOpen = true;
+    this.el.settingsButton?.setAttribute('aria-expanded', 'true');
+    this.el.settingsClose?.focus();
+  }
+  closeSettings({ restoreFocus = true } = {}) {
+    this.el.settingsPanel?.classList.add('hidden');
+    this.settingsOpen = false;
+    this.el.settingsButton?.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) this.el.settingsButton?.focus();
   }
   toggleWorldMap() { this.worldMapOpen ? this.closeMap() : this.openMap(); }
-  openMap() { this.el.worldMap?.classList.remove('hidden'); this.worldMapOpen = true; this.el.mapTitle?.classList.add('expanded'); }
+  openMap() {
+    if (this.settingsOpen) this.closeSettings({ restoreFocus: false });
+    this.el.worldMap?.classList.remove('hidden');
+    this.worldMapOpen = true;
+    this.el.mapTitle?.classList.add('expanded');
+  }
   closeMap() { this.el.worldMap?.classList.add('hidden'); this.worldMapOpen = false; this.el.mapTitle?.classList.remove('expanded'); }
   startGame() { this.el.intro.classList.add('hidden'); }
   completeGame(scrap, missions = 10) {
@@ -66,26 +114,11 @@ export class UIManager {
   hideInteraction() { this.el.interaction.classList.add('hidden'); }
   toast(text, duration = 2400) { clearTimeout(this.toastTimer); this.el.toast.textContent = text; this.el.toast.classList.remove('hidden'); this.toastTimer = setTimeout(() => this.el.toast.classList.add('hidden'), duration); }
   subtitle(text, seconds = 4) { clearTimeout(this.subtitleTimer); this.el.subtitle.textContent = text; this.el.subtitle.classList.remove('hidden'); this.subtitleTimer = setTimeout(() => this.el.subtitle.classList.add('hidden'), seconds * 1000); }
-  updateQuest(mission, scrap, missionSystem) {
-    this.el.questTitle.textContent = mission.title;
-    this.el.questDescription.textContent = mission.description;
+  updateQuest(mission, scrap) {
     this.el.progressLabel.textContent = mission.progress(scrap);
     this.el.progressBar.style.width = `${mission.percent(scrap)}%`;
-    if (missionSystem) {
-      const count = missionSystem.progressText || `${String(mission.order||1).padStart(2,'0')} / 10`;
-      if (this.el.missionCount) this.el.missionCount.textContent = count;
-      if (this.el.missionCountDetail) this.el.missionCountDetail.textContent = `${missionSystem.orderIndex} of ${missionSystem.totalMissions} missions`;
-      this.renderMissionList(missionSystem);
-    }
   }
-  renderMissionList(missionSystem) {
-    if (!this.el.missionList || !missionSystem.allMissionsStatus) return;
-    const items = missionSystem.allMissionsStatus();
-    this.el.missionList.innerHTML = items.map(item =>
-      `<div class="mission-item ${item.state}"><b>${String(item.order).padStart(2,'0')}</b> ${item.title}</div>`
-    ).join('');
-  }
-  updateStatus({ resolve, pulse, player, target, missionTitle }) {
+  updateStatus({ resolve, pulse, player, target, missionTitle, npcs = null }) {
     this.el.resolveBar.style.width = `${resolve}%`;
     this.el.resolveNumber.textContent = Math.ceil(resolve);
     this.el.pulse.textContent = pulse >= 35 ? 'SCRAP PULSE READY' : 'PULSE RECHARGING';
@@ -114,10 +147,10 @@ export class UIManager {
     }
     // update small npc markers on minimap for platform visibility
     const npcMap = {
-      'kollie': { x: -4, z: -3 },
-      'tenneh': { x: 16, z: 13 },
-      'boakai': { x: 21, z: -3 },
-      'vardee': { x: -22, z: -16 },
+      kollie: npcs?.kollie?.position || { x: -4, z: -3 },
+      tenneh: npcs?.tenneh?.position || { x: 16, z: 13 },
+      boakai: npcs?.boakai?.position || { x: 32, z: -3 },
+      vardee: npcs?.vardee?.position || { x: -22, z: -16 },
     };
     Object.entries(npcMap).forEach(([id, pos]) => {
       const el = document.getElementById(`map-npc-${id}`);

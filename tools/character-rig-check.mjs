@@ -49,6 +49,9 @@ globalThis.document ??= dom.window.document;
 // GLTFLoader touches self.URL when it turns an embedded image into a blob; a failed image load
 // is swallowed by the loader itself, but `self` has to exist for it to get that far.
 globalThis.self ??= dom.window;
+// The GLB embeds a texture in a bufferView. GLTFLoader creates a temporary object URL for it;
+// jsdom does not provide createObjectURL, so use Node's URL implementation for the no-WebGL test.
+globalThis.self.URL = globalThis.URL;
 globalThis.Blob ??= dom.window.Blob;
 
 const buffer = readFileSync(glbPath);

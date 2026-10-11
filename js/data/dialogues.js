@@ -19,6 +19,7 @@ export const DIALOGUE = {
   flomoSupport: 'FLOMO: “You are not alone, brother. I will watch your back at the interchange.”',
   togarWarning: 'TOGAR: “Vardee does not forgive loose ends. Walk away, Markie.”',
   jallahRival: 'JALLAH: “You want respect? Take it from Vardee, not from me.”',
+  kormah: 'KORMAH: “Keep a copy of every paper, Markie. The city has a habit of losing things.”',
 };
 
 // Story roster is data-driven so future missions can use the same names and roles.
@@ -36,3 +37,143 @@ export const CHARACTER_ROSTER = [
   { id: 'togar', name: 'Togar', role: 'Lieutenant', description: 'Vardee’s enforcer, with a possible redemption arc.' },
   { id: 'jallah', name: 'Jallah', role: 'Rival', description: 'Competes with Markie for territory and respect.' },
 ];
+
+// Ambient street talk: what two characters say to each other when they run into one another on
+// the platform (js/systems/CrowdSystem.js). These are NOT mission lines — they carry no speaker
+// tag because the line floats over the speaker's head, and the subtitle bar adds the name.
+//   greetings — anyone can open with one of these
+//   replies   — the short answer the other person gives back
+//   lectures  — what a `voice: 'lecturer'` character says instead (see character_palettes.json)
+// Every pool has a `default`, so a character added later always has something to say.
+export const SMALL_TALK = {
+  greetings: {
+    default: [
+      'Ehn, my people. You good?',
+      'Morning. The sea quiet today.',
+      'You walking far?',
+      'The light come back on your side?',
+      'They say rain coming before evening.',
+      'Small small, we move.',
+    ],
+    markie: [
+      'Morning. You need anything fixed?',
+      'I got two spare capacitors if your radio dead.',
+      'Careful near the interchange today.',
+      'Kollie send his greetings.',
+    ],
+    kollie: [
+      'Peace, my child. The morning is a good sign.',
+      'You eat before you walk so far?',
+      'Sit small. The day is long.',
+    ],
+    tenneh: [
+      'Ehn, my sister! The market open early today.',
+      'You come to buy or you come to look?',
+      'Markie, you too thin. Come and eat.',
+    ],
+    flomo: [
+      'Oo, my man! Where you going with that bag?',
+      'I got a story for you, but you must not laugh.',
+      'Walk with me small.',
+    ],
+    sia: [
+      'Look what I find in the scrap field!',
+      'You fix it, Markie? You fix everything.',
+      'I can carry it. I strong!',
+    ],
+    garmai: [
+      'You hear the thing they saying at the market?',
+      'Careful who you greet in the open.',
+      'Information is not free. For you, small price.',
+    ],
+    boakai: [
+      'Parts come in this morning. Good ones.',
+      'You need a battery or you need a miracle?',
+      'Price is price, my friend.',
+    ],
+    jallah: [
+      'You walking in my street today?',
+      'Respect is respect. You got yours?',
+      'Move easy, Markie.',
+    ],
+    togar: [
+      'Keep moving. Nothing to see here.',
+      'That name is not for shouting in the open.',
+      'You should not be standing here.',
+    ],
+    vardee: [
+      'Look who still breathing.',
+      'This street remembers everybody.',
+      'You got courage. Small one.',
+    ],
+    watch: [
+      'The boss want this road clear.',
+      'You pass here every day, ehn?',
+      'Move along, my friend.',
+    ],
+    musu: [
+      'Markie, wash your hands before you touch that radio.',
+      'Your father will be home before the rain. Come sit with me.',
+    ],
+    kormah: [
+      'Public service is a long road. Learn who signs the papers.',
+      'The city is not run by feelings, my friend.',
+    ],
+  },
+  replies: {
+    default: [
+      'Ehn, true talk.',
+      'I hear you.',
+      'Small small.',
+      'Na so it be.',
+      'God bless your way.',
+      'Okay, my people.',
+    ],
+    markie: ['I will remember that.', 'Kollie taught me the same.', 'I hear you, truly.'],
+    kollie: ['The old ears still hear, my child.', 'Truth does not hurry.', 'Go easy, my boy.'],
+    tenneh: ['I will keep it for you.', 'The market does not lie.', 'Come back before dark.'],
+    flomo: ['Oo! Say it again!', 'You serious?', 'I go tell everybody.'],
+    sia: ['I go remember that one!', 'You promise?', 'Ehn!'],
+    garmai: ['I will remember who told me.', 'That is worth something.', 'Keep your voice small.'],
+    boakai: ['Bring it, I price it.', 'Tools do not argue.', 'Fair enough.'],
+    jallah: ['We go see.', 'Respect, then.', 'Na so.'],
+    togar: ['Do not make me come back here.', 'I hear you.', 'Walk.'],
+    vardee: ['Everything has a price.', 'We will see, small boy.', 'The street decides.'],
+    watch: ['I hear.', 'Yes, boss.', 'Move.'],
+    musu: ['I will, Mama.', 'I hear you.'],
+    kormah: ['The office will review it.', 'I understand.'],
+  },
+  lectures: {
+    default: [
+      'Listen well, because I will not say it twice.',
+      'The old way still works, if you have patience for it.',
+      'Everybody talks in Waterside. Few of them teach.',
+    ],
+    kollie: [
+      'A radio carries the truth. Be like the radio, my child.',
+      'Your father said: a broken thing still carries a signal.',
+      'Patience is not weakness. The tide returns without shouting.',
+      'Learn each part’s name; no one can cheat you at market.',
+    ],
+    garmai: [
+      'Every secret passes through the market. Learn which one to buy.',
+      'A name spoken openly is a name used against you. Whisper.',
+      'Kormah signs the paper. Vardee takes the money. Know both.',
+    ],
+    togar: [
+      'Courage is choosing where you stand, not standing still.',
+      'I buried boys who talked loud on the wrong street. Learn.',
+      'Vardee does not shout. That is the thing to fear.',
+    ],
+    vardee: [
+      'This street feeds people. Do not confuse it with your feelings.',
+      'Everybody here takes something. That is the truth.',
+      'Your parents knew the price of things. That is why they are gone.',
+    ],
+    kormah: [
+      'A city is forms and signatures. Keep copies of everything.',
+      'The court remembers the number at the bottom of the page.',
+      'Call it corruption. I call it the price of the lights.',
+    ],
+  },
+};

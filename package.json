@@ -11,9 +11,17 @@
     "deploy": "npm run build && wrangler deploy",
     "cf:preview": "npm run build && wrangler dev",
     "check:touch": "node tools/touch-pad-check.mjs",
-    "check": "npm run check:controls && npm run check:touch && npm run check:character",
+    "check": "npm run check:controls && npm run check:touch && npm run check:character && npm run check:palette && npm run check:lighting && npm run check:music && npm run check:sfx && npm run check:crowd",
     "check:character": "node tools/character-rig-check.mjs",
-    "rig:character": "python3 tools/rig_and_animate.py build --fbx fbx/Survival_Character.fbx --no-morphs"
+    "rig:character": "python3 tools/rig_and_animate.py build --fbx fbx/Survival_Character.fbx --no-morphs",
+    "palette": "python3 tools/character_palette.py build",
+    "check:palette": "node tools/palette-check.mjs",
+    "sky": "python3 tools/bake_hdr_sky.py bake",
+    "check:lighting": "node tools/lighting-check.mjs",
+    "music": "python3 tools/bake_platform_music.py",
+    "check:music": "node tools/music-check.mjs",
+    "check:sfx": "node tools/sfx-check.mjs",
+    "check:crowd": "node tools/crowd-check.mjs"
   },
   "dependencies": {
     "three": "^0.179.1"

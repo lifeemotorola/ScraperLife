@@ -77,6 +77,7 @@ export class VoiceSystem {
     this.voices = [];
     this.pendingTimer = null;
     this.currentAudio = null;
+    this.clipGeneration = 0;
     this.abortConversation = null;
     // One shared element: unlocked once inside a user gesture, reused for every clip.
     this.player = typeof window !== 'undefined' && typeof Audio !== 'undefined' ? new Audio() : null;
@@ -133,11 +134,22 @@ export class VoiceSystem {
     audio.src = url;
     audio.currentTime = 0;
     this.currentAudio = audio;
-    audio.play().catch(() => {
+    const generation = this.clipGeneration;
+    let settled = false;
+    const clear = () => {
+      if (this.currentAudio === audio && this.clipGeneration === generation) this.currentAudio = null;
+    };
+    const ended = () => { settled = true; clear(); };
+    const fallback = () => {
+      if (settled || this.clipGeneration !== generation) return;
+      settled = true;
+      clear();
       // Clip blocked or failed to load — the fallback keeps the line audible.
-      if (this.currentAudio === audio) this.currentAudio = null;
       this.speak(line);
-    });
+    };
+    audio.addEventListener('ended', ended, { once: true });
+    audio.addEventListener('error', fallback, { once: true });
+    audio.play().catch(fallback);
   }
 
   // A scripted multi-voice conversation. steps: [{ id, line, seconds }].
@@ -188,6 +200,9 @@ export class VoiceSystem {
   }
 
   stopPlayback() {
+    // Invalidate `ended`/`error` listeners from the previous line before reusing the one shared
+    // Audio element. Otherwise an old pause/error can clear the new line's `currentAudio` flag.
+    this.clipGeneration += 1;
     if (this.currentAudio) {
       try { this.currentAudio.pause(); } catch { /* ignore */ }
       this.currentAudio = null;

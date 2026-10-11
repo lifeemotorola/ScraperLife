@@ -15,18 +15,11 @@
     <div id="game"></div>
 
     <div id="ui" aria-live="polite">
-      <header class="brand">
-        <div class="brand-mark">SL</div>
-        <div>
-          <p class="eyebrow">A MONROVIA STORY</p>
-          <h1>SCRAPER <span>LIFE</span></h1>
-        </div>
-      </header>
+      <button id="settings-button" class="settings-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-panel">
+        <span class="settings-icon" aria-hidden="true">⚙</span><span>SETTINGS</span>
+      </button>
 
-      <aside class="quest-panel glass">
-        <div class="panel-heading"><span class="orange-dot"></span> CURRENT JOB <span id="mission-count" style="margin-left:auto;color:var(--amber)">01 / 10</span></div>
-        <h2 id="quest-title">The Weight of Truth</h2>
-        <p id="quest-description">Old Man Kollie needs parts to power his radio. Search Waterside for usable scrap.</p>
+      <aside class="quest-panel glass" aria-label="Markie's scrap progress">
         <div class="quest-progress">
           <span id="progress-label">SCRAP 0 / 7</span>
           <div class="bar"><i id="progress-bar"></i></div>
@@ -38,8 +31,7 @@
         <div class="meter-label"><span>RESOLVE</span><b id="resolve-number">100</b></div>
         <div class="resolve-meter"><i id="resolve-bar"></i></div>
         <div class="pulse-line"><span class="pulse-dot"></span><span id="pulse-status">SCRAP PULSE READY</span></div>
-        <div class="world-line"><span id="world-time">DAY 01 // 14:30</span><span id="weather-label">COASTAL CLEAR</span></div>
-        <button id="voice-toggle" class="voice-toggle" type="button" aria-label="Toggle character voices">◉ VOICES ON</button>
+        <div class="world-line"><span id="world-time">DAY 01 // 06:00</span><span id="weather-label">COASTAL CLEAR</span></div>
       </section>
 
       <section id="map-panel" class="map-panel glass" role="button" tabindex="0" aria-label="Open expanded map">
@@ -58,26 +50,9 @@
         <span class="map-platform-badge">PLATFORM MAP</span>
       </section>
 
-      <section id="mission-log" class="mission-log glass" aria-label="Mission chain">
-        <div class="panel-heading" style="margin-bottom:6px"><span class="orange-dot"></span> MISSION CHAIN</div>
-        <div id="mission-list"></div>
-        <div class="mission-count" id="mission-count-detail">1 of 10 missions</div>
-      </section>
-
       <div id="interaction" class="interaction hidden"><kbd>E</kbd><span id="interaction-text">PICK UP SCRAP</span></div>
       <div id="toast" class="toast hidden"></div>
       <div id="subtitle" class="subtitle hidden"></div>
-
-      <footer class="controls glass">
-        <span><kbd>W A S D</kbd> MOVE</span>
-        <span><kbd>SHIFT</kbd> RUN</span>
-        <span><kbd>SPACE</kbd> SCRAP PULSE</span>
-        <span><kbd>E</kbd> INTERACT</span>
-        <span><kbd>DRAG</kbd> LOOK</span>
-        <span><kbd>V</kbd> VOICES</span>
-        <span><kbd>M</kbd> MAP</span>
-        <span><kbd>C</kbd> <b id="camera-label">WIDE VIEW</b></span>
-      </footer>
 
       <!-- Touch gamepad: left thumb walks, right thumb acts, system keys stay up top. -->
       <section id="mobile-controller" class="mobile-controller" aria-label="Touch controller">
@@ -90,11 +65,64 @@
           <button id="touch-pulse" class="touch-button touch-pulse" aria-label="Use Scrap Pulse">PULSE</button>
           <button id="touch-interact" class="touch-button touch-use" aria-label="Interact">USE</button>
         </div>
-        <div class="mobile-system" aria-label="System">
-          <button id="touch-camera" class="touch-button touch-camera" aria-label="Change camera view">CAM</button>
-          <button id="touch-voice" class="touch-button touch-voice" aria-label="Toggle character voices">VOX</button>
-          <button id="touch-map" class="touch-button touch-map" aria-label="Open map">MAP</button>
+        <div class="mobile-system" aria-label="System controls">
+          <button id="touch-camera" class="touch-button touch-camera" type="button" aria-label="Change camera view">CAM</button>
+          <button id="touch-map" class="touch-button touch-map" type="button" aria-label="Open map">MAP</button>
         </div>
+      </section>
+    </div>
+
+    <div id="settings-panel" class="settings-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <section class="settings-card">
+        <header class="settings-header">
+          <div>
+            <p class="eyebrow">WATERSIDE // PLATFORM SETTINGS</p>
+            <h2 id="settings-title">CONTROLS &amp; AUDIO</h2>
+            <p class="settings-intro">The quick guide lives here, off the play screen.</p>
+          </div>
+          <button id="settings-close" class="settings-close" type="button" aria-label="Close settings">×</button>
+        </header>
+
+        <div class="settings-grid">
+          <section class="settings-section" aria-labelledby="keyboard-controls-title">
+            <h3 id="keyboard-controls-title">KEYBOARD &amp; MOUSE</h3>
+            <div class="settings-row"><kbd>W A S D / ↑ ↓ ← →</kbd><span>Move Markie</span></div>
+            <div class="settings-row"><kbd>SHIFT</kbd><span>Run</span></div>
+            <div class="settings-row"><kbd>SPACE</kbd><span>Scrap Pulse</span></div>
+            <div class="settings-row"><kbd>E</kbd><span>Interact</span></div>
+            <div class="settings-row"><kbd>DRAG</kbd><span>Look around</span></div>
+            <div class="settings-row"><kbd>C</kbd><span>Cycle camera <small id="camera-label">WIDE VIEW</small></span></div>
+            <div class="settings-row"><kbd>M</kbd><span>Open / close map</span></div>
+            <div class="settings-row"><kbd>V</kbd><span>Toggle character voices</span></div>
+            <div class="settings-row"><kbd>B</kbd><span>Toggle background music</span></div>
+          </section>
+
+          <section class="settings-section" aria-labelledby="touch-controls-title">
+            <h3 id="touch-controls-title">TOUCH CONTROLS</h3>
+            <div class="settings-row"><kbd>LEFT STICK</kbd><span>Move Markie</span></div>
+            <div class="settings-row"><kbd>HOLD RUN</kbd><span>Run</span></div>
+            <div class="settings-row"><kbd>PULSE</kbd><span>Scrap Pulse</span></div>
+            <div class="settings-row"><kbd>USE</kbd><span>Interact</span></div>
+            <div class="settings-row"><kbd>DRAG</kbd><span>Look around</span></div>
+            <div class="settings-row"><kbd>CAM</kbd><span>Cycle camera</span></div>
+            <div class="settings-row"><kbd>MAP</kbd><span>Open the platform map</span></div>
+          </section>
+
+          <section class="settings-section settings-audio" aria-labelledby="audio-settings-title">
+            <h3 id="audio-settings-title">AUDIO</h3>
+            <div class="settings-audio-controls">
+              <div class="settings-audio-item">
+                <span>Character voices</span>
+                <button id="voice-toggle" class="settings-audio-button voice-toggle" type="button" aria-label="Toggle character voices" aria-pressed="true">◉ VOICES ON</button>
+              </div>
+              <div class="settings-audio-item">
+                <span>Background music</span>
+                <button id="music-toggle" class="settings-audio-button music-toggle" type="button" aria-label="Toggle background music" aria-pressed="true">♫ MUSIC ON</button>
+              </div>
+            </div>
+          </section>
+        </div>
+        <p class="settings-footer"><kbd>ESC</kbd> Close settings or the map</p>
       </section>
     </div>
 
@@ -105,7 +133,7 @@
           <div>
             <p class="eyebrow">PLATFORM MAP // WATERSIDE SECTOR 04 — MONROVIA</p>
             <h3>MONROVIA WATERSIDE</h3>
-            <p>Tap a district marker or press <kbd>M</kbd> / <kbd>ESC</kbd> to close • Live platform tracking</p>
+            <p>LIVE PLATFORM TRACKING</p>
           </div>
           <button id="close-world-map" style="padding:8px 14px;font-size:11px">CLOSE ✕</button>
         </div>
@@ -136,11 +164,11 @@
         <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
           <div class="glass" style="flex:1;min-width:180px;padding:10px">
             <div class="panel-heading">MAP SIZE</div>
-            <p style="margin:6px 0 0;font:500 11px/1.4 'DM Mono';color:#c5cec4">Sector expanded to <b style="color:var(--orange)">92 × 92</b> platform units. Minimap is 70% larger (280×190). Full platform map is now available on desktop (click minimap or press <kbd>M</kbd>) and on Android (MAP button).</p>
+            <p style="margin:6px 0 0;font:500 11px/1.4 'DM Mono';color:#c5cec4">Sector 04 spans <b style="color:var(--orange)">92 × 92</b> platform units, mapping Waterside’s roads and coastline.</p>
           </div>
           <div class="glass" style="flex:1;min-width:180px;padding:10px">
             <div class="panel-heading">MISSIONS ON MAP</div>
-            <p style="margin:6px 0 0;font:500 11px/1.4 'DM Mono';color:#c5cec4">10 linked jobs are pinned live. Follow the orange pulse — it always points to the next platform objective.</p>
+            <p style="margin:6px 0 0;font:500 11px/1.4 'DM Mono';color:#c5cec4">Ten linked jobs are tracked across the platform. The orange marker identifies Markie’s current objective.</p>
           </div>
         </div>
       </div>
