@@ -11,7 +11,9 @@
     "deploy": "npm run build && wrangler deploy",
     "cf:preview": "npm run build && wrangler dev",
     "check:touch": "node tools/touch-pad-check.mjs",
-    "check": "npm run check:controls && npm run check:touch"
+    "check": "npm run check:controls && npm run check:touch && npm run check:character",
+    "check:character": "node tools/character-rig-check.mjs",
+    "rig:character": "python3 tools/rig_and_animate.py build --fbx fbx/Survival_Character.fbx --no-morphs"
   },
   "dependencies": {
     "three": "^0.179.1"

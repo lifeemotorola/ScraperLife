@@ -78,7 +78,16 @@ export class Game {
       new Enemy(this.scene, { position: [5, -28] }),
     ];
     this.matchCharacterHeights(this.player.getCharacterHeight());
-    this.player.loadDAE(new URL('../../assets/textures/markie.dae', import.meta.url).href, (height) => this.matchCharacterHeights(height));
+    // Rigged GLB first (tools/rig_and_animate.py), the COLLADA character if it is missing,
+    // the procedural humanoid last: the game always renders a Markie, and a re-export of the
+    // GLB never needs a code change.
+    const daeUrl = new URL('../../assets/textures/markie.dae', import.meta.url).href;
+    const loadDAE = () => this.player.loadDAE(daeUrl, (height) => this.matchCharacterHeights(height));
+    this.player.loadGLB(new URL('../../assets/models/survival_character.glb', import.meta.url).href, {
+      manifest: new URL('../../assets/models/survival_character.character.json', import.meta.url).href,
+      fallback: loadDAE,
+      onReady: (height) => this.matchCharacterHeights(height),
+    });
     this.scrap = this.createScrap();
     this.input = new InputManager({
       element: this.renderer.domElement,
@@ -206,6 +215,7 @@ export class Game {
     if (hit.type === 'scrap') {
       hit.object.userData.collected = true; hit.object.visible = false; this.scrapGlow.setColor(hit.object.userData.glowIndex, 0);
       const total = this.inventory.collectScrap(); this.ui.toast(`SALVAGE SECURED // ${total} PIECE${total === 1 ? '' : 'S'}`);
+      this.player.play('interact');   // reach-down on the piece he just lifted
       if (total === 1) this.dialogue.play('firstScrap', 4);
       if (total === 7) { this.ui.toast('ALL MATERIALS FOUND // RETURN TO KOLLIE'); this.dialogue.play('allScrap', 5); }
       this.updateQuest();
@@ -265,6 +275,7 @@ export class Game {
         this.missions.phase = 'finale_complete';
       }
       this.ui.toast('LEDGER DELIVERED // THE MARKET WILL REMEMBER'); this.updateQuest();
+      this.player.play('celebrate');
       // A real spoken exchange closes the chapter: Tenneh answers the market, Markie
       // reads the truth aloud, and Sia asks what it all means. The completion screen
       // waits for the conversation instead of cutting the voices off.
@@ -292,6 +303,7 @@ export class Game {
     if (!this.running) return;
     const stunned = this.pulse.activate(this.player.position, this.enemies);
     if (stunned === null) return;
+    this.player.play('pulse');
     this.ui.toast(stunned ? `SCRAP PULSE // ${stunned} WATCH${stunned > 1 ? 'ES' : ''} DISRUPTED` : 'SCRAP PULSE // AREA CLEAR');
   }
 
@@ -345,6 +357,7 @@ export class Game {
     this.combat.update(delta); this.pulse.update(delta);
     this.enemies.forEach((enemy) => {
       if (enemy.update(delta, this.time, this.player.position) && this.combat.takePressure(12)) {
+        this.player.play('hit');   // recoil clip; ignored when the model has no clips
         this.ui.toast('VARDEE’S WATCH // STAY MOVING');
         if (this.combat.resolve <= 0) { this.player.recover(); this.combat.recover(); this.ui.toast('MARKIE TAKES A BREATH // BACK ON YOUR FEET'); }
       }
