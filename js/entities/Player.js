@@ -1,6 +1,13 @@
 import * as THREE from 'three';
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
 
+// The rigged COLLADA character (assets/textures/markie.dae) is authored facing +X,
+// not +Z like the rest of the game assumes (the group's +Z is the "forward" that
+// rotation.y = atan2(dx, dz) aligns with the walking direction). Verified against the
+// loaded asset: width 1.05 on X, 5.9 on Z (T-pose arms), toes pointing +X.
+// Without this quarter turn, Markie strafes sideways the whole time.
+export const DAE_FORWARD_YAW = -Math.PI / 2;
+
 export function makeHumanoid(shirt, skin, { backpack = false } = {}) {
   const group = new THREE.Group();
   const legs = new THREE.Mesh(new THREE.BoxGeometry(.48, .88, .35), new THREE.MeshStandardMaterial({ color: 0x22302f, roughness: 1 }));
@@ -13,8 +20,9 @@ export function makeHumanoid(shirt, skin, { backpack = false } = {}) {
   const hair = new THREE.Mesh(new THREE.SphereGeometry(.285, 10, 7, 0, Math.PI * 2, 0, Math.PI * .47), new THREE.MeshStandardMaterial({ color: 0x1d1713, roughness: 1 }));
   hair.position.y = 2.02; group.add(hair);
   if (backpack) {
+    // -Z is the character's back: forward is +Z for every humanoid in this game.
     const pack = new THREE.Mesh(new THREE.BoxGeometry(.44, .58, .16), new THREE.MeshStandardMaterial({ color: 0xc36a31, roughness: .8 }));
-    pack.position.set(0, 1.28, .31); pack.castShadow = true; group.add(pack);
+    pack.position.set(0, 1.28, -.31); pack.castShadow = true; group.add(pack);
   }
   group.userData = { torso, legs };
   return group;
@@ -57,6 +65,7 @@ export class Player {
       });
       model.scale.set(1.05, 1.05, 1.05);
       model.position.y = 0;
+      model.rotation.y = DAE_FORWARD_YAW;
       this.fallback.visible = false;
       this.model = model;
       if (collada.animations?.length) {

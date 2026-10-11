@@ -6,15 +6,19 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
+    "check:controls": "node tools/controls-check.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "deploy": "npm run build && wrangler deploy",
-    "cf:preview": "npm run build && wrangler dev"
+    "cf:preview": "npm run build && wrangler dev",
+    "check:touch": "node tools/touch-pad-check.mjs",
+    "check": "npm run check:controls && npm run check:touch"
   },
   "dependencies": {
     "three": "^0.179.1"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.63.1",
+    "jsdom": "^30.1.2",
     "vite": "^7.1.7",
     "wrangler": "^4.149.0"
   }

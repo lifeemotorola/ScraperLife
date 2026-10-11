@@ -14,6 +14,11 @@ export class UIManager {
     };
     this.worldBounds = 48; // matches PhysicsEngine limit + water offset; platform expanded to 92 units
     this.worldMapOpen = false;
+    // Touch players have no E key; the interaction prompt should name the button they do have.
+    if (matchMedia('(pointer: coarse)').matches) {
+      const key = this.el.interaction?.querySelector('kbd');
+      if (key) key.textContent = 'USE';
+    }
   }
 
   bindStart(onStart, onRestart) {
