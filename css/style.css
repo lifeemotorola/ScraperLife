@@ -19,10 +19,10 @@ h1 { font:800 26px/.8 'Barlow Condensed',sans-serif; letter-spacing:.05em; margi
 .quest-panel p { color:#c5cec4; margin:0; font-size:12px; line-height:1.38; }
 .quest-progress { margin-top:16px; }.quest-progress span,.meter-label { display:flex;justify-content:space-between;color:#e5e8dd;font:500 9px/1 'DM Mono';letter-spacing:.08em; }
 .bar,.resolve-meter { background:rgba(242,240,220,.15);height:4px;margin-top:7px;overflow:hidden; }.bar i {display:block;height:100%;width:0;background:var(--orange);box-shadow:0 0 8px var(--orange);transition:width .3s}.status-panel { position:absolute; right:31px; top:28px; width:235px; padding:13px 14px; }.status-row {display:flex;justify-content:space-between;color:#edf2e9;font:600 10px/1 'DM Mono';letter-spacing:.07em}.status-row span:last-child{color:#a5b8ae;font-size:8px}.meter-label { margin-top:16px;}.meter-label b{color:var(--teal);font-weight:500}.resolve-meter i{display:block;height:100%;width:100%;background:var(--teal);transition:width .2s}.pulse-line{display:flex;align-items:center;gap:6px;margin-top:12px;color:#bfcac1;font:500 8px/1 'DM Mono';letter-spacing:.12em}.pulse-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);box-shadow:0 0 9px var(--teal)}.world-line{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:9px;border-top:1px solid rgba(217,238,220,.12);font:500 8px/1 'DM Mono';letter-spacing:.07em;color:#d5e0d6}.world-line span:last-child{color:var(--amber)}
-/* Character voices toggle (status panel). Overrides the chunky orange button default. */
-.voice-toggle{margin-top:11px;width:100%;padding:7px 8px;border-radius:0;border:1px solid rgba(117,197,187,.5);background:rgba(117,197,187,.16);color:var(--teal);font:700 9px/1 'DM Mono',monospace;letter-spacing:.14em;cursor:pointer;pointer-events:auto;transition:background .2s,color .2s,opacity .2s}
-.voice-toggle:hover{transform:none;background:rgba(117,197,187,.28);color:#cdeee8}
-.voice-toggle.off{border-color:rgba(160,172,164,.3);background:rgba(18,28,28,.4);color:#8a9a92}
+/* Audio toggles (status panel). Overrides the chunky orange button default. */
+.voice-toggle,.music-toggle{margin-top:7px;width:100%;padding:7px 8px;border-radius:0;border:1px solid rgba(117,197,187,.5);background:rgba(117,197,187,.16);color:var(--teal);font:700 9px/1 'DM Mono',monospace;letter-spacing:.14em;cursor:pointer;pointer-events:auto;transition:background .2s,color .2s,opacity .2s}
+.voice-toggle:hover,.music-toggle:hover{transform:none;background:rgba(117,197,187,.28);color:#cdeee8}
+.voice-toggle.off,.music-toggle.off{border-color:rgba(160,172,164,.3);background:rgba(18,28,28,.4);color:#8a9a92}
 .map-panel{position:absolute;right:31px;bottom:39px;width:280px;padding:10px;cursor:pointer;pointer-events:auto;transition:transform .2s,box-shadow .2s}
 .map-panel:hover{transform:translateY(-2px);box-shadow:0 18px 42px rgba(0,0,0,.35)}
 .map-title{color:#c3d1c7;font:500 8px/1 'DM Mono';letter-spacing:.08em;padding:2px 2px 7px;display:flex;justify-content:space-between;align-items:center}
@@ -121,13 +121,13 @@ h1 { font:800 26px/.8 'Barlow Condensed',sans-serif; letter-spacing:.05em; margi
   /* --- system keys: top right, clear of both thumbs --- */
   .mobile-system { position:absolute; right:max(14px, env(safe-area-inset-right)); top:max(14px, env(safe-area-inset-top));
     display:flex; gap:8px; pointer-events:none; transform:scale(var(--pad-scale)); transform-origin:right top; }
-  .touch-camera,.touch-voice,.touch-map { position:static; width:52px; height:52px; font-size:10px; pointer-events:auto; }
+  .touch-camera,.touch-voice,.touch-music,.touch-map { position:static; width:52px; height:52px; font-size:10px; pointer-events:auto; }
   .touch-camera { background:radial-gradient(circle at 35% 30%,rgba(85,125,135,.92),rgba(18,45,48,.96)); }
-  .touch-map { border-color:rgba(117,197,187,.5); background:radial-gradient(circle at 35% 30%,rgba(85,125,135,.92),rgba(18,45,48,.96)); }
-  .touch-voice.off { opacity:.5; }
+  .touch-map,.touch-music { border-color:rgba(117,197,187,.5); background:radial-gradient(circle at 35% 30%,rgba(85,125,135,.92),rgba(18,45,48,.96)); }
+  .touch-voice.off,.touch-music.off { opacity:.5; }
 
   /* --- HUD: keep the top corners readable, hand the bottom to the thumbs --- */
-  .controls, .map-panel, .mission-log, .voice-toggle { display:none; }
+  .controls, .map-panel, .mission-log, .voice-toggle, .music-toggle { display:none; }
   .brand { left:max(12px, env(safe-area-inset-left)); top:max(12px, env(safe-area-inset-top)); transform:scale(.82); transform-origin:top left; }
   .quest-panel { left:max(12px, env(safe-area-inset-left)); top:max(62px, calc(env(safe-area-inset-top) + 62px)); width:min(232px,48vw); padding:11px 13px; }
   .quest-panel h2 { font-size:17px; margin:9px 0 4px; }
@@ -171,7 +171,7 @@ h1 { font:800 26px/.8 'Barlow Condensed',sans-serif; letter-spacing:.05em; margi
   .touch-use { width:66px; height:66px; font-size:12px; }
   .touch-pulse { right:76px; bottom:6px; width:58px; height:58px; }
   .touch-run { right:10px; bottom:78px; width:52px; height:52px; font-size:10px; }
-  .touch-camera,.touch-voice,.touch-map { width:46px; height:46px; }
+  .touch-camera,.touch-voice,.touch-music,.touch-map { width:46px; height:46px; }
   .quest-panel { top:max(56px, calc(env(safe-area-inset-top) + 56px)); width:min(206px,42vw); padding:9px 11px; }
   .quest-panel h2 { font-size:15px; }
   .quest-panel p { -webkit-line-clamp:2; font-size:10px; }

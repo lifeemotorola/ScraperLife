@@ -11,6 +11,7 @@ export class UIManager {
       mapPanel: $('map-panel'), worldMap: $('world-map'), worldMapPlayer: $('world-map-player'), worldMapObjective: $('world-map-objective'), worldMapObjectiveLabel: $('world-map-objective-label'), closeWorldMap: $('close-world-map'), mapTitle: $('map-title'),
       missionList: $('mission-list'), missionCount: $('mission-count'), missionCountDetail: $('mission-count-detail'), completeCopy: $('complete-copy'),
       touchMap: $('touch-map'), voiceToggle: $('voice-toggle'), touchVoice: $('touch-voice'),
+      musicToggle: $('music-toggle'), touchMusic: $('touch-music'),
     };
     this.worldBounds = 48; // matches PhysicsEngine limit + water offset; platform expanded to 92 units
     this.worldMapOpen = false;
@@ -51,6 +52,26 @@ export class UIManager {
       this.el.voiceToggle.classList.toggle('off', !on);
     }
     this.el.touchVoice?.classList.toggle('off', !on);
+  }
+  bindMusicToggle(onToggle) {
+    const flip = () => this.setMusicState(onToggle());
+    this.el.musicToggle?.addEventListener('click', (event) => { event.preventDefault(); flip(); });
+    this.el.touchMusic?.addEventListener('pointerdown', (event) => {
+      event.preventDefault(); event.stopPropagation(); flip();
+    }, { passive: false });
+    window.addEventListener('keydown', (event) => {
+      if (event.repeat || event.key.toLowerCase() !== 'b') return;
+      flip();
+    });
+  }
+  setMusicState(on) {
+    if (this.el.musicToggle) {
+      this.el.musicToggle.textContent = on ? '♫ MUSIC ON' : '♫ MUSIC OFF';
+      this.el.musicToggle.classList.toggle('off', !on);
+      this.el.musicToggle.setAttribute('aria-pressed', String(Boolean(on)));
+    }
+    this.el.touchMusic?.classList.toggle('off', !on);
+    this.el.touchMusic?.setAttribute('aria-pressed', String(Boolean(on)));
   }
   toggleWorldMap() { this.worldMapOpen ? this.closeMap() : this.openMap(); }
   openMap() { this.el.worldMap?.classList.remove('hidden'); this.worldMapOpen = true; this.el.mapTitle?.classList.add('expanded'); }

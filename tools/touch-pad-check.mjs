@@ -1,6 +1,6 @@
 // End-to-end check of the touch pad against the real index.html markup:
 // synthetic pointer events on the joystick must produce the documented input vector,
-// and the MAP / VOX / CAM buttons must be wired.
+// and the MAP / VOX / MUSIC / CAM buttons must be wired.
 import { JSDOM } from 'jsdom';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -36,6 +36,9 @@ const ui = new UIManager();
 ui.bindStart(() => {}, () => {});
 let voiceOn = true;
 ui.bindVoiceToggle(() => (voiceOn = !voiceOn));
+let musicOn = true;
+ui.bindMusicToggle(() => (musicOn = !musicOn));
+ui.setMusicState(musicOn);
 
 const controller = new MobileController(input);
 check('MobileController found the pad elements', Boolean(controller.zone && controller.base && controller.knob));
@@ -110,6 +113,19 @@ check('VOX button toggles voices off', vox.classList.contains('off') === true, `
 check('desktop voice button mirrors the state',
   dom.window.document.getElementById('voice-toggle').textContent.includes('OFF'),
   dom.window.document.getElementById('voice-toggle').textContent);
+
+const musicButton = dom.window.document.getElementById('touch-music');
+musicButton.dispatchEvent(pointer('pointerdown', 750, 40, 14));
+check('MUS button toggles background music off', musicOn === false && musicButton.classList.contains('off'),
+  `enabled=${musicOn} classes="${musicButton.className}"`);
+check('desktop music button mirrors the mobile state',
+  dom.window.document.getElementById('music-toggle').textContent.includes('OFF')
+    && dom.window.document.getElementById('music-toggle').getAttribute('aria-pressed') === 'false',
+  dom.window.document.getElementById('music-toggle').textContent);
+dom.window.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'b', bubbles: true }));
+check('B key toggles music back on', musicOn === true
+  && dom.window.document.getElementById('touch-music').getAttribute('aria-pressed') === 'true',
+  `enabled=${musicOn}`);
 
 console.log(failures.length ? `\n${failures.length} touch-wiring check(s) failed.` : '\nAll touch-wiring checks passed.');
 process.exit(failures.length ? 1 : 0);

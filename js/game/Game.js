@@ -15,6 +15,7 @@ import { CrowdSystem, CROWD_TUNING } from '../systems/CrowdSystem.js';
 import { MissionSystem } from '../systems/MissionSystem.js';
 import { DialogueSystem } from '../systems/DialogueSystem.js';
 import { VoiceSystem } from '../systems/VoiceSystem.js';
+import { MusicSystem } from '../systems/MusicSystem.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { InventorySystem } from '../systems/InventorySystem.js';
 import { DIALOGUE } from '../data/dialogues.js';
@@ -75,6 +76,7 @@ export class Game {
     this.inventory = new InventorySystem();
     this.missions = new MissionSystem(this.inventory);
     this.voice = new VoiceSystem();
+    this.music = new MusicSystem();
     this.dialogue = new DialogueSystem(this.ui, DIALOGUE, this.voice);
     this.combat = new CombatSystem();
     this.physics = new PhysicsEngine({ limit: 48 });
@@ -169,6 +171,12 @@ export class Game {
       return on;
     });
     this.ui.setVoiceState(this.voice.enabled);
+    this.ui.bindMusicToggle(() => {
+      const on = this.music.toggle();
+      this.ui.toast(on ? 'MUSIC // ON' : 'MUSIC // OFF');
+      return on;
+    });
+    this.ui.setMusicState(this.music.enabled);
     this.ui.setCameraView(this.cameraModes[this.cameraIndex].label);
     window.addEventListener('resize', () => this.resize());
     this.updateQuest();
@@ -242,7 +250,9 @@ export class Game {
 
   start() {
     this.running = true; this.ui.startGame();
-    // Unlocks speech inside the start-button gesture so the opening line can play.
+    // Music must begin inside the start-button gesture so mobile browsers permit playback.
+    this.music.start();
+    // Unlocks speech inside the same gesture so the opening line can play over the music.
     this.voice.unlock();
     this.ui.toast('JOB STARTED // THE WEIGHT OF TRUTH'); this.dialogue.play('opening', 6);
   }

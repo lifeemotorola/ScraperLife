@@ -25,6 +25,7 @@ npm run deploy   # vite build + wrangler deploy
 | `C` | `CAM` | cycle camera view (also recenters behind Markie) |
 | `M` | `MAP` | platform map |
 | `V` | `VOX` | toggle character voices |
+| `B` | `MUS` | toggle platform background music |
 
 ## Conventions that keep the camera and the pad in agreement
 
@@ -115,11 +116,13 @@ target and minimap.
 ## Lighting: HDR, not a blanket of fog
 
 `tools/bake_hdr_sky.py` bakes a small, equirectangular Radiance RGBE sky at
-`assets/textures/waterside_sky.hdr`. It includes a high-range sun placed to match the day-cycle
-sun at the opening time. `RGBELoader` reads the map, `PMREMGenerator` convolves it into the
-scene’s image-based lighting, and ACES tone mapping preserves the bright sun and the darker
-street range. Clear weather uses a long linear fog distance; rain and Harmattan haze can pull the
-horizon closer, but the entire city is no longer hidden by permanent exponential fog.
+`assets/textures/waterside_sky.hdr`. It includes a high-range sun that the climate controller
+rotates with the shadow-casting sun. One full 24-hour in-game day takes 15 real minutes: the loop
+starts at 06:00, gives 7.5 minutes of daylight, then 7.5 minutes of night, and advances the day
+counter at sunrise. `RGBELoader` reads the map, `PMREMGenerator` convolves it into the scene’s
+image-based lighting, and ACES tone mapping preserves the bright sun and darker street range.
+Clear weather uses a long linear fog distance; rain and Harmattan haze can pull the horizon closer,
+but the entire city is no longer hidden by permanent exponential fog.
 
 ```bash
 python3 tools/bake_hdr_sky.py               # coastal-clear HDR (512 x 256)
@@ -128,10 +131,23 @@ python3 tools/bake_hdr_sky.py check         # decode + verify sun direction and 
 npm run sky
 ```
 
+## Platform music
+
+`tools/bake_platform_music.py` composes an original, vocal-free 16-bar instrumental loop using only
+Python’s standard library. The soft keys, bass, and light hand percussion start after the player
+presses **START**, stay quiet under story dialogue, and loop across the platform. Toggle it with
+`B` on desktop or `MUS` on touch; the preference is saved locally.
+
+```bash
+python3 tools/bake_platform_music.py  # regenerate assets/audio/platform-loop.wav
+npm run music                        # same as above
+npm run check:music                  # verify WAV format, duration, and signal level
+```
+
 ## Checks
 
 ```bash
-npm run check   # controls, touch, rig, cast palettes, HDR and crowd behavior
+npm run check   # controls, touch, rig, cast palettes, HDR, music, and crowd behavior
 ```
 
 * `npm run check:controls` — drives the real `InputManager`, `Player` and
@@ -140,7 +156,7 @@ npm run check   # controls, touch, rig, cast palettes, HDR and crowd behavior
   the way he walks. This is the regression guard for the inverted analog.
 * `npm run check:touch` — loads the real `index.html` in jsdom and fires synthetic pointer
   events at the pad, so the stick axes, the dead zone, multi-touch isolation and every
-  `USE` / `PULSE` / `RUN` / `CAM` / `VOX` / `MAP` button stay wired to the game.
+  `USE` / `PULSE` / `RUN` / `CAM` / `VOX` / `MUS` / `MAP` button stay wired to the game.
 * `npm run check:character` — loads the exported GLB through the real `GLTFLoader`, then asserts
   the conventions the game is built on: feet on `y=0`, height equal to the manifest, **+Z** as the
   forward axis (toe joint ahead of the ankle joint), every state mapped to a clip, clip durations
@@ -148,9 +164,10 @@ npm run check   # controls, touch, rig, cast palettes, HDR and crowd behavior
   silhouette stays on the floor and keeps its height while the walk clip plays. It skips quietly
   when `assets/models/` has not been generated yet.
 * `npm run check:palette` — loads the same GLB, clones the rig for every palette, checks every
-  material/skin/outfit tint, and asserts characters share vertex buffers but not skeletons.
+  material/skin/outfit tint and garment flutter uniforms, and asserts characters share vertex
+  buffers but not skeletons.
 * `npm run check:lighting` — decodes the baked HDR with three.js’ `RGBELoader`, checks the sun
-  and radiance range, and verifies clear-weather sight distance stays long while rain/Harmattan
-  still have distinct, shorter horizons.
+  and radiance range, verifies the 15-minute day/night timing, and confirms weather visibility.
+* `npm run check:music` — checks the generated platform loop’s PCM format, duration, and signal level.
 * `npm run check:crowd` — drives the real `CrowdSystem`/`PhysicsEngine` outside a browser and
   verifies roaming, building collisions, greetings, lectures, replies and pair cooldowns.
