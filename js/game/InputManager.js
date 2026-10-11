@@ -26,8 +26,22 @@ export class InputManager {
     this.element.addEventListener('pointercancel', this.onPointerUp);
   }
 
+  isUiModalOpen() {
+    if (typeof document === 'undefined') return false;
+    return ['settings-panel', 'world-map'].some((id) => {
+      const panel = document.getElementById(id);
+      return panel && !panel.classList.contains('hidden');
+    });
+  }
+
   onKeyDown(event) {
     const blocked = ['Space', 'KeyE', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    if (this.isUiModalOpen()) {
+      const gameKeys = [...blocked, 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyC', 'ShiftLeft', 'ShiftRight'];
+      if (gameKeys.includes(event.code)) event.preventDefault();
+      this.keys.delete(event.code);
+      return;
+    }
     if (blocked.includes(event.code)) event.preventDefault();
     this.keys.add(event.code);
     if (event.repeat) return;
@@ -73,6 +87,7 @@ export class InputManager {
   // Stick/key vector (x = right, z = down/back) rotated into the camera frame.
   // up (-z) -> camera forward, right (+x) -> camera right, at any camera angle.
   getMovement() {
+    if (this.isUiModalOpen()) return { x: 0, z: 0, running: false };
     let x = this.virtualMove.x; let z = this.virtualMove.z;
     if (this.isDown('KeyW', 'ArrowUp')) z -= 1;
     if (this.isDown('KeyS', 'ArrowDown')) z += 1;

@@ -412,7 +412,7 @@ export class Game {
     this.ui.toast(stunned ? `SCRAP PULSE // ${stunned} WATCH${stunned > 1 ? 'ES' : ''} DISRUPTED` : 'SCRAP PULSE // AREA CLEAR');
   }
 
-  updateQuest() { this.ui.updateQuest(this.missions.mission, this.inventory.scrap, this.missions); }
+  updateQuest() { this.ui.updateQuest(this.missions.mission, this.inventory.scrap); }
   updateCamera() {
     const view = this.cameraModes[this.cameraIndex];
     const up = new THREE.Vector3(0, 1, 0);

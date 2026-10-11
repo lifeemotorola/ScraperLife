@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 // This build of the addon exports bare functions (`retarget`, `retargetClip`, `clone`), not a
 // `SkeletonUtils` namespace — importing a namespace here would resolve to `undefined`.
 import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
+import { applyWardrobe } from './Wardrobe.js';
 
 // Runtime half of tools/rig_and_animate.py. The Python script exports a GLB plus a
 // `<name>.character.json` manifest; everything here reads that manifest instead of guessing,
@@ -372,9 +373,10 @@ export function instantiateCharacter(shared, { palette = null, paletteData = nul
     slots: paletteData?.slots || shared.slots || {},
     shared: paletteData?.shared || shared.shared || {},
   });
+  const wardrobe = applyWardrobe(root, materials, palette, { shadow, cull });
   const animator = new CharacterAnimator(root, shared.clips || [], {
     stateMap: shared.manifest?.stateMap || {},
   });
   animator.clothMotion = attachClothMotion(materials, palette?.seed || palette?.name || root.uuid);
-  return { root, animator, materials };
+  return { root, animator, materials, wardrobe };
 }

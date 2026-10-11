@@ -5,8 +5,9 @@ Scraper Life their own skin tone and outfit without exporting a second mesh.
 Every character in the game is now *the same character as Markie*: they all load
 ``assets/models/survival_character.glb`` (the file ``tools/rig_and_animate.py`` builds) and
 are cloned at runtime. What separates Kollie from Vardee is no longer a different body or a
-box-shaped placeholder — it is colour. This script is the single place that colour is
-decided.
+box-shaped placeholder — it is their skin tone, garment colours, authored clothing patterns,
+headwear and accessories. This script is the single place those palette and wardrobe profiles
+are decided; ``js/entities/Wardrobe.js`` paints them onto each clone.
 
     python3 tools/character_palette.py inspect          # what slots the GLB actually has
     python3 tools/character_palette.py build            # write assets/models/character_palettes.json
@@ -31,8 +32,9 @@ slot to live in, or if the palette names a material the GLB no longer has. The r
 has to guess either: an unknown material simply keeps the exported colour.
 
 Colours are deterministic. Each character's palette is drawn from a blake2b-seeded RNG keyed
-on its id, so ``build`` is reproducible (no diff churn, no re-roll on every machine) while
-still giving each character a slightly different tone rather than eleven copies of one hex.
+on its id, so ``build`` is reproducible (no diff churn, no re-roll on every machine). The roster
+also carries one authored top/bottom/headwear/backpack combination and optional jersey number per
+character.
 
 This script needs no Blender and no third-party packages: the GLB JSON chunk is parsed with
 ``struct``.
@@ -129,6 +131,21 @@ SLOTS = [
 
 # Slots every character must have a colour for. `brows` is derived from `hair`.
 REQUIRED_SLOTS = ["skin", "hair", "brows", "shirt", "pants", "shoes", "gloves", "pack"]
+# Palette wardrobe IDs are mirrored by CharacterRig's procedural outfit shader/accessories.
+WARDROBE_TOP_STYLES = (
+    "street-tee", "print-blouse", "work-shirt", "wrap-blouse", "football-jersey",
+    "graphic-tee", "hoodie", "utility-vest", "bomber", "tactical-polo", "tailored-suit",
+    "formal-tunic", "striped-jersey", "market-polo", "hi-vis-vest", "track-jacket", "cargo-vest",
+)
+WARDROBE_BOTTOM_STYLES = (
+    "field-cargo", "pattern-trouser", "pressed-trouser", "straight-jeans", "track-pants",
+    "rolled-jeans", "tailored-pants", "work-cargo", "dark-denim", "tactical-pants",
+    "suit-trousers", "formal-trousers", "uniform-trousers", "market-jeans", "dock-workwear",
+    "harbor-track-pants", "warehouse-cargo",
+)
+WARDROBE_HEADWEAR_STYLES = (
+    "none", "cap", "sports-cap", "flat-cap", "headwrap", "headband", "beanie", "kufi", "hardhat", "bandana",
+)
 # Slots coloured once for the whole cast (see SHARED_COLOURS).
 SHARED_SLOTS = ["eyes", "mouth"]
 
@@ -176,12 +193,14 @@ ROSTER = [
     {
         "id": "markie", "name": "Markie Kollie", "label": "MARKIE", "role": "Protagonist",
         "voice": "greeter", "skin": 4, "accent": "#75c5bb",
+        "wardrobe": {"top": "street-tee", "bottom": "field-cargo", "headwear": "cap", "backpack": True, "number": 0},
         "outfit": {"shirt": "#2f5d5b", "pants": "#26333c", "shoes": "#3b2a1f",
                    "gloves": "#22302d", "pack": "#c36a31"},
     },
     {
         "id": "musu", "name": "Musu Kollie", "label": "MUSU", "role": "Mother — memory",
         "voice": "greeter", "skin": 8, "accent": "#f4b07a",
+        "wardrobe": {"top": "print-blouse", "bottom": "pattern-trouser", "headwear": "headwrap", "backpack": False, "number": 0},
         "outfit": {"shirt": "#8d4b47", "pants": "#583849", "shoes": "#49312b",
                    "gloves": "#65443d", "pack": "#845b46"},
         "hair": "#18110e",
@@ -189,6 +208,7 @@ ROSTER = [
     {
         "id": "kollie", "name": "Old Man Kollie", "label": "OLD MAN KOLLIE", "role": "Mentor",
         "voice": "lecturer", "skin": 1, "accent": "#9fd7ff",
+        "wardrobe": {"top": "work-shirt", "bottom": "pressed-trouser", "headwear": "flat-cap", "backpack": False, "number": 0},
         "outfit": {"shirt": "#3f5a70", "pants": "#35322c", "shoes": "#2c211a",
                    "gloves": "#4a3b2c", "pack": "#6b5a3a"},
         "hair": "#cfc7bb",  # grey: the elder of Waterside
@@ -196,54 +216,63 @@ ROSTER = [
     {
         "id": "tenneh", "name": "Tenneh", "label": "TENNEH", "role": "Love interest",
         "voice": "greeter", "skin": 7, "accent": "#ffb454",
+        "wardrobe": {"top": "wrap-blouse", "bottom": "straight-jeans", "headwear": "headband", "backpack": False, "number": 0},
         "outfit": {"shirt": "#c9662f", "pants": "#43342a", "shoes": "#6b4a2c",
                    "gloves": "#8a6a3a", "pack": "#b0562f"},
     },
     {
         "id": "flomo", "name": "Flomo", "label": "FLOMO", "role": "Best friend",
         "voice": "greeter", "skin": 5, "accent": "#a8d26a",
+        "wardrobe": {"top": "football-jersey", "bottom": "track-pants", "headwear": "sports-cap", "backpack": False, "number": 8},
         "outfit": {"shirt": "#5d6b3a", "pants": "#33485e", "shoes": "#3a2f24",
                    "gloves": "#2f3b2a", "pack": "#7a6a3a"},
     },
     {
         "id": "sia", "name": "Sia", "label": "SIA", "role": "Street kid",
         "voice": "greeter", "skin": 8, "accent": "#ffd08a",
+        "wardrobe": {"top": "graphic-tee", "bottom": "rolled-jeans", "headwear": "beanie", "backpack": True, "number": 0},
         "outfit": {"shirt": "#d2663a", "pants": "#3c4a58", "shoes": "#b08a4a",
                    "gloves": "#4a4a44", "pack": "#cf8a3a"},
     },
     {
         "id": "garmai", "name": "Garmai", "label": "GARMAI", "role": "Information broker",
         "voice": "lecturer", "skin": 6, "accent": "#c760b0",
+        "wardrobe": {"top": "hoodie", "bottom": "tailored-pants", "headwear": "headwrap", "backpack": False, "number": 0},
         "outfit": {"shirt": "#5b3560", "pants": "#2f2b3a", "shoes": "#3a2c33",
                    "gloves": "#4a3a44", "pack": "#6b4a6b"},
     },
     {
         "id": "boakai", "name": "Boakai", "label": "BOAKAI", "role": "Equipment fixer",
         "voice": "greeter", "skin": 2, "accent": "#d8c07a",
+        "wardrobe": {"top": "utility-vest", "bottom": "work-cargo", "headwear": "none", "backpack": True, "number": 0},
         "outfit": {"shirt": "#8a7448", "pants": "#4a4a3a", "shoes": "#4a3524",
                    "gloves": "#6b5a3a", "pack": "#7a6a4a"},
     },
     {
         "id": "jallah", "name": "Jallah", "label": "JALLAH", "role": "Rival",
         "voice": "greeter", "skin": 3, "accent": "#ff6b5e",
+        "wardrobe": {"top": "bomber", "bottom": "dark-denim", "headwear": "beanie", "backpack": False, "number": 0},
         "outfit": {"shirt": "#3a3a3f", "pants": "#2a2a30", "shoes": "#26221f",
                    "gloves": "#4a2a28", "pack": "#3f3a38"},
     },
     {
         "id": "togar", "name": "Togar", "label": "TOGAR", "role": "Lieutenant",
         "voice": "lecturer", "skin": 0, "accent": "#9aa7b0",
+        "wardrobe": {"top": "tactical-polo", "bottom": "tactical-pants", "headwear": "none", "backpack": True, "number": 0},
         "outfit": {"shirt": "#2b2f33", "pants": "#23262a", "shoes": "#1c1d1f",
                    "gloves": "#2f3236", "pack": "#26292c"},
     },
     {
         "id": "vardee", "name": "Vardee", "label": "VARDEE", "role": "Antagonist",
         "voice": "lecturer", "skin": 0, "accent": "#ff3b3b",
+        "wardrobe": {"top": "tailored-suit", "bottom": "suit-trousers", "headwear": "none", "backpack": False, "number": 0},
         "outfit": {"shirt": "#4a1f26", "pants": "#231c1e", "shoes": "#1e1a1a",
                    "gloves": "#3a1f22", "pack": "#2e1c1e"},
     },
     {
         "id": "kormah", "name": "Kormah", "label": "KORMAH", "role": "Corrupt official",
         "voice": "lecturer", "skin": 5, "accent": "#bca36a",
+        "wardrobe": {"top": "formal-tunic", "bottom": "formal-trousers", "headwear": "kufi", "backpack": False, "number": 0},
         "outfit": {"shirt": "#3f4b45", "pants": "#292e30", "shoes": "#251f1a",
                    "gloves": "#383c34", "pack": "#45413a"},
         "hair": "#211b16",
@@ -251,30 +280,35 @@ ROSTER = [
     {
         "id": "watch-east-1", "name": "East Watch", "label": "EAST WATCH", "role": "Street watch",
         "voice": "greeter", "skin": 9, "accent": "#ff7041",
+        "wardrobe": {"top": "striped-jersey", "bottom": "uniform-trousers", "headwear": "cap", "backpack": False, "number": 4},
         "outfit": {"shirt": "#712f29", "pants": "#33252a", "shoes": "#241d1d",
                    "gloves": "#3f2222", "pack": "#40262a"},
     },
     {
         "id": "watch-market-2", "name": "Market Watch", "label": "MARKET WATCH", "role": "Street watch",
         "voice": "greeter", "skin": 4, "accent": "#ff8a50",
+        "wardrobe": {"top": "market-polo", "bottom": "market-jeans", "headwear": "sports-cap", "backpack": False, "number": 0},
         "outfit": {"shirt": "#67352e", "pants": "#373034", "shoes": "#241d1d",
                    "gloves": "#452a29", "pack": "#493036"},
     },
     {
         "id": "watch-docks-3", "name": "Docks Watch", "label": "DOCKS WATCH", "role": "Street watch",
         "voice": "greeter", "skin": 7, "accent": "#e85f43",
+        "wardrobe": {"top": "hi-vis-vest", "bottom": "dock-workwear", "headwear": "hardhat", "backpack": True, "number": 0},
         "outfit": {"shirt": "#803a31", "pants": "#303037", "shoes": "#221e20",
                    "gloves": "#50292b", "pack": "#48282b"},
     },
     {
         "id": "watch-harbor-4", "name": "Harbor Watch", "label": "HARBOR WATCH", "role": "Street watch",
         "voice": "greeter", "skin": 0, "accent": "#dc5740",
+        "wardrobe": {"top": "track-jacket", "bottom": "harbor-track-pants", "headwear": "bandana", "backpack": False, "number": 0},
         "outfit": {"shirt": "#5b2927", "pants": "#343033", "shoes": "#211d1c",
                    "gloves": "#3e2425", "pack": "#382326"},
     },
     {
         "id": "watch-warehouse-5", "name": "Warehouse Watch", "label": "WAREHOUSE WATCH", "role": "Street watch",
         "voice": "greeter", "skin": 6, "accent": "#ff8054",
+        "wardrobe": {"top": "cargo-vest", "bottom": "warehouse-cargo", "headwear": "hardhat", "backpack": True, "number": 0},
         "outfit": {"shirt": "#8a4031", "pants": "#393134", "shoes": "#241d1d",
                    "gloves": "#562b28", "pack": "#502d30"},
     },
@@ -336,6 +370,7 @@ def character_palette(entry, seed):
         "role": entry["role"],
         "voice": entry["voice"],
         "accent": entry["accent"],
+        "wardrobe": dict(entry["wardrobe"]),
         "seed": hashlib.blake2b(f"{seed}|{entry['id']}".encode("utf-8"), digest_size=4).hexdigest(),
         "colors": colours,
     }
@@ -350,12 +385,12 @@ def build_document(glb_path, seed, only=None):
         die(f"no roster entries match --only {sorted(only)}")
     return {
         "generator": "tools/character_palette.py",
-        "version": 1,
+        "version": 2,
         "seed": seed,
         "model": os.path.splitext(os.path.basename(glb_path))[0],
         "source": glb_path.replace(os.sep, "/"),
         "units": "sRGB hex, as read by three.js Color.set()",
-        "note": "One rigged body for the whole cast; per-character colour only. Do not edit by hand - re-run the generator.",
+        "note": "One rigged body for the whole cast; each palette carries its own colours and wardrobe style. Do not edit by hand - re-run the generator.",
         "materials": names,
         "unmatchedMaterials": unmatched,
         "slots": slots,
@@ -452,6 +487,25 @@ def cmd_check(args):
               character.get("voice") in ("lecturer", "greeter"), str(character.get("voice")))
         check(f"'{entry['id']}' palette is reproducible",
               character == fresh["characters"].get(entry["id"]), "re-ran the generator")
+
+    wardrobe_profiles = [entry.get("wardrobe", {}) for entry in ROSTER]
+    check("every character has a supported topwear style",
+          all(profile.get("top") in WARDROBE_TOP_STYLES for profile in wardrobe_profiles),
+          f"{len(wardrobe_profiles)}/{len(ROSTER)}")
+    check("every character has a supported bottomwear style",
+          all(profile.get("bottom") in WARDROBE_BOTTOM_STYLES for profile in wardrobe_profiles),
+          f"{len(wardrobe_profiles)}/{len(ROSTER)}")
+    check("every character has supported headwear and pack choices",
+          all(profile.get("headwear") in WARDROBE_HEADWEAR_STYLES
+              and isinstance(profile.get("backpack"), bool)
+              and 0 <= int(profile.get("number", 0)) <= 9 for profile in wardrobe_profiles),
+          f"{len(wardrobe_profiles)}/{len(ROSTER)}")
+    top_styles = [profile.get("top") for profile in wardrobe_profiles]
+    bottom_styles = [profile.get("bottom") for profile in wardrobe_profiles]
+    check("every character has a distinct topwear look", len(set(top_styles)) == len(ROSTER),
+          f"{len(set(top_styles))}/{len(ROSTER)}")
+    check("every character has a distinct bottomwear look", len(set(bottom_styles)) == len(ROSTER),
+          f"{len(set(bottom_styles))}/{len(ROSTER)}")
 
     skins = [c["colors"]["skin"] for c in characters.values()]
     shirts = [c["colors"]["shirt"] for c in characters.values()]

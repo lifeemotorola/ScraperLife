@@ -1,11 +1,11 @@
 {
   "generator": "tools/character_palette.py",
-  "version": 1,
+  "version": 2,
   "seed": "waterside-01",
   "model": "survival_character",
   "source": "/home/user/ScraperLife/assets/models/survival_character.glb",
   "units": "sRGB hex, as read by three.js Color.set()",
-  "note": "One rigged body for the whole cast; per-character colour only. Do not edit by hand - re-run the generator.",
+  "note": "One rigged body for the whole cast; each palette carries its own colours and wardrobe style. Do not edit by hand - re-run the generator.",
   "materials": [
     "Backpack2",
     "Head",
@@ -106,6 +106,13 @@
       "role": "Protagonist",
       "voice": "greeter",
       "accent": "#75c5bb",
+      "wardrobe": {
+        "top": "street-tee",
+        "bottom": "field-cargo",
+        "headwear": "cap",
+        "backpack": true,
+        "number": 0
+      },
       "seed": "d696921b",
       "colors": {
         "skin": "#66412a",
@@ -124,6 +131,13 @@
       "role": "Mother \u2014 memory",
       "voice": "greeter",
       "accent": "#f4b07a",
+      "wardrobe": {
+        "top": "print-blouse",
+        "bottom": "pattern-trouser",
+        "headwear": "headwrap",
+        "backpack": false,
+        "number": 0
+      },
       "seed": "551050d1",
       "colors": {
         "skin": "#8f623d",
@@ -142,6 +156,13 @@
       "role": "Mentor",
       "voice": "lecturer",
       "accent": "#9fd7ff",
+      "wardrobe": {
+        "top": "work-shirt",
+        "bottom": "pressed-trouser",
+        "headwear": "flat-cap",
+        "backpack": false,
+        "number": 0
+      },
       "seed": "3f9b3b3f",
       "colors": {
         "skin": "#4a2b18",
@@ -160,6 +181,13 @@
       "role": "Love interest",
       "voice": "greeter",
       "accent": "#ffb454",
+      "wardrobe": {
+        "top": "wrap-blouse",
+        "bottom": "straight-jeans",
+        "headwear": "headband",
+        "backpack": false,
+        "number": 0
+      },
       "seed": "d8459414",
       "colors": {
         "skin": "#91633e",
@@ -178,6 +206,13 @@
       "role": "Best friend",
       "voice": "greeter",
       "accent": "#a8d26a",
+      "wardrobe": {
+        "top": "football-jersey",
+        "bottom": "track-pants",
+        "headwear": "sports-cap",
+        "backpack": false,
+        "number": 8
+      },
       "seed": "32bca77f",
       "colors": {
         "skin": "#77462f",
@@ -196,6 +231,13 @@
       "role": "Street kid",
       "voice": "greeter",
       "accent": "#ffd08a",
+      "wardrobe": {
+        "top": "graphic-tee",
+        "bottom": "rolled-jeans",
+        "headwear": "beanie",
+        "backpack": true,
+        "number": 0
+      },
       "seed": "1a80662c",
       "colors": {
         "skin": "#9b6c44",
@@ -214,6 +256,13 @@
       "role": "Information broker",
       "voice": "lecturer",
       "accent": "#c760b0",
+      "wardrobe": {
+        "top": "hoodie",
+        "bottom": "tailored-pants",
+        "headwear": "headwrap",
+        "backpack": false,
+        "number": 0
+      },
       "seed": "873d63a9",
       "colors": {
         "skin": "#824b2b",
@@ -232,6 +281,13 @@
       "role": "Equipment fixer",
       "voice": "greeter",
       "accent": "#d8c07a",
+      "wardrobe": {
+        "top": "utility-vest",
+        "bottom": "work-cargo",
+        "headwear": "none",
+        "backpack": true,
+        "number": 0
+      },
       "seed": "aa57788a",
       "colors": {
         "skin": "#542c1b",
@@ -250,6 +306,13 @@
       "role": "Rival",
       "voice": "greeter",
       "accent": "#ff6b5e",
+      "wardrobe": {
+        "top": "bomber",
+        "bottom": "dark-denim",
+        "headwear": "beanie",
+        "backpack": false,
+        "number": 0
+      },
       "seed": "7e0b8627",
       "colors": {
         "skin": "#603822",
@@ -268,6 +331,13 @@
       "role": "Lieutenant",
       "voice": "lecturer",
       "accent": "#9aa7b0",
+      "wardrobe": {
+        "top": "tactical-polo",
+        "bottom": "tactical-pants",
+        "headwear": "none",
+        "backpack": true,
+        "number": 0
+      },
       "seed": "616068e7",
       "colors": {
         "skin": "#412318",
@@ -286,6 +356,13 @@
       "role": "Antagonist",
       "voice": "lecturer",
       "accent": "#ff3b3b",
+      "wardrobe": {
+        "top": "tailored-suit",
+        "bottom": "suit-trousers",
+        "headwear": "none",
+        "backpack": false,
+        "number": 0
+      },
       "seed": "22bc11a0",
       "colors": {
         "skin": "#412217",
@@ -304,6 +381,13 @@
       "role": "Corrupt official",
       "voice": "lecturer",
       "accent": "#bca36a",
+      "wardrobe": {
+        "top": "formal-tunic",
+        "bottom": "formal-trousers",
+        "headwear": "kufi",
+        "backpack": false,
+        "number": 0
+      },
       "seed": "acb93fcc",
       "colors": {
         "skin": "#6e4327",
@@ -322,6 +406,13 @@
       "role": "Street watch",
       "voice": "greeter",
       "accent": "#ff7041",
+      "wardrobe": {
+        "top": "striped-jersey",
+        "bottom": "uniform-trousers",
+        "headwear": "cap",
+        "backpack": false,
+        "number": 4
+      },
       "seed": "12466076",
       "colors": {
         "skin": "#a3714d",
@@ -340,6 +431,13 @@
       "role": "Street watch",
       "voice": "greeter",
       "accent": "#ff8a50",
+      "wardrobe": {
+        "top": "market-polo",
+        "bottom": "market-jeans",
+        "headwear": "sports-cap",
+        "backpack": false,
+        "number": 0
+      },
       "seed": "7d4c024a",
       "colors": {
         "skin": "#6d4326",
@@ -358,6 +456,13 @@
       "role": "Street watch",
       "voice": "greeter",
       "accent": "#e85f43",
+      "wardrobe": {
+        "top": "hi-vis-vest",
+        "bottom": "dock-workwear",
+        "headwear": "hardhat",
+        "backpack": true,
+        "number": 0
+      },
       "seed": "241c4f3d",
       "colors": {
         "skin": "#865436",
@@ -376,6 +481,13 @@
       "role": "Street watch",
       "voice": "greeter",
       "accent": "#dc5740",
+      "wardrobe": {
+        "top": "track-jacket",
+        "bottom": "harbor-track-pants",
+        "headwear": "bandana",
+        "backpack": false,
+        "number": 0
+      },
       "seed": "e1100ca8",
       "colors": {
         "skin": "#402017",
@@ -394,6 +506,13 @@
       "role": "Street watch",
       "voice": "greeter",
       "accent": "#ff8054",
+      "wardrobe": {
+        "top": "cargo-vest",
+        "bottom": "warehouse-cargo",
+        "headwear": "hardhat",
+        "backpack": true,
+        "number": 0
+      },
       "seed": "bbfe5e49",
       "colors": {
         "skin": "#7c4d33",

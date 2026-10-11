@@ -24,8 +24,9 @@ npm run deploy   # vite build + wrangler deploy
 | drag the view | drag the view | look around |
 | `C` | `CAM` | cycle camera view (also recenters behind Markie) |
 | `M` | `MAP` | platform map |
-| `V` | `VOX` | toggle character voices |
-| `B` | `MUS` | toggle platform background music |
+| `V` | — | toggle character voices (also in Settings) |
+| `B` | — | toggle platform background music (also in Settings) |
+| `SETTINGS` | `SETTINGS` | open the full control guide and audio preferences |
 
 ## Conventions that keep the camera and the pad in agreement
 
@@ -98,13 +99,17 @@ story character and Vardee’s crew. It uses only Python’s standard library:
 ```bash
 python3 tools/character_palette.py inspect  # show real GLB materials and the palette by person
 python3 tools/character_palette.py build    # write assets/models/character_palettes.json
-python3 tools/character_palette.py check    # validate colours/materials and reproducibility
+python3 tools/character_palette.py check    # validate colours, materials, wardrobe IDs and reproducibility
 npm run palette                             # same as build
 ```
 
-Re-run `npm run palette` after rebuilding or renaming the GLB materials. Skin tones are a curated
-range; outfit colours are varied per character. Musu’s flashback palette is included for future
-memory scenes, and Kormah now walks his office district like the rest of the street cast.
+Re-run `npm run palette` after rebuilding or renaming the GLB materials. Skin tones and garment
+colours are varied per character, and the generated profiles assign 17 different tops and bottoms
+(including tees, printed blouses, workwear, football/striped jerseys, suits and trackwear), plus
+headwear, optional jersey numbers and backpack choices. `js/entities/Wardrobe.js` paints each
+look onto the shared shirt/trouser meshes, exposes skin-tone sleeves on tees/jerseys/vests, and
+adds headwear to the cloned head bone; the existing cloth flutter continues to animate the copies. Musu’s flashback palette is included for
+future memory scenes, and Kormah now walks his office district like the rest of the street cast.
 
 Residents stroll within their own Waterside district and avoid the real building colliders. When
 two people meet, they stop, face each other, and trade either a greeting or a short lecture based
@@ -136,7 +141,7 @@ npm run sky
 `tools/bake_platform_music.py` composes an original, vocal-free 16-bar instrumental loop using only
 Python’s standard library. The soft keys, bass, and light hand percussion start after the player
 presses **START**, stay quiet under story dialogue, and loop across the platform. Toggle the music
-with `B` on desktop or `MUS` on touch; the preference is saved locally.
+with `B` or from **Settings** on any device; the preference is saved locally.
 
 `SoundEffectsSystem` synthesizes short Web Audio effects for Markie’s footsteps, salvaged scrap
 pickups, the scrap pulse, radio repair, interactions, and enemy impacts. It unlocks on **START** for
@@ -159,8 +164,8 @@ npm run check   # controls, touch, rig, cast palettes, HDR, music, SFX, and crow
   that the projected screen direction matches the pushed direction and that Markie faces
   the way he walks. This is the regression guard for the inverted analog.
 * `npm run check:touch` — loads the real `index.html` in jsdom and fires synthetic pointer
-  events at the pad, so the stick axes, the dead zone, multi-touch isolation and every
-  `USE` / `PULSE` / `RUN` / `CAM` / `VOX` / `MUS` / `MAP` button stay wired to the game.
+  events at the pad, so the stick axes, dead zone, multi-touch isolation, progress-only HUD,
+  Settings guide/audio toggles, and `USE` / `PULSE` / `RUN` / `CAM` / `MAP` controls stay wired.
 * `npm run check:character` — loads the exported GLB through the real `GLTFLoader`, then asserts
   the conventions the game is built on: feet on `y=0`, height equal to the manifest, **+Z** as the
   forward axis (toe joint ahead of the ankle joint), every state mapped to a clip, clip durations
