@@ -21,6 +21,106 @@ const STATES = ['idle', 'walk', 'run', 'jump', 'pulse', 'hit', 'interact', 'cele
 const ONE_SHOT = new Set(['pulse', 'hit', 'interact', 'celebrate', 'jump']);
 // 'dance' is deliberately not one-shot: a looping dance is what the manifest's state map is for.
 
+const CLOTH_SLOTS = Object.freeze({
+  shirt: { kind: 0, weight: 1.0 },
+  pants: { kind: 1, weight: 0.42 },
+  pack: { kind: 2, weight: 0.72 },
+});
+const CLOTH_SHADER_VERSION = 'waterside-cloth-v1';
+
+function clothPhase(seed, slot, index) {
+  const text = `${seed ?? 'waterside'}:${slot}:${index}`;
+  let hash = 2166136261;
+  for (let i = 0; i < text.length; i += 1) hash = Math.imul(hash ^ text.charCodeAt(i), 16777619);
+  return ((hash >>> 0) / 0xffffffff) * Math.PI * 2;
+}
+
+// Adds a tiny vertex-space ripple to the three loose wardrobe layers. The body stays on its
+// authored animation and the camera never drives this motion: jogging gives fabric a little more
+// follow-through, while an idle breeze keeps hems and the backpack from reading as rigid plastic.
+function attachClothMotion(materials, seed) {
+  const tracks = [];
+  for (const [slot, profile] of Object.entries(CLOTH_SLOTS)) {
+    for (const [index, material] of (materials.get(slot) || []).entries()) {
+      if (!material || material.userData?.clothMotion) continue;
+      const state = {
+        time: 0,
+        amount: 0.22,
+        weight: profile.weight,
+        kind: profile.kind,
+        phase: clothPhase(seed, slot, index),
+        uniforms: null,
+      };
+      const previousCompile = material.onBeforeCompile;
+      const previousCacheKey = material.customProgramCacheKey.bind(material);
+      material.onBeforeCompile = function onBeforeCompile(shader, renderer) {
+        previousCompile.call(this, shader, renderer);
+        shader.uniforms.uClothTime = { value: state.time };
+        shader.uniforms.uClothAmount = { value: state.amount };
+        shader.uniforms.uClothWeight = { value: state.weight };
+        shader.uniforms.uClothKind = { value: state.kind };
+        shader.uniforms.uClothPhase = { value: state.phase };
+        shader.vertexShader = shader.vertexShader.replace(
+          '#include <common>',
+          `#include <common>\nuniform float uClothTime;\nuniform float uClothAmount;\nuniform float uClothWeight;\nuniform float uClothKind;\nuniform float uClothPhase;`,
+        );
+        shader.vertexShader = shader.vertexShader.replace(
+          '#include <skinning_vertex>',
+          `#include <skinning_vertex>
+float slClothMask;
+if (uClothKind < 0.5) {
+  slClothMask = 1.0 - smoothstep(1.18, 1.82, position.y);
+} else if (uClothKind < 1.5) {
+  slClothMask = 0.20 + 0.80 * smoothstep(0.12, 0.36, position.y) * (1.0 - smoothstep(1.0, 1.35, position.y));
+} else {
+  slClothMask = 0.28 + 0.72 * (1.0 - smoothstep(1.30, 1.86, position.y));
+}
+float slClothDrive = slClothMask * uClothAmount * uClothWeight;
+float slClothWaveA = sin(uClothTime * 5.1 + position.y * 5.4 + position.x * 2.7 + uClothPhase);
+float slClothWaveB = cos(uClothTime * 3.8 - position.z * 4.1 + position.y * 2.3 + uClothPhase * 1.37);
+float slClothBreath = sin(uClothTime * 1.65 + uClothPhase);
+transformed.x += slClothDrive * (slClothWaveA * 0.038 + slClothBreath * 0.012);
+transformed.z += slClothDrive * slClothWaveB * 0.026;
+transformed.y += slClothDrive * slClothWaveA * 0.006;`,
+        );
+        state.uniforms = shader.uniforms;
+      };
+      material.customProgramCacheKey = function customProgramCacheKey() {
+        return `${previousCacheKey()}|${CLOTH_SHADER_VERSION}`;
+      };
+      material.needsUpdate = true;
+      material.userData.clothMotion = state;
+      tracks.push(state);
+    }
+  }
+
+  if (!tracks.length) return null;
+  let target = 0.22;
+  let burst = 0;
+  let time = 0;
+  return {
+    setLocomotion({ moving = false, running = false } = {}) {
+      target = running ? 1.35 : (moving ? 0.92 : 0.22);
+    },
+    kick() { burst = Math.max(burst, 0.72); },
+    update(delta) {
+      const step = Math.max(0, Number.isFinite(delta) ? delta : 0);
+      time += step;
+      burst = Math.max(0, burst - step);
+      const amount = Math.max(target, burst > 0 ? 1.45 : 0);
+      const blend = Math.min(1, step * 6);
+      for (const state of tracks) {
+        state.time = time;
+        state.amount += (amount - state.amount) * blend;
+        if (state.uniforms) {
+          state.uniforms.uClothTime.value = state.time;
+          state.uniforms.uClothAmount.value = state.amount;
+        }
+      }
+    },
+  };
+}
+
 export function resolveClip(clips, wanted, stateMap = {}) {
   // Exact name from the manifest's state map first, then a substring search so a clip
   // exported as "MarkieWalk" or "walk.001" still drives the walk state.
@@ -47,6 +147,7 @@ export class CharacterAnimator {
     this.oneShot = null;
     this.speed = speed;
     this.crossFade = CROSSFADE;
+    this.clothMotion = null;
     this.mixer.addEventListener('finished', (e) => this._finished(e));
     for (const state of STATES) {
       const clip = resolveClip(clips, state, stateMap);
@@ -74,6 +175,7 @@ export class CharacterAnimator {
 
   // state = 'idle' | 'walk' | 'run'; running only matters for how fast the walk clip plays.
   setLocomotion({ moving = false, running = false } = {}) {
+    this.clothMotion?.setLocomotion({ moving, running });
     const next = !moving ? 'idle' : (running ? 'run' : 'walk');
     if (next === this.state) {
       if (next === 'walk') this.setPace(running ? 1.35 : 1);
@@ -91,6 +193,7 @@ export class CharacterAnimator {
   trigger(state) {
     const action = this.actions.get(state);
     if (!action) return false;
+    this.clothMotion?.kick();
     if (this.oneShot) this.oneShot.stop();
     this.oneShot = action;
     action.reset().setEffectiveWeight(1).play();
@@ -110,6 +213,7 @@ export class CharacterAnimator {
 
   update(delta) {
     this.mixer.update(delta);
+    this.clothMotion?.update(delta);
   }
 }
 
@@ -262,12 +366,15 @@ export function applyPalette(root, character, { slots = {}, shared = {} } = {}) 
 export function instantiateCharacter(shared, { palette = null, paletteData = null, cull = true, shadow = true } = {}) {
   const root = cloneSkeleton(shared.root);
   styleCharacter(root, { shadow, cull });
-  const materials = palette ? applyPalette(root, palette, {
+  // Copy wardrobe materials even without a colour palette: procedural cloth uniforms must be
+  // independent per actor, just like their skeleton and pose.
+  const materials = applyPalette(root, palette, {
     slots: paletteData?.slots || shared.slots || {},
     shared: paletteData?.shared || shared.shared || {},
-  }) : new Map();
+  });
   const animator = new CharacterAnimator(root, shared.clips || [], {
     stateMap: shared.manifest?.stateMap || {},
   });
+  animator.clothMotion = attachClothMotion(materials, palette?.seed || palette?.name || root.uuid);
   return { root, animator, materials };
 }

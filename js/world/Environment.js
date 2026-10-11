@@ -166,8 +166,11 @@ export class ClimateController {
   constructor(scene, lights, { mobile = false } = {}) {
     this.scene = scene; this.lights = lights; this.mobile = mobile;
     this.elapsed = 0;
-    this.dayProgress = .61; // late afternoon start: 14:38
-    this.dayDuration = 300; // five real minutes for one in-game day
+    // One 24-hour in-game cycle takes 15 real minutes. Start at sunrise: the first 7.5 minutes
+    // carry 06:00 through 18:00 daylight, then 7.5 minutes of night lead into the next sunrise.
+    this.dayProgress = .25;
+    this.dayNumber = 1;
+    this.dayDuration = 15 * 60;
     this.weatherIndex = -1;
     this.weather = { id: 'clear', label: 'COASTAL CLEAR', rain: 0, fog: FOG.clear, tint: new THREE.Color(0x6da9a2) };
     this.rain = this.createRain();
@@ -175,10 +178,9 @@ export class ClimateController {
     this.day = new THREE.Color(0x72aea7);
     this.dawn = new THREE.Color(0xeb8159);
     this.workingColor = new THREE.Color();
-    // The baked map's sun starts at the same position as the day-cycle sun at dayProgress=.61.
-    // Rotate both environment and background together as the sun moves, so reflections and the
-    // actual sky keep agreeing with the shadow-casting DirectionalLight through the full day.
-    this.hdrStartSun = new THREE.Vector3(-0.586, 0.707, 0.395).normalize();
+    // The baked map was authored for the dayProgress=.61 sun angle; use that as its reference,
+    // then rotate sky and reflections together to the cycle's sunrise start and each live sun pose.
+    this.hdrReferenceSun = new THREE.Vector3(-0.586, 0.707, 0.395).normalize();
     this.sunDirection = new THREE.Vector3();
     this.hdrRotation = new THREE.Quaternion();
     this.hdrEuler = new THREE.Euler();
@@ -212,7 +214,10 @@ export class ClimateController {
 
   update(delta, playerPosition) {
     this.elapsed += delta;
-    this.dayProgress = (this.dayProgress + delta / this.dayDuration) % 1;
+    const progressedDay = this.dayProgress + delta / this.dayDuration;
+    const completedDays = Math.floor(progressedDay);
+    this.dayNumber += completedDays;
+    this.dayProgress = progressedDay - completedDays;
     const weatherIndex = Math.floor(this.elapsed / 62) % 3;
     const changed = weatherIndex !== this.weatherIndex;
     if (changed) this.setWeather(weatherIndex);
@@ -224,7 +229,7 @@ export class ClimateController {
     const radius = 42;
     this.lights.sun.position.set(Math.cos(solarAngle) * radius, Math.sin(solarAngle) * radius, 18);
     this.sunDirection.copy(this.lights.sun.position).normalize();
-    this.hdrRotation.setFromUnitVectors(this.hdrStartSun, this.sunDirection);
+    this.hdrRotation.setFromUnitVectors(this.hdrReferenceSun, this.sunDirection);
     this.hdrEuler.setFromQuaternion(this.hdrRotation);
     this.scene.environmentRotation?.copy(this.hdrEuler);
     this.scene.backgroundRotation?.copy(this.hdrEuler);
@@ -282,7 +287,7 @@ export class ClimateController {
     const totalMinutes = Math.floor(this.dayProgress * 24 * 60);
     const hours = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
     const minutes = (totalMinutes % 60).toString().padStart(2, '0');
-    return `DAY 01 // ${hours}:${minutes}`;
+    return `DAY ${this.dayNumber.toString().padStart(2, '0')} // ${hours}:${minutes}`;
   }
 }
 

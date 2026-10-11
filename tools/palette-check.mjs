@@ -151,6 +151,11 @@ for (const id of ids) {
     id === 'markie' ? 'player always visible' : 'animated NPC bound enabled');
   check(`'${id}' gets a real walk action`, character.animator.actions.has('walk'),
     [...character.animator.actions.keys()].join(', '));
+  const clothSlots = ['shirt', 'pants', 'pack'];
+  const clothMaterials = clothSlots.flatMap((slot) => character.materials.get(slot) || []);
+  check(`'${id}' clothes get procedural flutter`,
+    clothMaterials.length >= clothSlots.length && clothMaterials.every((material) => material.userData?.clothMotion),
+    `${clothMaterials.length} animated garment materials`);
 }
 
 const markie = characters.get('markie');
@@ -168,6 +173,35 @@ check('the same outfit material is independent per character',
   markieJacket && kollieJacket && markieJacket !== kollieJacket
     && !markieJacket.color.equals(kollieJacket.color),
   `Markie ${paletteData.characters.markie.colors.shirt} / Kollie ${paletteData.characters.kollie.colors.shirt}`);
+const clothShader = {
+  uniforms: {},
+  vertexShader: '#include <common>\nvoid main() {\n#include <skinning_vertex>\n#include <project_vertex>\n}',
+};
+markieJacket?.onBeforeCompile(clothShader, {});
+const skinningChunk = clothShader.vertexShader.indexOf('#include <skinning_vertex>');
+const flutterCode = clothShader.vertexShader.indexOf('slClothWaveA');
+check('jacket flutter is injected after the character skinning',
+  skinningChunk >= 0 && flutterCode > skinningChunk,
+  `skinning at ${skinningChunk}, fabric wave at ${flutterCode}`);
+check('each actor has its own cloth phase and shader uniforms',
+  markieJacket?.userData?.clothMotion?.phase !== kollieJacket?.userData?.clothMotion?.phase
+    && clothShader.uniforms.uClothTime && clothShader.uniforms.uClothAmount,
+  'independent palette-seeded motion with time and activity uniforms');
+const clothAnimator = markie.animator;
+clothAnimator.setLocomotion({ moving: false });
+clothAnimator.update(0.1);
+const idleClothAmount = clothShader.uniforms.uClothAmount.value;
+const clothStartTime = clothShader.uniforms.uClothTime.value;
+clothAnimator.setLocomotion({ moving: true });
+clothAnimator.update(0.3);
+const walkClothAmount = clothShader.uniforms.uClothAmount.value;
+clothAnimator.setLocomotion({ moving: true, running: true });
+clothAnimator.update(0.3);
+const runClothAmount = clothShader.uniforms.uClothAmount.value;
+check('cloth follows the rig, with more follow-through when moving faster',
+  walkClothAmount > idleClothAmount && runClothAmount > walkClothAmount
+    && clothShader.uniforms.uClothTime.value > clothStartTime,
+  `idle ${idleClothAmount.toFixed(2)} / walk ${walkClothAmount.toFixed(2)} / run ${runClothAmount.toFixed(2)}`);
 check('clone shares the heavy geometry but not its skeleton',
   markieSkinMesh && kollieSkinMesh
     && markieSkinMesh.geometry === kollieSkinMesh.geometry
