@@ -118,19 +118,18 @@ export class Game {
     this.crowd = new CrowdSystem([this.markieCrowdActor, ...Object.values(this.npcs), ...this.enemies], this.physics, {
       onExchange: ({ kind, opener, responder, position }) => {
         if (position.distanceTo(this.player.position) > CROWD_TUNING.hearRadius) return;
-        if (this.voice.abortConversation || (this.voice.currentAudio && this.voice.player && !this.voice.player.paused)) return;
+        if (this.dialogue.sequenceActive || this.voice.abortConversation || (this.voice.currentAudio && this.voice.player && !this.voice.player.paused)) return;
         this.ui.toast(kind === 'lecture'
           ? `${opener.label} HAS A WORD FOR ${responder.label}`
           : `${opener.label} AND ${responder.label} // STREET TALK`, 2300);
       },
       onLine: ({ person, text, seconds, exchange }) => {
         if (exchange.position.distanceTo(this.player.position) > CROWD_TUNING.hearRadius) return;
-        // Ambient talk never cuts across a recorded story line or an active voice conversation.
-        if (this.voice.abortConversation || (this.voice.currentAudio && this.voice.player && !this.voice.player.paused)) return;
+        // Ambient talk never cuts across a recorded story line, radio broadcast, or active voice conversation.
+        if (this.dialogue.sequenceActive || this.voice.abortConversation || (this.voice.currentAudio && this.voice.player && !this.voice.player.paused)) return;
         if (typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking) return;
-        // Recorded story clips stay mission-only; ambient chatter uses the voice profile/TTS so
-        // the same line can belong to any resident.
-        this.dialogue.playText(`${person.label}: “${text}”`, seconds);
+        const streetClipId = this.voice.pickStreetClipId(person);
+        this.dialogue.playText(`${person.label}: “${text}”`, seconds, streetClipId);
       },
     });
     this.matchCharacterHeights(this.player.getCharacterHeight());
@@ -502,6 +501,7 @@ export class Game {
       const intel = this.music.currentIntel();
       const npcQuote = intel?.npcQuotes?.[npcId];
       const pointKey = `${npcId}-${track?.id}`;
+      const quoteClipId = track?.id ? `quote_${npcId}_${track.id.replace(/-/g, '_')}` : null;
       const isNewPoint = npcQuote && !this.unlockedMusicPoints.has(pointKey);
 
       if (isNewPoint) {
@@ -510,11 +510,11 @@ export class Game {
         this.inventory.addSalvagePoints(1);
         this.sfx.play('pickup', 1.0);
         hit.object.say?.(npcQuote, 6);
-        this.dialogue.playText(`${hit.object.label}: “${npcQuote}”`, 6);
+        this.dialogue.playText(`${hit.object.label}: “${npcQuote}”`, 6, quoteClipId);
         this.ui.toast(`+1 SALVAGE // ${hit.object.label}’S POINT ON ${track.title.toUpperCase()} RECORDED!`);
       } else if (npcQuote && Math.random() < 0.45) {
         hit.object.say?.(npcQuote, 5);
-        this.dialogue.playText(`${hit.object.label}: “${npcQuote}”`, 5);
+        this.dialogue.playText(`${hit.object.label}: “${npcQuote}”`, 5, quoteClipId);
       } else {
         // Voice the side character with their recorded clip when one exists.
         if (hit.object.quoteId) this.dialogue.play(hit.object.quoteId, 4);

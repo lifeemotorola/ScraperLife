@@ -6,7 +6,8 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { DIALOGUE } from '../js/data/dialogues.js';
-import { PROFILES, profileFor, dealVoices, guessGender, splitSpeaker, AUDIO_LINES, VoiceSystem } from '../js/systems/VoiceSystem.js';
+import { MUSIC_INTEL, RADIO_NEWS_BULLETINS } from '../js/data/musicIntel.js';
+import { PROFILES, profileFor, dealVoices, guessGender, splitSpeaker, AUDIO_LINES, NPC_QUOTE_LINES, STREET_AUDIO_LINES, VoiceSystem } from '../js/systems/VoiceSystem.js';
 
 const failures = [];
 const check = (label, ok, detail = '') => {
@@ -110,10 +111,14 @@ function readWavInfo(path) {
   return { ...fmt, seconds: byteRate ? dataSize / byteRate : 0 };
 }
 
-const clipEntries = Object.entries(AUDIO_LINES);
+const clipEntries = [
+  ...Object.entries(AUDIO_LINES),
+  ...Object.entries(NPC_QUOTE_LINES),
+  ...Object.entries(STREET_AUDIO_LINES),
+];
 check('recorded voice lines ship as .wav clips',
-  clipEntries.length > 0 && clipEntries.every(([, url]) => url.endsWith('.wav')),
-  `${clipEntries.length} clips, no mp3 left behind`);
+  clipEntries.length === 88 && clipEntries.every(([, url]) => url.endsWith('.wav')),
+  `${clipEntries.length} clips (25 mission + 42 music quotes + 21 street talk), no mp3 left behind`);
 
 const clipInfos = clipEntries.map(([id, url]) => [id, readWavInfo(fileURLToPath(url))]);
 const unreadable = clipInfos.filter(([id, info]) => {
@@ -128,6 +133,24 @@ const recordedSeconds = clipInfos.reduce((sum, [, info]) => sum + (info?.seconds
 check('every voice wav is a playable 16-bit PCM file',
   unreadable.length === 0,
   unreadable.length ? `${unreadable.map(([id]) => id).join(', ')} unreadable` : `${clipInfos.length} clips, ${recordedSeconds.toFixed(1)}s of recorded dialogue`);
+
+const radioSteps = [
+  ...Object.values(MUSIC_INTEL).flatMap((track) => track.cohostDialogue || []),
+  ...RADIO_NEWS_BULLETINS.flatMap((bulletin) => bulletin.steps || []),
+];
+const radioInfos = radioSteps.map((step) => [step.audio?.split('/').pop() || 'unknown', readWavInfo(fileURLToPath(step.audio))]);
+const unreadableRadio = radioInfos.filter(([, info]) => {
+  if (!info) return true;
+  return (info.audioFormat !== 1 && info.audioFormat !== 3)
+    || info.channels < 1 || info.channels > 2
+    || info.sampleRate < 16000 || info.sampleRate > 96000
+    || info.bitsPerSample !== 16
+    || info.seconds < 1.5;
+});
+const radioSeconds = radioInfos.reduce((sum, [, info]) => sum + (info?.seconds || 0), 0);
+check('every 94.7 FM radio broadcaster wav is a playable 16-bit PCM file',
+  radioInfos.length === 41 && unreadableRadio.length === 0,
+  unreadableRadio.length ? `${unreadableRadio.map(([id]) => id).join(', ')} unreadable` : `${radioInfos.length} clips, ${radioSeconds.toFixed(1)}s of radio dialogue`);
 
 // ---- The deal: one system voice per character ---------------------------
 
@@ -219,9 +242,9 @@ check('unknown speakers are voiced separately from the cast at runtime',
     && !heardVoices.includes(visitorUtterance.voice) && !heardVoices.includes(otherVisitorUtterance.voice),
   `${visitorUtterance.voice?.name} and ${otherVisitorUtterance.voice?.name}`);
 
-// Season One beats without a recorded clip must still carry the character's voice.
+// Any future beat without a recorded clip must still carry the character's voice.
 spoken.length = 0;
-system.playLine('kormah', DIALOGUE.kormah, 4);
+system.playLine('unrecordedBeat', DIALOGUE.kormah, 4);
 await sleep(90);
 check('unrecorded mission lines fall back to the character voice, not the narrator',
   spoken.length === 1 && spoken[0].voice === heard.get('KORMAH').voice && spoken[0].pitch === PROFILES.KORMAH.pitch,
