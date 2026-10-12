@@ -27,7 +27,7 @@ export const SKIES = {
 };
 const requestedSky = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('sky') : null;
 export const HDR = {
-  url: SKIES[requestedSky] || SKIES.waterside,
+  url: SKIES[requestedSky] || SKIES.kloofendal,
   exposure: 1.0,
   // Environment intensity is driven by the day cycle (see ClimateController.update).
   day: 1.0,
