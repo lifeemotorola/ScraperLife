@@ -79,7 +79,11 @@ export function profileFor(speaker) {
   while (taken.some((profile) => profile.pitch === pitch && profile.rate === rate)) {
     pitch = Math.round((pitch + 0.01) * 100) / 100;
   }
-  const profile = { gender: null, pitch, rate };
+  let gender = null;
+  const upper = speaker.toUpperCase();
+  if (upper.includes('KPANNAH') || upper.includes('WOMAN') || upper.includes('GIRL')) gender = 'female';
+  else if (upper.includes('GABRIEL') || upper.includes('MAN') || upper.includes('BOY')) gender = 'male';
+  const profile = { gender, pitch, rate };
   derivedProfiles.set(speaker, profile);
   return profile;
 }

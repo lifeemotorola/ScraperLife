@@ -35,10 +35,11 @@
         <div class="resolve-meter"><i id="resolve-bar"></i></div>
         <div class="pulse-line"><span class="pulse-dot"></span><span id="pulse-status">SCRAP PULSE READY</span></div>
         <div class="world-line"><span id="world-time">DAY 01 // 06:00</span><span id="weather-label">COASTAL CLEAR</span></div>
-        <div class="radio-line" id="radio-station-line" title="Tune 94.7 Waterside FM [R]">
+        <div class="radio-line" id="radio-station-line" title="Tune 94.7 Waterside FM [R] // Air News [N]">
           <div class="radio-tag"><span class="radio-icon">📻</span><span class="radio-station-name">94.7 FM</span></div>
           <div class="radio-info"><span id="radio-track-name" class="radio-track-title">PLATFORM THEME</span></div>
           <button id="radio-tune-btn" class="radio-tune-btn" type="button" aria-label="Tune next track">TUNE ❯</button>
+          <button id="radio-news-btn" class="radio-tune-btn radio-news-btn" type="button" aria-label="Air breaking radio news">NEWS 📢</button>
         </div>
       </section>
 
@@ -123,6 +124,7 @@
             <div class="settings-row"><kbd>J</kbd><span>Scavenger Journal &amp; Field Mods</span></div>
             <div class="settings-row"><kbd>M</kbd><span>Open / close map</span></div>
             <div class="settings-row"><kbd>R</kbd><span>Tune Radio Station (94.7 FM)</span></div>
+            <div class="settings-row"><kbd>N</kbd><span>Air Breaking Radio News (94.7 FM)</span></div>
             <div class="settings-row"><kbd>V</kbd><span>Toggle character voices</span></div>
             <div class="settings-row"><kbd>B</kbd><span>Toggle background music</span></div>
           </section>
@@ -256,7 +258,14 @@
               <span class="salvage-label">MONROVIA 94.7 FM BROADCAST ARCHIVE</span>
               <b id="radio-intel-stats" class="salvage-count">6 TRACKS // AIRWAVES ACTIVE</b>
             </div>
-            <p class="salvage-hint">Listen to DJ Gabriel’s on-air broadcasts and talk to residents across Waterside to gather points on the music.</p>
+            <p class="salvage-hint">Listen to DJ Gabriel &amp; DJ Kpannah’s radio show banter and breaking news sessions to gather salvage points.</p>
+          </div>
+          <div class="radio-news-block">
+            <div class="radio-news-header">
+              <span class="radio-news-badge">🔴 LIVE DISPATCHES</span>
+              <h4 class="radio-news-title">TOP OF THE HOUR NEWS SESSIONS</h4>
+            </div>
+            <div class="radio-news-grid" id="radio-news-list"></div>
           </div>
           <div class="radio-intel-list" id="radio-intel-list"></div>
         </section>

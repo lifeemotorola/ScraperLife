@@ -1,7 +1,7 @@
 import { isEditableTarget } from './InputManager.js';
 import { UPGRADE_DEFINITIONS } from '../systems/InventorySystem.js';
 import { CHARACTER_DOSSIERS, DISTRICT_INTEL } from '../data/dossier.js';
-import { MUSIC_INTEL } from '../data/musicIntel.js';
+import { MUSIC_INTEL, RADIO_NEWS_BULLETINS } from '../data/musicIntel.js';
 
 export class UIManager {
   constructor() {
@@ -19,12 +19,12 @@ export class UIManager {
       completeCopy: $('complete-copy'),
       touchMap: $('touch-map'), voiceToggle: $('voice-toggle'), musicToggle: $('music-toggle'),
       // Radio Station
-      radioLine: $('radio-station-line'), radioTrackName: $('radio-track-name'), radioTuneBtn: $('radio-tune-btn'), radioTuneSettingsBtn: $('radio-tune-settings-btn'),
+      radioLine: $('radio-station-line'), radioTrackName: $('radio-track-name'), radioTuneBtn: $('radio-tune-btn'), radioNewsBtn: $('radio-news-btn'), radioTuneSettingsBtn: $('radio-tune-settings-btn'),
       // Scavenger Journal & Workbench
       journalButton: $('journal-button'), journalPanel: $('journal-panel'), journalClose: $('journal-close'),
       tabUpgrades: $('tab-upgrades'), tabDossier: $('tab-dossier'), tabIntel: $('tab-intel'), tabRadioIntel: $('tab-radio-intel'),
       sectionUpgrades: $('journal-content-upgrades'), sectionDossier: $('journal-content-dossier'), sectionIntel: $('journal-content-intel'), sectionRadioIntel: $('journal-content-radio-intel'),
-      salvageCount: $('salvage-points-count'), upgradesList: $('upgrades-list'), dossierList: $('dossier-list'), intelList: $('intel-list'), radioIntelList: $('radio-intel-list'), radioIntelStats: $('radio-intel-stats'),
+      salvageCount: $('salvage-points-count'), upgradesList: $('upgrades-list'), dossierList: $('dossier-list'), intelList: $('intel-list'), radioIntelList: $('radio-intel-list'), radioIntelStats: $('radio-intel-stats'), radioNewsList: $('radio-news-list'),
       touchJournal: $('touch-journal'), touchDash: $('touch-dash'),
     };
     this.worldBounds = 48; // matches PhysicsEngine limit + water offset; platform expanded to 92 units
@@ -35,6 +35,7 @@ export class UIManager {
     this.onCraftCallback = null;
     this.onMapPulseCallback = null;
     this.onTuneRadioCallback = null;
+    this.onAirNewsCallback = null;
     this.inventoryRef = null;
     this.missionsRef = null;
 
@@ -73,8 +74,12 @@ export class UIManager {
       event.stopPropagation();
       this.onTuneRadioCallback?.();
     });
+    this.el.radioNewsBtn?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      this.onAirNewsCallback?.();
+    });
     this.el.radioLine?.addEventListener('click', (event) => {
-      if (event.target !== this.el.radioTuneBtn) this.onTuneRadioCallback?.();
+      if (event.target !== this.el.radioTuneBtn && event.target !== this.el.radioNewsBtn) this.onTuneRadioCallback?.();
     });
     this.el.radioTuneSettingsBtn?.addEventListener('click', () => {
       this.onTuneRadioCallback?.();
@@ -120,12 +125,17 @@ export class UIManager {
       if (event.key.toLowerCase() === 'm' && !this.journalOpen) { event.preventDefault(); this.toggleWorldMap(); }
       if (event.key.toLowerCase() === 'j') { event.preventDefault(); this.toggleJournal(); }
       if (event.key.toLowerCase() === 'r' && !event.repeat) { event.preventDefault(); this.onTuneRadioCallback?.(); }
+      if (event.key.toLowerCase() === 'n' && !event.repeat) { event.preventDefault(); this.onAirNewsCallback?.(); }
     });
   }
 
   // Radio Station
   bindRadioTune(onTune) {
     this.onTuneRadioCallback = onTune;
+  }
+
+  bindAirNews(onAirNews) {
+    this.onAirNewsCallback = onAirNews;
   }
 
   setRadioTrack(track) {
@@ -164,13 +174,14 @@ export class UIManager {
   }
 
   // Scavenger Journal & Workbench
-  bindJournalHandlers({ onCraft, inventory, missions, music = null, unlockedMusicPoints = null, onTuneTrack = null }) {
+  bindJournalHandlers({ onCraft, inventory, missions, music = null, unlockedMusicPoints = null, onTuneTrack = null, onAirNews = null }) {
     this.onCraftCallback = onCraft;
     this.inventoryRef = inventory;
     this.missionsRef = missions;
     this.musicRef = music;
     this.unlockedMusicPointsRef = unlockedMusicPoints;
     this.onTuneTrackCallback = onTuneTrack;
+    if (onAirNews) this.onAirNewsCallback = onAirNews;
   }
 
   toggleJournal() {
@@ -313,10 +324,45 @@ export class UIManager {
   }
 
   renderRadioIntel() {
-    if (!this.el.radioIntelList) return;
-    this.el.radioIntelList.innerHTML = '';
     const currentTrack = this.musicRef?.currentTrack?.();
     const unlocked = this.unlockedMusicPointsRef || new Set();
+
+    // Render Radio News Bulletins
+    if (this.el.radioNewsList) {
+      this.el.radioNewsList.innerHTML = '';
+      RADIO_NEWS_BULLETINS.forEach((bulletin) => {
+        const isHeard = unlocked.has(`news-${bulletin.id}`);
+        const card = document.createElement('div');
+        card.className = `radio-news-card ${isHeard ? 'unlocked' : ''}`;
+        const dialogueLines = bulletin.steps.map((s) => `
+          <div class="radio-dialogue-turn ${s.speaker.includes('KPANNAH') ? 'female-host' : 'male-host'}">
+            <b>${s.speaker}:</b> ${s.line}
+          </div>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="radio-news-card-head">
+            <span class="radio-news-card-cat">${bulletin.category}</span>
+            <span class="radio-news-card-status">${isHeard ? '✓ HEARD (+1 SALVAGE)' : '📢 BROADCAST READY'}</span>
+          </div>
+          <h4 class="radio-news-card-title">${bulletin.headline}</h4>
+          <div class="radio-news-dialogue-box">
+            ${dialogueLines}
+          </div>
+          <button class="radio-air-news-btn" type="button">▶ AIR THIS NEWS BULLETIN</button>
+        `;
+
+        card.querySelector('.radio-air-news-btn')?.addEventListener('click', () => {
+          this.onAirNewsCallback?.(bulletin.id);
+          this.closeJournal();
+        });
+
+        this.el.radioNewsList.appendChild(card);
+      });
+    }
+
+    if (!this.el.radioIntelList) return;
+    this.el.radioIntelList.innerHTML = '';
 
     let totalPoints = 0;
     let unlockedPoints = 0;
@@ -349,6 +395,12 @@ export class UIManager {
         `;
       }).join('');
 
+      const cohostHtml = (item.cohostDialogue || []).map((step) => `
+        <div class="radio-dialogue-turn ${step.speaker.includes('KPANNAH') ? 'female-host' : 'male-host'}">
+          <b>${step.speaker}:</b> “${step.line}”
+        </div>
+      `).join('');
+
       card.innerHTML = `
         <div class="radio-card-header">
           <div>
@@ -367,10 +419,12 @@ export class UIManager {
 
         <div class="radio-broadcast-quote">
           <div class="radio-broadcast-head">
-            <span class="radio-broadcast-tag">📻 LIVE AIRWAVES // ${item.broadcaster}</span>
+            <span class="radio-broadcast-tag">📻 LIVE AIRWAVES BANTER // ${item.broadcaster}</span>
             <span class="radio-broadcast-status">${broadcastUnlocked ? '✓ BROADCAST RECORDED' : '🔒 LISTEN ON RADIO'}</span>
           </div>
-          <p class="radio-broadcast-p">${item.broadcastLine}</p>
+          <div class="radio-cohost-conversation">
+            ${cohostHtml || `<p class="radio-broadcast-p">${item.broadcastLine}</p>`}
+          </div>
         </div>
 
         <div class="radio-points-block">

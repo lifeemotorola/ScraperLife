@@ -5,11 +5,44 @@ export class DialogueSystem {
     this.voice = voice;
     this.music = music;
     this.duckTimer = null;
+    this.sequenceTimer = null;
   }
 
   play(id, seconds) {
     const line = this.dialogue[id];
     if (line) this.playText(line, seconds, id);
+  }
+
+  stopSequence() {
+    clearTimeout(this.sequenceTimer);
+    clearTimeout(this.duckTimer);
+    this.music?.unduck?.();
+  }
+
+  // Sequence of dialogue lines with different speakers (e.g. real radio show banter between man & woman)
+  playSequence(steps, onDone) {
+    if (!steps || !steps.length) { onDone?.(); return; }
+    this.stopSequence();
+    this.music?.duck?.();
+
+    let index = 0;
+    const playNext = () => {
+      if (index >= steps.length) {
+        this.duckTimer = setTimeout(() => this.music?.unduck?.(), 800);
+        onDone?.();
+        return;
+      }
+      const step = steps[index++];
+      const seconds = step.seconds || 4.8;
+      const formatted = step.line.includes(':') ? step.line : `${step.speaker}: “${step.line}”`;
+      this.ui.subtitle(formatted, seconds);
+      if (this.voice) {
+        this.voice.speak(formatted);
+      }
+      this.sequenceTimer = setTimeout(playNext, seconds * 1000);
+    };
+
+    playNext();
   }
 
   // Subtitle on screen + spoken voice line (recorded clip first, browser voices as fallback).

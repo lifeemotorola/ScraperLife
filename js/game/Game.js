@@ -20,6 +20,7 @@ import { SoundEffectsSystem } from '../systems/SoundEffectsSystem.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { InventorySystem, UPGRADE_DEFINITIONS } from '../systems/InventorySystem.js';
 import { DIALOGUE } from '../data/dialogues.js';
+import { RADIO_NEWS_BULLETINS } from '../data/musicIntel.js';
 import { PortraitStudio } from '../multiplayer/Portraits.js';
 import { RemotePlayers, SpeechBubbleSlot, characterName } from '../multiplayer/RemotePlayers.js';
 import { SessionPanel } from '../multiplayer/SessionPanel.js';
@@ -177,6 +178,8 @@ export class Game {
     });
     this.mobileController = new MobileController(this.input);
     this.unlockedMusicPoints = new Set();
+    this.currentNewsIndex = -1;
+    this.trackChangeCounter = 0;
     this.ui.bindStart(() => this.start(), () => location.reload());
     this.ui.bindJournalHandlers({
       inventory: this.inventory,
@@ -184,9 +187,11 @@ export class Game {
       music: this.music,
       unlockedMusicPoints: this.unlockedMusicPoints,
       onTuneTrack: (id) => this.tuneTrackById(id),
+      onAirNews: (id) => this.airNewsBulletin(id),
       onCraft: (upgradeId) => this.craftUpgrade(upgradeId),
     });
     this.ui.bindRadioTune(() => this.tuneRadio());
+    this.ui.bindAirNews((id) => this.airNewsBulletin(id));
     this.ui.bindMapPulse(() => this.usePulse());
     this.ui.setRadioTrack(this.music.currentTrack());
     this.ui.bindVoiceToggle(() => {
@@ -571,16 +576,52 @@ export class Game {
       this.sfx.play('pickup', 0.9);
       this.ui.toast(`+1 SALVAGE // BROADCAST INTEL: ${track.title.toUpperCase()}`);
     } else {
-      this.ui.toast(`📻 94.7 FM BROADCAST // ${track.title.toUpperCase()}`);
+      this.ui.toast(`📻 94.7 FM // ${track.title.toUpperCase()}`);
     }
-    if (intel.broadcastLine) {
+
+    // Two-host radio broadcast dialogue between DJ Gabriel (man) and DJ Kpannah (woman)
+    if (intel.cohostDialogue && intel.cohostDialogue.length) {
+      this.dialogue.playSequence(intel.cohostDialogue);
+    } else if (intel.broadcastLine) {
       this.dialogue.playText(intel.broadcastLine, 7);
     }
   }
 
+  airNewsBulletin(bulletinId = null) {
+    let bulletin = null;
+    if (bulletinId) {
+      bulletin = RADIO_NEWS_BULLETINS.find((b) => b.id === bulletinId);
+    }
+    if (!bulletin) {
+      this.currentNewsIndex = ((this.currentNewsIndex ?? -1) + 1) % RADIO_NEWS_BULLETINS.length;
+      bulletin = RADIO_NEWS_BULLETINS[this.currentNewsIndex];
+    }
+    if (!bulletin) return;
+
+    this.sfx.play('tune', 1.0);
+    const newsKey = `news-${bulletin.id}`;
+    const isNew = !this.unlockedMusicPoints.has(newsKey);
+    if (isNew) {
+      this.unlockedMusicPoints.add(newsKey);
+      this.inventory.addSalvagePoints(1);
+      this.sfx.play('pickup', 1.0);
+      this.ui.toast(`+1 SALVAGE // NEWS FLASH: ${bulletin.headline}`);
+    } else {
+      this.ui.toast(`🔴 94.7 FM LIVE NEWS // ${bulletin.headline}`);
+    }
+
+    // Co-hosts deliver the news dispatch in sequenced dialogue
+    this.dialogue.playSequence(bulletin.steps);
+  }
+
   onRadioTrackChange(track, { auto = false } = {}) {
     this.ui.setRadioTrack(track);
-    if (auto && this.running) {
+    this.trackChangeCounter = (this.trackChangeCounter || 0) + 1;
+
+    // Every 3 track transitions, cut in with a breaking news bulletin session!
+    if (this.trackChangeCounter % 3 === 0 && this.running) {
+      this.airNewsBulletin();
+    } else if (auto && this.running) {
       this.sfx.play('tune', 0.6);
       this.broadcastCurrentTrack(track);
     }
