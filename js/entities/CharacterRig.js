@@ -227,10 +227,9 @@ export function styleCharacter(root, { shadow = true, cull = false } = {}) {
     if (!object.isMesh) return;
     object.castShadow = shadow;
     object.receiveShadow = shadow;
-    // Skinned meshes are culled against the bind-pose bounds, so an animated limb can be
-    // dropped for a frame and the character blinks out at the edge of the view. That is why
-    // this is off by default: the player is always on screen, so culling him can only hurt.
-    // Crowd clones opt in with `cull: true` AFTER expandCullBounds() has inflated the bounds.
+    // Skinned meshes are culled against their own `boundingSphere` (see expandCullBounds). That
+    // is why this is off by default: the player is always on screen, so culling him can only
+    // hurt. Crowd clones opt in with `cull: true` AFTER expandCullBounds() has set the spheres.
     object.frustumCulled = cull;
     if (!object.geometry.getAttribute('normal')) object.geometry.computeVertexNormals();
     const materials = Array.isArray(object.material) ? object.material : [object.material];
@@ -244,28 +243,110 @@ export function styleCharacter(root, { shadow = true, cull = false } = {}) {
   return root;
 }
 
-// A skinned mesh culls against its BIND pose: a limb that swings out during the walk clip can
-// leave that sphere and three.js drops the whole draw for a frame. With sixteen characters on
-// the platform, drawing the ones behind the camera is the single biggest waste in the frame, so
-// the crowd opts into culling with bounds big enough for the animated silhouette instead — a
-// sphere around the rig's centre covering the bind-pose diagonal. tools/palette-check.mjs
-// measures the deformed walk against this sphere, so the margin is verified, not guessed.
-export function expandCullBounds(root, margin = 1.12) {
+// Frustum culling for skinned meshes. three.js does NOT cull a SkinnedMesh against
+// `geometry.boundingSphere`: SkinnedMesh has its own `boundingSphere`, which is null until the
+// first frustum test and is then built from the vertices as posed at THAT moment and never
+// rebuilt. So an animated limb (a walking foot, a swinging hand, a blink) can leave the sphere
+// and the whole mesh disappears while part of it is still on screen. The fix is to give every
+// skinned mesh one sphere that is guaranteed to enclose every skinned vertex in every frame of
+// every clip. tools/palette-check.mjs verifies that against the real vertices at 60 fps.
+//
+// Why a bound instead of sampling every vertex: a skinned vertex is a weighted blend of
+// `bone.matrixWorld * boneInverse` applied to its bind position (SkinnedMesh.applyBoneTransform).
+// A blend of points lies inside any sphere that contains all of them, and each bone moves its
+// points rigidly, so for the bone-by-bone term  |M·q - C| <= s·|q - joint| + |boneWorld - C|.
+// Only the per-bone reach (computed once from bind pose) and the bone positions per frame are
+// needed, which is cheap enough to run on every load (sampling all 85k vertices took seconds).
+const CLOTH_SLACK = 0.08;      // metres; procedural cloth moves vertices up to ~0.05 after skinning
+const CULL_SAMPLE_FPS = 60;    // bone keys sit on the 30 fps grid; 60 fps leaves room for crossfades
+
+export function expandCullBounds(root, clips = [], margin = 1.02) {
   root.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(root);
-  const centre = box.getCenter(new THREE.Vector3());
-  const radius = Math.max(box.getSize(new THREE.Vector3()).length() * 0.5 * margin, 0.001);
-  const inverse = new THREE.Matrix4();
-  root.traverse((object) => {
-    if (!object.isMesh) return;
-    object.frustumCulled = true;
-    inverse.copy(object.matrixWorld).invert();
-    // The sphere lives in geometry space, and geometry is SHARED between clones (see
-    // instantiateCharacter) — every clone is authored identically, so they all compute the
-    // same sphere and overwriting it is idempotent rather than a race.
-    object.geometry.boundingSphere = new THREE.Sphere(centre.clone().applyMatrix4(inverse), radius);
+  const skins = [];
+  root.traverse((object) => { if (object.isSkinnedMesh) skins.push(object); });
+  if (!skins.length) return 0;
+
+  // Work on a CLONE so the shared bind pose that every instantiateCharacter() clone is copied
+  // from is never posed. Clone traversal order matches `skins`, so the spheres map back 1:1.
+  const probe = cloneSkeleton(root);
+  probe.updateMatrixWorld(true);
+  const probeSkins = [];
+  probe.traverse((object) => { if (object.isSkinnedMesh) probeSkins.push(object); });
+
+  const matrix = new THREE.Matrix4();
+  const position = new THREE.Vector3();
+  const vertex = new THREE.Vector3();
+  const per = probeSkins.map((skin) => {
+    const bones = skin.skeleton.bones;
+    const inverses = skin.skeleton.boneInverses;
+    const bind = skin.bindMatrix;
+    const geometry = skin.geometry;
+    geometry.computeBoundingBox();
+    // Centre and reach are in "bind space": the space the skinning formula blends in.
+    const centre = geometry.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(bind);
+    const joints = bones.map((_, i) => new THREE.Vector3().setFromMatrixPosition(matrix.copy(inverses[i]).invert()));
+    const reach = new Float64Array(bones.length);
+    const skinIndex = geometry.attributes.skinIndex;
+    const skinWeight = geometry.attributes.skinWeight;
+    let weightSum = 1;
+    for (let v = 0; v < geometry.attributes.position.count; v++) {
+      vertex.fromBufferAttribute(geometry.attributes.position, v).applyMatrix4(bind);
+      let sum = 0;
+      for (let k = 0; k < 4; k++) {
+        const weight = skinWeight.getComponent(v, k);
+        if (weight === 0) continue;
+        sum += weight;
+        const b = skinIndex.getComponent(v, k);
+        reach[b] = Math.max(reach[b], vertex.distanceTo(joints[b]));
+      }
+      weightSum = Math.max(weightSum, sum);
+    }
+    return { skin, bones, inverses, centre, reach, weightSum, radius: 0 };
   });
-  return radius;
+
+  const sample = () => {
+    probe.updateMatrixWorld(true);
+    for (const entry of per) {
+      const { bones, inverses, centre, reach } = entry;
+      for (let b = 0; b < bones.length; b++) {
+        if (reach[b] === 0) continue;
+        // Scale of the skinning matrix (current * inverse bind); 1 for a rigid bone.
+        const scale = matrix.multiplyMatrices(bones[b].matrixWorld, inverses[b]).getMaxScaleOnAxis();
+        const distance = position.setFromMatrixPosition(bones[b].matrixWorld).distanceTo(centre);
+        entry.radius = Math.max(entry.radius, scale * reach[b] + distance);
+      }
+    }
+  };
+
+  // Bind pose first, then every frame of every clip.
+  sample();
+  const mixer = new THREE.AnimationMixer(probe);
+  for (const clip of clips) {
+    if (!clip?.duration) continue;
+    mixer.stopAllAction();
+    const action = mixer.clipAction(clip);
+    action.play();
+    const frames = Math.max(1, Math.ceil(clip.duration * CULL_SAMPLE_FPS));
+    for (let f = 0; f <= frames; f++) {
+      action.time = Math.min(clip.duration, f / CULL_SAMPLE_FPS);
+      mixer.update(0);
+      sample();
+    }
+  }
+  mixer.stopAllAction();
+
+  const inverseBind = new THREE.Matrix4();
+  let largest = 0;
+  per.forEach((entry, i) => {
+    const { skin, centre, weightSum } = entry;
+    // Sphere in bind space -> mesh-local space (the space `Frustum` transforms by matrixWorld).
+    const sphere = new THREE.Sphere(centre, (entry.radius * weightSum) * margin + CLOTH_SLACK);
+    sphere.applyMatrix4(inverseBind.copy(skin.bindMatrix).invert());
+    skins[i].boundingSphere = sphere;
+    skins[i].frustumCulled = true;
+    largest = Math.max(largest, sphere.radius);
+  });
+  return largest;
 }
 
 
@@ -311,12 +392,12 @@ export function loadPalettes(url) {
 const sharedCache = new Map();
 
 // Loads (once) the one body the whole cast is made of. Every caller gets the SAME promise, so
-// the sixteen in-world characters cost one 5.3 MB download and one glTF parse. Cull bounds are inflated here
-// because geometry is shared by every clone, so it only has to be computed once.
+// the sixteen in-world characters cost one 5.3 MB download and one glTF parse. Cull bounds are
+// computed here, once, from every clip, and every clone inherits them (SkinnedMesh.copy).
 export function loadSharedCharacter(url, { manifest = null, onProgress } = {}) {
   if (!sharedCache.has(url)) {
     const loading = loadCharacter(url, { manifest, onProgress }).then((loaded) => {
-      expandCullBounds(loaded.root);
+      expandCullBounds(loaded.root, loaded.clips);
       return { ...loaded, url };
     });
     // A failed load must not poison the cache: the next caller gets to try again.
