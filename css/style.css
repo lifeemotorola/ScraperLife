@@ -287,12 +287,95 @@ body { font-family:Outfit,Arial,sans-serif; }
 .map-remote { position:absolute; z-index:2; width:7px; height:7px; border-radius:50%; background:#ffb454; border:1px solid #1a2426; transform:translate(-50%,-50%); box-shadow:0 0 6px rgba(255,180,84,.7); }
 .world-map-point.remote b { background:#ffb454; color:#ffb454; box-shadow:0 0 10px #ffb454; }
 
+/* Scavenger Journal & Field Workbench */
+.journal-button { position:absolute; top:26px; right:152px; z-index:8; display:flex; align-items:center; gap:8px; padding:10px 13px; border:1px solid rgba(117,197,187,.35); background:rgba(11,22,23,.75); color:#dce7dd; font:600 9px/1 'DM Mono',monospace; letter-spacing:.13em; backdrop-filter:blur(8px); pointer-events:auto; transition:transform .15s,background .15s,border-color .15s; }
+.journal-button:hover { transform:translateY(-1px); background:rgba(20,38,38,.92); color:#fff; border-color:var(--teal); }
+.journal-icon { color:var(--teal); font-size:13px; line-height:1; }
+
+.journal-overlay { position:fixed; inset:0; z-index:22; background:rgba(6,14,15,.92); display:grid; place-items:center; padding:16px; backdrop-filter:blur(10px); pointer-events:auto; }
+.journal-card { width:min(94vw,780px); background:linear-gradient(145deg,rgba(16,32,34,.98),rgba(10,20,22,.96)); border:1px solid rgba(117,197,187,.28); box-shadow:0 24px 64px rgba(0,0,0,.6); padding:22px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; }
+.journal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.journal-header h2 { font:800 28px/1 'Barlow Condensed',sans-serif; color:var(--cream); letter-spacing:.04em; margin:4px 0 6px; }
+.journal-intro { color:#9fb2a7; font-size:12px; margin:0; }
+.journal-close { background:transparent; border:1px solid rgba(229,244,229,.2); color:#c5cec4; font:700 13px/1 'DM Mono'; padding:8px 14px; cursor:pointer; }
+.journal-close:hover { background:rgba(255,112,65,.2); color:var(--orange); border-color:var(--orange); }
+
+.journal-tabs { display:flex; gap:8px; border-bottom:1px solid rgba(229,244,229,.14); padding-bottom:12px; margin-bottom:16px; }
+.journal-tab { background:rgba(14,28,30,.6); border:1px solid rgba(229,244,229,.16); color:#a8b9af; font:700 11px/1 'DM Mono'; letter-spacing:.09em; padding:9px 16px; cursor:pointer; transition:all .15s; }
+.journal-tab:hover { color:#fff; border-color:var(--teal); }
+.journal-tab.active { background:var(--teal); color:#0d1617; border-color:var(--teal); font-weight:800; }
+
+.journal-section { overflow-y:auto; flex:1; padding-right:4px; max-height:56vh; }
+.salvage-banner { display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg,rgba(117,197,187,.14),rgba(11,22,23,.5)); border:1px solid rgba(117,197,187,.3); padding:12px 16px; margin-bottom:16px; }
+.salvage-label { font:600 9px/1 'DM Mono'; letter-spacing:.12em; color:#a2b8ad; display:block; margin-bottom:4px; }
+.salvage-count { font:800 22px/1 'Barlow Condensed'; color:var(--teal); letter-spacing:.06em; }
+.salvage-hint { margin:0; font:500 10px/1.3 'DM Mono'; color:#8da195; max-width:280px; }
+
+.upgrades-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:12px; }
+.upgrade-card { background:rgba(12,24,26,.85); border:1px solid rgba(229,244,229,.12); padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:10px; transition:border-color .15s; }
+.upgrade-card.installed { border-color:rgba(117,197,187,.45); background:linear-gradient(135deg,rgba(14,35,36,.8),rgba(11,22,23,.9)); }
+.upgrade-top { display:flex; gap:12px; align-items:flex-start; }
+.upgrade-icon { font-size:24px; padding:8px; background:rgba(117,197,187,.1); border-radius:4px; border:1px solid rgba(117,197,187,.2); line-height:1; }
+.upgrade-meta { flex:1; }
+.upgrade-category { font:600 8px/1 'DM Mono'; color:var(--amber); letter-spacing:.14em; text-transform:uppercase; display:block; margin-bottom:3px; }
+.upgrade-title { font:800 16px/1.1 'Barlow Condensed'; color:var(--cream); letter-spacing:.04em; margin:0 0 5px; }
+.upgrade-desc { font:400 11px/1.4 Outfit,sans-serif; color:#a2b5aa; margin:0; }
+.upgrade-footer { display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid rgba(229,244,229,.08); }
+.upgrade-cost { font:700 10px/1 'DM Mono'; color:var(--amber); letter-spacing:.08em; }
+.upgrade-btn { padding:7px 12px; font:700 11px/1 'DM Mono'; letter-spacing:.08em; border:none; cursor:pointer; }
+.upgrade-btn.craftable { background:var(--orange); color:#0f1816; }
+.upgrade-btn.craftable:hover { background:#ff895f; }
+.upgrade-btn.installed { background:rgba(117,197,187,.18); color:var(--teal); border:1px solid var(--teal); cursor:default; }
+.upgrade-btn.locked { background:rgba(255,255,255,.07); color:#6f8078; cursor:not-allowed; }
+
+.dossier-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:12px; }
+.dossier-card { background:rgba(12,24,26,.85); border:1px solid rgba(229,244,229,.12); padding:14px; }
+.dossier-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.dossier-name { font:800 16px/1 'Barlow Condensed'; color:var(--cream); letter-spacing:.04em; margin:0; }
+.dossier-status { font:700 8px/1 'DM Mono'; padding:3px 6px; border-radius:2px; letter-spacing:.08em; }
+.dossier-status.ALLIED { background:rgba(117,197,187,.2); color:var(--teal); }
+.dossier-status.ACTIVE { background:rgba(255,112,65,.2); color:var(--orange); }
+.dossier-status.HOSTILE { background:rgba(255,59,59,.2); color:#ff5e5e; }
+.dossier-status.CONFIRMED { background:rgba(251,179,74,.2); color:var(--amber); }
+.dossier-status.NEUTRAL { background:rgba(160,180,170,.2); color:#a0b4aa; }
+.dossier-status.COMPROMISED { background:rgba(216,168,90,.2); color:#d8a85a; }
+.dossier-role { font:600 9px/1 'DM Mono'; color:var(--amber); display:block; margin-bottom:2px; }
+.dossier-district { font:500 8px/1 'DM Mono'; color:#7e9287; display:block; margin-bottom:8px; }
+.dossier-bio { font:400 11px/1.4 Outfit,sans-serif; color:#b5c4bc; margin:0; }
+
+.intel-list { display:flex; flex-direction:column; gap:12px; }
+.intel-card { background:rgba(12,24,26,.85); border:1px solid rgba(229,244,229,.12); padding:14px; border-left:3px solid var(--orange); }
+.intel-title { font:800 15px/1 'Barlow Condensed'; color:var(--cream); margin:0 0 5px; }
+.intel-desc { font:400 11px/1.4 Outfit,sans-serif; color:#b5c4bc; margin:0; }
+
+.journal-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; padding-top:12px; border-top:1px solid rgba(229,244,229,.12); font:500 9px/1 'DM Mono'; color:#8b9e94; flex-wrap:wrap; }
+
+/* Radar ping minimap indicator */
+.map-scrap-ping { position:absolute; z-index:4; width:12px; height:12px; border-radius:50%; border:2px solid var(--teal); background:rgba(117,197,187,.45); transform:translate(-50%,-50%); pointer-events:none; box-shadow:0 0 10px var(--teal); }
+@keyframes ping-wave {
+  0% { transform:translate(-50%,-50%) scale(0.6); opacity:1; }
+  100% { transform:translate(-50%,-50%) scale(2.8); opacity:0; }
+}
+.map-scrap-ping.pulsing:after {
+  content:""; position:absolute; inset:-4px; border:2px solid var(--teal); border-radius:50%;
+  animation:ping-wave 1.3s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+
+/* Touch dash & journal buttons */
+.touch-dash { background:rgba(117,197,187,.22); border-color:rgba(117,197,187,.6); color:var(--teal); }
+.touch-dash.active { background:var(--teal); color:#0d1617; }
+.touch-journal { background:rgba(251,179,74,.18); border-color:rgba(251,179,74,.4); color:var(--amber); }
+.touch-journal.active { background:var(--amber); color:#0d1617; }
+
 @media (max-width: 900px) {
   .session-roster { width:196px; }
   .roster-list { max-height:260px; }
   .session-card { padding:16px; }
   .character-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
   .card-portrait { width:84px; height:84px; }
+  .journal-button { right:132px; padding:8px 10px; font-size:8px; }
+  .upgrades-grid { grid-template-columns:1fr; }
+  .dossier-grid { grid-template-columns:1fr; }
 }
 
 /* Touch screens: chat folds away behind the CHAT key so it does not cover the thumb controls. */

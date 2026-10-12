@@ -166,6 +166,29 @@ export class SoundEffectsSystem {
       return true;
     }
 
+    if (name === 'dash') {
+      this.tone({ frequency: 220, endFrequency: 580, start: now, duration: 0.16,
+        volume: 0.22 * energy, type: 'triangle', attack: 0.005, pan: -0.05 });
+      this.noise({ start: now, duration: 0.16, volume: 0.18 * energy, cutoff: 1600, filter: 'bandpass', pan: 0.05 });
+      return true;
+    }
+
+    if (name === 'ping') {
+      this.tone({ frequency: 1760, endFrequency: 2200, start: now, duration: 0.26,
+        volume: 0.20 * energy, type: 'sine', attack: 0.004, pan: 0.1 });
+      this.tone({ frequency: 880, start: now + 0.06, duration: 0.32,
+        volume: 0.14 * energy, type: 'sine', attack: 0.008, pan: -0.1 });
+      return true;
+    }
+
+    if (name === 'upgrade') {
+      [440, 554.37, 659.25, 880, 1108.73].forEach((frequency, index) => {
+        this.tone({ frequency, start: now + index * 0.06, duration: 0.30,
+          volume: 0.18 * energy, type: 'triangle', attack: 0.006, pan: (index - 2) * 0.1 });
+      });
+      return true;
+    }
+
     return false;
   }
 

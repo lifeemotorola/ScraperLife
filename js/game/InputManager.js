@@ -6,7 +6,7 @@ export function isEditableTarget(target) {
 }
 
 export class InputManager {
-  constructor({ onInteract, onPulse, onCamera, onLook, element } = {}) {
+  constructor({ onInteract, onPulse, onCamera, onLook, onDash, onJournal, element } = {}) {
     this.keys = new Set();
     this.virtualMove = { x: 0, z: 0 };
     this.virtualRunning = false;
@@ -14,7 +14,7 @@ export class InputManager {
     // this frame, so "push up" always walks away from the camera (up the screen) and
     // "push right" always walks to the right of the screen, whatever way Markie faces.
     this.cameraYaw = 0;
-    this.handlers = { onInteract, onPulse, onCamera, onLook };
+    this.handlers = { onInteract, onPulse, onCamera, onLook, onDash, onJournal };
     this.element = element || document.body;
     this.dragging = false;
     this.lookPointer = null;
@@ -35,7 +35,7 @@ export class InputManager {
 
   isUiModalOpen() {
     if (typeof document === 'undefined') return false;
-    return ['settings-panel', 'world-map'].some((id) => {
+    return ['settings-panel', 'world-map', 'journal-panel'].some((id) => {
       const panel = document.getElementById(id);
       return panel && !panel.classList.contains('hidden');
     });
@@ -44,9 +44,9 @@ export class InputManager {
   onKeyDown(event) {
     // Typing in a text field (lobby name, chat) must not walk Markie or eat spaces.
     if (isEditableTarget(event.target)) return;
-    const blocked = ['Space', 'KeyE', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    const blocked = ['Space', 'KeyE', 'KeyQ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
     if (this.isUiModalOpen()) {
-      const gameKeys = [...blocked, 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyC', 'ShiftLeft', 'ShiftRight'];
+      const gameKeys = [...blocked, 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyC', 'KeyJ', 'ShiftLeft', 'ShiftRight'];
       if (gameKeys.includes(event.code)) event.preventDefault();
       this.keys.delete(event.code);
       return;
@@ -57,6 +57,8 @@ export class InputManager {
     if (event.code === 'KeyE') this.handlers.onInteract?.();
     if (event.code === 'Space') this.handlers.onPulse?.();
     if (event.code === 'KeyC') this.handlers.onCamera?.();
+    if (event.code === 'KeyQ') this.handlers.onDash?.();
+    if (event.code === 'KeyJ') this.handlers.onJournal?.();
   }
 
   onKeyUp(event) {
@@ -115,6 +117,8 @@ export class InputManager {
   triggerInteract() { this.handlers.onInteract?.(); }
   triggerPulse() { this.handlers.onPulse?.(); }
   triggerCamera() { this.handlers.onCamera?.(); }
+  triggerDash() { this.handlers.onDash?.(); }
+  triggerJournal() { this.handlers.onJournal?.(); }
   isDown(...codes) { return codes.some((code) => this.keys.has(code)); }
   dispose() {
     window.removeEventListener('keydown', this.onKeyDown);

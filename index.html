@@ -15,6 +15,9 @@
     <div id="game"></div>
 
     <div id="ui" aria-live="polite">
+      <button id="journal-button" class="journal-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="journal-panel">
+        <span class="journal-icon" aria-hidden="true">📓</span><span>JOURNAL</span>
+      </button>
       <button id="settings-button" class="settings-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-panel">
         <span class="settings-icon" aria-hidden="true">⚙</span><span>SETTINGS</span>
       </button>
@@ -76,12 +79,14 @@
         </div>
         <div class="mobile-actions" aria-label="Actions">
           <button id="touch-run" class="touch-button touch-run" aria-label="Hold to run">RUN</button>
+          <button id="touch-dash" class="touch-button touch-dash" aria-label="Quick dash">DASH</button>
           <button id="touch-pulse" class="touch-button touch-pulse" aria-label="Use Scrap Pulse">PULSE</button>
           <button id="touch-interact" class="touch-button touch-use" aria-label="Interact">USE</button>
         </div>
         <div class="mobile-system" aria-label="System controls">
           <button id="touch-camera" class="touch-button touch-camera" type="button" aria-label="Change camera view">CAM</button>
           <button id="touch-map" class="touch-button touch-map" type="button" aria-label="Open map">MAP</button>
+          <button id="touch-journal" class="touch-button touch-journal" type="button" aria-label="Open journal">LOG</button>
           <button id="chat-toggle" class="touch-button touch-chat hidden" type="button" aria-label="Open session chat">CHAT</button>
         </div>
       </section>
@@ -103,11 +108,13 @@
             <h3 id="keyboard-controls-title">KEYBOARD &amp; MOUSE</h3>
             <div class="settings-row"><kbd>W A S D / ↑ ↓ ← →</kbd><span>Move Markie</span></div>
             <div class="settings-row"><kbd>SHIFT</kbd><span>Run</span></div>
+            <div class="settings-row"><kbd>Q</kbd><span>Quick Dash / Evade</span></div>
             <div class="settings-row"><kbd>SPACE</kbd><span>Scrap Pulse</span></div>
             <div class="settings-row"><kbd>E</kbd><span>Interact</span></div>
             <div class="settings-row"><kbd>DRAG</kbd><span>Look around</span></div>
             <div class="settings-row"><kbd>C</kbd><span>Cycle camera <small id="camera-label">WIDE VIEW</small></span></div>
             <div class="settings-row"><kbd>ENTER</kbd><span>Chat with your session</span></div>
+            <div class="settings-row"><kbd>J</kbd><span>Scavenger Journal &amp; Field Mods</span></div>
             <div class="settings-row"><kbd>M</kbd><span>Open / close map</span></div>
             <div class="settings-row"><kbd>V</kbd><span>Toggle character voices</span></div>
             <div class="settings-row"><kbd>B</kbd><span>Toggle background music</span></div>
@@ -117,10 +124,12 @@
             <h3 id="touch-controls-title">TOUCH CONTROLS</h3>
             <div class="settings-row"><kbd>LEFT STICK</kbd><span>Move Markie</span></div>
             <div class="settings-row"><kbd>HOLD RUN</kbd><span>Run</span></div>
+            <div class="settings-row"><kbd>DASH</kbd><span>Quick Dash / Evade</span></div>
             <div class="settings-row"><kbd>PULSE</kbd><span>Scrap Pulse</span></div>
             <div class="settings-row"><kbd>USE</kbd><span>Interact</span></div>
             <div class="settings-row"><kbd>DRAG</kbd><span>Look around</span></div>
             <div class="settings-row"><kbd>CAM</kbd><span>Cycle camera</span></div>
+            <div class="settings-row"><kbd>LOG</kbd><span>Scavenger Journal</span></div>
             <div class="settings-row"><kbd>MAP</kbd><span>Open the platform map</span></div>
             <div class="settings-row"><kbd>CHAT</kbd><span>Chat with your session</span></div>
           </section>
@@ -188,6 +197,51 @@
             <p style="margin:6px 0 0;font:500 11px/1.4 'DM Mono';color:#c5cec4">Ten linked jobs are tracked across the platform. The orange marker identifies Markie’s current objective.</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Scavenger Journal & Field Workbench -->
+    <div id="journal-panel" class="journal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="journal-title">
+      <div class="journal-card">
+        <header class="journal-header">
+          <div>
+            <p class="eyebrow">WATERSIDE // FIELD LOG &amp; WORKBENCH</p>
+            <h2 id="journal-title">SCAVENGER JOURNAL</h2>
+            <p class="journal-intro">Scrap modifications, street dossiers, and salvaged intelligence.</p>
+          </div>
+          <button id="journal-close" class="journal-close" type="button" aria-label="Close journal">✕</button>
+        </header>
+
+        <nav class="journal-tabs" role="tablist">
+          <button id="tab-upgrades" class="journal-tab active" role="tab" aria-selected="true" type="button">⚡ FIELD MODS</button>
+          <button id="tab-dossier" class="journal-tab" role="tab" aria-selected="false" type="button">🗂 DOSSIER</button>
+          <button id="tab-intel" class="journal-tab" role="tab" aria-selected="false" type="button">📜 INTEL &amp; LEADS</button>
+        </nav>
+
+        <section id="journal-content-upgrades" class="journal-section">
+          <div class="salvage-banner">
+            <div>
+              <span class="salvage-label">FIELD SALVAGE AVAILABLE</span>
+              <b id="salvage-points-count" class="salvage-count">0 UNITS</b>
+            </div>
+            <p class="salvage-hint">Collect scrap across Waterside to fabricate equipment mods.</p>
+          </div>
+          <div id="upgrades-list" class="upgrades-grid"></div>
+        </section>
+
+        <section id="journal-content-dossier" class="journal-section hidden">
+          <div class="dossier-grid" id="dossier-list"></div>
+        </section>
+
+        <section id="journal-content-intel" class="journal-section hidden">
+          <div class="intel-list" id="intel-list"></div>
+        </section>
+
+        <footer class="journal-footer">
+          <span><kbd>J</kbd> or <kbd>ESC</kbd> Close Journal</span>
+          <span><kbd>Q</kbd> Quick Dash</span>
+          <span><kbd>SPACE</kbd> Scrap Pulse</span>
+        </footer>
       </div>
     </div>
 

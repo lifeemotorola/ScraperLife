@@ -34,6 +34,8 @@ export class MobileController {
     this.bindTap('touch-interact', () => this.input.triggerInteract());
     this.bindTap('touch-pulse', () => this.input.triggerPulse());
     this.bindTap('touch-camera', () => this.input.triggerCamera());
+    this.bindTap('touch-dash', () => this.input.triggerDash?.());
+    this.bindTap('touch-journal', () => this.input.triggerJournal?.());
     this.bindHold('touch-run', (active) => this.input.setVirtualRunning(active));
   }
 
