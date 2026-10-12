@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { COLORS, LampLightPool, addGlowPoints, addGlowSprite, lamp, road } from './Environment.js';
 import { Building, makeSign } from './Building.js';
+import { loadHouseTemplate, placeHouse } from './HouseModel.js';
 
 export class City {
   constructor(scene, physics) { this.scene = scene; this.physics = physics; this.generator = null; this.generatorPosition = new THREE.Vector3(-3, 0, -2); this.warehousePos = new THREE.Vector3(3, 0, -23); this.ledgerPos = new THREE.Vector3(3, 0, -23); }
@@ -17,7 +18,19 @@ export class City {
       // New expansion districts for larger platform map
       [-32, -8, 9, 9, 10, 0x4a5a56, 'OLD HARBOR'], [32, -18, 10, 8, 9, 0x3d4f4e, 'CONTAINER YARD'], [ -8, -32, 14, 9, 8, 0x5e4e3e, 'SCRAP FIELD'], [ 28, 22, 9, 9, 11, 0x4b5e5a, 'TIDE APARTMENTS'], [-30, 32, 11, 7, 9, 0x5a6260, 'UNION HOUSE'], [ 10, -34, 12, 8, 9, 0x6b5a42, 'FUEL DEPOT'],
     ];
-    buildingData.forEach(([x,z,width,depth,height,color,label]) => new Building(this.scene, this.physics, { x,z,width,depth,height,color,label }).add());
+    // Every block gets its collider now, so movement is the same whether or not the house model has loaded.
+    const blocks = buildingData.map(([x,z,width,depth,height,color,label]) => {
+      const building = new Building(this.scene, this.physics, { x,z,width,depth,height,color,label });
+      building.addCollider();
+      return building;
+    });
+    // The authored house model replaces the box visuals once it loads; boxes stay as the fallback.
+    this.housesReady = loadHouseTemplate().then((template) => {
+      blocks.forEach((building) => placeHouse(this.scene, template, building.data));
+    }).catch((error) => {
+      console.warn('House model could not load; using box houses instead.', error);
+      blocks.forEach((building) => building.addVisual());
+    });
     this.makeWorkshop(-4, -3);
     this.makeWarehouse(3, -23);
     [[21,-10,0xa64e36],[19,-17,0x26555d],[22,12,0x9d613c],[16,8,0x2d6264],[-11,4,0x935b3b],[36,-22,0x8a4a3a],[ -36,-6,0x2f5d5b],[ 30,30,0x9d7a4a]].forEach(([x,z,color]) => this.container(x,z,color));
