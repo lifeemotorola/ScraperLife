@@ -82,9 +82,11 @@ export class Game {
     this.inventory = new InventorySystem();
     this.missions = new MissionSystem(this.inventory);
     this.voice = new VoiceSystem();
-    this.music = new MusicSystem();
+    this.music = new MusicSystem({
+      onTrackChange: (track, meta) => this.onRadioTrackChange(track, meta),
+    });
     this.sfx = new SoundEffectsSystem();
-    this.dialogue = new DialogueSystem(this.ui, DIALOGUE, this.voice);
+    this.dialogue = new DialogueSystem(this.ui, DIALOGUE, this.voice, this.music);
     this.combat = new CombatSystem();
     this.physics = new PhysicsEngine({ limit: 48 });
     this.city = new City(this.scene, this.physics); this.city.build({ lampLightCount: this.isMobile ? 3 : 5 });
@@ -180,6 +182,9 @@ export class Game {
       missions: this.missions,
       onCraft: (upgradeId) => this.craftUpgrade(upgradeId),
     });
+    this.ui.bindRadioTune(() => this.tuneRadio());
+    this.ui.bindMapPulse(() => this.usePulse());
+    this.ui.setRadioTrack(this.music.currentTrack());
     this.ui.bindVoiceToggle(() => {
       const on = this.voice.toggle();
       this.ui.toast(on ? 'VOICES // ON' : 'VOICES // OFF');
@@ -507,6 +512,21 @@ export class Game {
     if (dashed) {
       this.sfx.play('dash', 1.0);
       this.ui.toast(hasCoil ? 'KINETIC SURGE // EVASIVE DASH' : 'QUICK DASH // EVADE');
+    }
+  }
+
+  tuneRadio() {
+    const track = this.music.tuneNext();
+    this.sfx.play('tune', 1.0);
+    this.ui.setRadioTrack(track);
+    this.ui.toast(`📻 94.7 WATERSIDE FM // ${track.title.toUpperCase()}`);
+  }
+
+  onRadioTrackChange(track, { auto = false } = {}) {
+    this.ui.setRadioTrack(track);
+    if (auto && this.running) {
+      this.sfx.play('tune', 0.6);
+      this.ui.toast(`📻 NOW PLAYING // ${track.title.toUpperCase()}`);
     }
   }
 

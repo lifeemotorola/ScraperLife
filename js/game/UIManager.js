@@ -13,10 +13,12 @@ export class UIManager {
       worldTime: $('world-time'), weather: $('weather-label'), camera: $('camera-label'),
       mapPlayer: $('map-player'), objective: document.querySelector('.map-objective'), finalScrap: $('final-scrap'), finalMissions: $('final-missions'),
       minimap: $('minimap'),
-      mapPanel: $('map-panel'), worldMap: $('world-map'), worldMapPlayer: $('world-map-player'), worldMapObjective: $('world-map-objective'), worldMapObjectiveLabel: $('world-map-objective-label'), closeWorldMap: $('close-world-map'), mapTitle: $('map-title'),
+      mapPanel: $('map-panel'), worldMap: $('world-map'), worldMapGrid: $('world-map-grid'), worldMapPlayer: $('world-map-player'), worldMapObjective: $('world-map-objective'), worldMapObjectiveLabel: $('world-map-objective-label'), closeWorldMap: $('close-world-map'), mapTitle: $('map-title'),
       settingsButton: $('settings-button'), settingsPanel: $('settings-panel'), settingsClose: $('settings-close'),
       completeCopy: $('complete-copy'),
       touchMap: $('touch-map'), voiceToggle: $('voice-toggle'), musicToggle: $('music-toggle'),
+      // Radio Station
+      radioLine: $('radio-station-line'), radioTrackName: $('radio-track-name'), radioTuneBtn: $('radio-tune-btn'), radioTuneSettingsBtn: $('radio-tune-settings-btn'),
       // Scavenger Journal & Workbench
       journalButton: $('journal-button'), journalPanel: $('journal-panel'), journalClose: $('journal-close'),
       tabUpgrades: $('tab-upgrades'), tabDossier: $('tab-dossier'), tabIntel: $('tab-intel'),
@@ -30,6 +32,8 @@ export class UIManager {
     this.journalOpen = false;
     this.activeJournalTab = 'upgrades';
     this.onCraftCallback = null;
+    this.onMapPulseCallback = null;
+    this.onTuneRadioCallback = null;
     this.inventoryRef = null;
     this.missionsRef = null;
 
@@ -62,10 +66,39 @@ export class UIManager {
     this.el.tabDossier?.addEventListener('click', () => this.switchJournalTab('dossier'));
     this.el.tabIntel?.addEventListener('click', () => this.switchJournalTab('intel'));
 
-    // Platform map: click minimap, press M, or use the mobile MAP button.
-    this.el.mapPanel?.addEventListener('click', () => this.toggleWorldMap());
+    // Radio station tuning
+    this.el.radioTuneBtn?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      this.onTuneRadioCallback?.();
+    });
+    this.el.radioLine?.addEventListener('click', (event) => {
+      if (event.target !== this.el.radioTuneBtn) this.onTuneRadioCallback?.();
+    });
+    this.el.radioTuneSettingsBtn?.addEventListener('click', () => {
+      this.onTuneRadioCallback?.();
+    });
+
+    // Map: clicking on the map pulses the game!
+    this.el.minimap?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      this.triggerMapPulse(event, false);
+    });
+    this.el.mapTitle?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      this.toggleWorldMap();
+    });
+    this.el.mapPanel?.addEventListener('click', (event) => {
+      if (this.el.mapTitle && (event.target === this.el.mapTitle || this.el.mapTitle.contains(event.target))) {
+        this.toggleWorldMap();
+      } else {
+        this.triggerMapPulse(event, false);
+      }
+    });
     this.el.mapPanel?.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.toggleWorldMap(); }
+    });
+    this.el.worldMapGrid?.addEventListener('click', (event) => {
+      this.triggerMapPulse(event, true);
     });
     this.el.closeWorldMap?.addEventListener('click', () => this.closeMap());
     this.el.worldMap?.addEventListener('click', (event) => {
@@ -84,7 +117,48 @@ export class UIManager {
       if (this.settingsOpen) return;
       if (event.key.toLowerCase() === 'm' && !this.journalOpen) { event.preventDefault(); this.toggleWorldMap(); }
       if (event.key.toLowerCase() === 'j') { event.preventDefault(); this.toggleJournal(); }
+      if (event.key.toLowerCase() === 'r' && !event.repeat) { event.preventDefault(); this.onTuneRadioCallback?.(); }
     });
+  }
+
+  // Radio Station
+  bindRadioTune(onTune) {
+    this.onTuneRadioCallback = onTune;
+  }
+
+  setRadioTrack(track) {
+    if (!track) return;
+    if (this.el.radioTrackName) {
+      this.el.radioTrackName.textContent = `${track.title.toUpperCase()} — ${track.artist.toUpperCase()}`;
+    }
+    if (this.el.radioTuneSettingsBtn) {
+      this.el.radioTuneSettingsBtn.textContent = `📻 ${track.station} // ${track.title.toUpperCase()}`;
+    }
+  }
+
+  // Map Pulse
+  bindMapPulse(onPulse) {
+    this.onMapPulseCallback = onPulse;
+  }
+
+  triggerMapPulse(event, isWorldMap = false) {
+    this.onMapPulseCallback?.();
+    const container = isWorldMap ? this.el.worldMapGrid : this.el.minimap;
+    if (!container) return;
+    const rect = container.getBoundingClientRect?.() || { left: 0, top: 0 };
+    const x = (event?.clientX !== undefined && rect.left !== undefined)
+      ? (event.clientX - rect.left)
+      : (container.clientWidth || 100) / 2;
+    const y = (event?.clientY !== undefined && rect.top !== undefined)
+      ? (event.clientY - rect.top)
+      : (container.clientHeight || 100) / 2;
+
+    const ripple = document.createElement('i');
+    ripple.className = 'map-click-ripple';
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    container.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 700);
   }
 
   // Scavenger Journal & Workbench

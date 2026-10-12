@@ -189,6 +189,15 @@ export class SoundEffectsSystem {
       return true;
     }
 
+    if (name === 'tune') {
+      this.tone({ frequency: 820, endFrequency: 440, start: now, duration: 0.12,
+        volume: 0.16 * energy, type: 'sine', attack: 0.003, pan: 0.08 });
+      this.noise({ start: now, duration: 0.14, volume: 0.22 * energy, cutoff: 2400, filter: 'bandpass', pan: -0.08 });
+      this.tone({ frequency: 1200, endFrequency: 950, start: now + 0.05, duration: 0.08,
+        volume: 0.14 * energy, type: 'sawtooth', attack: 0.004 });
+      return true;
+    }
+
     return false;
   }
 

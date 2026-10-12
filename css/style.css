@@ -16,6 +16,16 @@ body { font-family:Outfit,Arial,sans-serif; }
 .panel-heading { color:#b6c3bb; font:500 10px/1 'DM Mono'; letter-spacing:.12em; display:flex; align-items:center; gap:7px; }
 .quest-progress { margin-top:0; }.quest-progress span,.meter-label { display:flex;justify-content:space-between;color:#e5e8dd;font:500 9px/1 'DM Mono';letter-spacing:.08em; }
 .bar,.resolve-meter { background:rgba(242,240,220,.15);height:4px;margin-top:7px;overflow:hidden; }.bar i {display:block;height:100%;width:0;background:var(--orange);box-shadow:0 0 8px var(--orange);transition:width .3s}.status-panel { position:absolute; right:31px; top:78px; width:235px; padding:13px 14px; }.status-row {display:flex;justify-content:space-between;color:#edf2e9;font:600 10px/1 'DM Mono';letter-spacing:.07em}.status-row span:last-child{color:#a5b8ae;font-size:8px}.meter-label { margin-top:16px;}.meter-label b{color:var(--teal);font-weight:500}.resolve-meter i{display:block;height:100%;width:100%;background:var(--teal);transition:width .2s}.pulse-line{display:flex;align-items:center;gap:6px;margin-top:12px;color:#bfcac1;font:500 8px/1 'DM Mono';letter-spacing:.12em}.pulse-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);box-shadow:0 0 9px var(--teal)}.world-line{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:9px;border-top:1px solid rgba(217,238,220,.12);font:500 8px/1 'DM Mono';letter-spacing:.07em;color:#d5e0d6}.world-line span:last-child{color:var(--amber)}
+.radio-line{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(217,238,220,.12);cursor:pointer}
+.radio-tag{display:flex;align-items:center;gap:4px;font:700 8px/1 'DM Mono',monospace;color:var(--amber);letter-spacing:.08em;flex-shrink:0}
+.radio-icon{font-size:11px}
+.radio-info{flex:1;min-width:0;overflow:hidden}
+.radio-track-title{display:block;font:600 8px/1.2 'DM Mono',monospace;color:var(--cream);letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.radio-tune-btn{padding:4px 7px;background:rgba(251,179,74,.2);border:1px solid rgba(251,179,74,.4);color:var(--amber);font:700 7px/1 'DM Mono';letter-spacing:.06em;cursor:pointer;border-radius:2px;flex-shrink:0}
+.radio-tune-btn:hover{background:var(--amber);color:#0d1617}
+.map-pulse-badge{position:absolute;bottom:4px;right:4px;z-index:3;background:rgba(11,22,23,.78);border:1px solid rgba(117,197,187,.4);color:var(--teal);font:700 6px/1 'DM Mono';letter-spacing:.08em;padding:2px 4px;border-radius:2px;pointer-events:none}
+.map-click-ripple{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid var(--teal);background:rgba(117,197,187,.35);transform:translate(-50%,-50%) scale(1);pointer-events:none;z-index:10;animation:map-ripple-expand .65s ease-out forwards}
+@keyframes map-ripple-expand{0%{transform:translate(-50%,-50%) scale(0.6);opacity:1}100%{transform:translate(-50%,-50%) scale(8);opacity:0}}
 /* Audio toggles live inside Settings instead of competing with the game HUD. */
 .settings-audio-button { width:100%; padding:8px 10px; border:1px solid rgba(117,197,187,.42); background:rgba(117,197,187,.12); color:var(--teal); font:700 9px/1 'DM Mono',monospace; letter-spacing:.1em; }
 .settings-audio-button:hover { transform:none; background:rgba(117,197,187,.24); color:#d8f5ee; }

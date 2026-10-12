@@ -35,6 +35,11 @@
         <div class="resolve-meter"><i id="resolve-bar"></i></div>
         <div class="pulse-line"><span class="pulse-dot"></span><span id="pulse-status">SCRAP PULSE READY</span></div>
         <div class="world-line"><span id="world-time">DAY 01 // 06:00</span><span id="weather-label">COASTAL CLEAR</span></div>
+        <div class="radio-line" id="radio-station-line" title="Tune 94.7 Waterside FM [R]">
+          <div class="radio-tag"><span class="radio-icon">📻</span><span class="radio-station-name">94.7 FM</span></div>
+          <div class="radio-info"><span id="radio-track-name" class="radio-track-title">PLATFORM THEME</span></div>
+          <button id="radio-tune-btn" class="radio-tune-btn" type="button" aria-label="Tune next track">TUNE ❯</button>
+        </div>
       </section>
 
       <section id="map-panel" class="map-panel glass" role="button" tabindex="0" aria-label="Open expanded map">
@@ -48,6 +53,7 @@
           <i class="map-npc npc-tenneh" id="map-npc-tenneh" style="left:72%;top:28%"></i>
           <i class="map-npc npc-boakai" id="map-npc-boakai" style="left:82%;top:52%"></i>
           <i class="map-npc npc-vardee" id="map-npc-vardee" style="left:14%;top:76%"></i>
+          <span class="map-pulse-badge">CLICK TO PULSE</span>
         </div>
         <div class="map-key"><span><i class="key-player"></i>MARKIE</span><span><i class="key-objective"></i>JOB</span><span><i style="background:#d8a85a"></i>KOLLIE</span><span><i style="background:#c760b0"></i>TENNEH</span></div>
         <span class="map-platform-badge">PLATFORM MAP</span>
@@ -116,6 +122,7 @@
             <div class="settings-row"><kbd>ENTER</kbd><span>Chat with your session</span></div>
             <div class="settings-row"><kbd>J</kbd><span>Scavenger Journal &amp; Field Mods</span></div>
             <div class="settings-row"><kbd>M</kbd><span>Open / close map</span></div>
+            <div class="settings-row"><kbd>R</kbd><span>Tune Radio Station (94.7 FM)</span></div>
             <div class="settings-row"><kbd>V</kbd><span>Toggle character voices</span></div>
             <div class="settings-row"><kbd>B</kbd><span>Toggle background music</span></div>
           </section>
@@ -131,6 +138,7 @@
             <div class="settings-row"><kbd>CAM</kbd><span>Cycle camera</span></div>
             <div class="settings-row"><kbd>LOG</kbd><span>Scavenger Journal</span></div>
             <div class="settings-row"><kbd>MAP</kbd><span>Open the platform map</span></div>
+            <div class="settings-row"><kbd>TAP MAP</kbd><span>Trigger Scrap Pulse</span></div>
             <div class="settings-row"><kbd>CHAT</kbd><span>Chat with your session</span></div>
           </section>
 
@@ -144,6 +152,10 @@
               <div class="settings-audio-item">
                 <span>Background music</span>
                 <button id="music-toggle" class="settings-audio-button music-toggle" type="button" aria-label="Toggle background music" aria-pressed="true">♫ MUSIC ON</button>
+              </div>
+              <div class="settings-audio-item">
+                <span>Radio Station (94.7 FM)</span>
+                <button id="radio-tune-settings-btn" class="settings-audio-button radio-tune-button" type="button">📻 TUNE NEXT TRACK ❯</button>
               </div>
             </div>
           </section>
