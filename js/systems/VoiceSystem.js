@@ -220,18 +220,18 @@ export class VoiceSystem {
 
   // ---- Real audio first, TTS fallback -------------------------------
 
-  playLine(id, line, seconds = 4) {
+  playLine(id, line, seconds = 4, onDone = null) {
     if (!this.enabled) return;
     const url = AUDIO_LINES[id];
     if (url && this.player) {
-      this.playClip(url, line, seconds);
+      this.playClip(url, line, seconds, onDone);
       return;
     }
-    this.speak(line);
+    this.speak(line, onDone);
   }
 
-  playClip(url, line, seconds = 4) {
-    if (!this.player) { this.speak(line); return; }
+  playClip(url, line, seconds = 4, onDone = null) {
+    if (!this.player) { this.speak(line, onDone); return; }
     this.stopPlayback();
     const audio = this.player;
     audio.src = url;
@@ -242,13 +242,18 @@ export class VoiceSystem {
     const clear = () => {
       if (this.currentAudio === audio && this.clipGeneration === generation) this.currentAudio = null;
     };
-    const ended = () => { settled = true; clear(); };
+    const ended = () => {
+      if (settled || this.clipGeneration !== generation) return;
+      settled = true;
+      clear();
+      onDone?.();
+    };
     const fallback = () => {
       if (settled || this.clipGeneration !== generation) return;
       settled = true;
       clear();
       // Clip blocked or failed to load — the fallback keeps the line audible.
-      this.speak(line);
+      this.speak(line, onDone);
     };
     audio.addEventListener('ended', ended, { once: true });
     audio.addEventListener('error', fallback, { once: true });

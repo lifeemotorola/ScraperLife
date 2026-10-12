@@ -40,7 +40,12 @@ export class DialogueSystem {
       const subtitleSeconds = Math.max(step.seconds || 4.2, (wordCount / 2.7) + 1.2);
       this.ui.subtitle(formatted, subtitleSeconds);
 
-      if (this.voice) {
+      if (this.voice && step.audio) {
+        // Play real .wav voice clip from assets/radioVoices/
+        this.voice.playClip(step.audio, formatted, subtitleSeconds, () => {
+          this.sequenceTimer = setTimeout(playNext, 400);
+        });
+      } else if (this.voice) {
         // Wait for the current speaker to finish speaking completely before advancing!
         this.voice.speak(formatted, () => {
           // Natural human conversational pause (400ms) between speakers
