@@ -19,8 +19,15 @@ export const COLORS = {
 // city is lit by it — sky from above, sun glare from the sun's actual azimuth, ground bounce
 // from below. ACESFilmic tone mapping then maps that HDR range onto the screen, which is what
 // keeps the sun white-hot while skin and concrete stay mid-range.
+// Skies that can light the city. Open the game with `?sky=<name>` to try one (e.g. `?sky=kloofendal`).
+export const SKIES = {
+  waterside: new URL('../../assets/textures/waterside_sky.hdr', import.meta.url).href,
+  citrus: new URL('../../assets/textures/citrus_orchard_road_puresky_1k.hdr', import.meta.url).href,
+  kloofendal: new URL('../../assets/textures/kloofendal_48d_partly_cloudy_puresky_1k.hdr', import.meta.url).href,
+};
+const requestedSky = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('sky') : null;
 export const HDR = {
-  url: new URL('../../assets/textures/waterside_sky.hdr', import.meta.url).href,
+  url: SKIES[requestedSky] || SKIES.kloofendal,
   exposure: 1.0,
   // Environment intensity is driven by the day cycle (see ClimateController.update).
   day: 1.0,

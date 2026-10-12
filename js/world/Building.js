@@ -17,7 +17,17 @@ export class Building {
     this.scene = scene; this.physics = physics;
     this.data = { x, z, width, depth, height, color, label };
   }
+  // The collider is what the player and NPCs bump into; it is the same whichever model draws the block.
+  addCollider() {
+    const { x, z, width, depth } = this.data;
+    this.physics.addBuilding({ x, z, width: width + .3, depth: depth + .3 });
+  }
+  // Procedural box house, used when the authored house model cannot be loaded.
   add() {
+    this.addCollider();
+    return this.addVisual();
+  }
+  addVisual() {
     const { x, z, width, depth, height, color, label } = this.data;
     const group = new THREE.Group(); group.position.set(x, height / 2, z);
     const body = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), new THREE.MeshStandardMaterial({ color, roughness: .85, metalness: .05 }));
@@ -45,7 +55,7 @@ export class Building {
     const entryLight = new THREE.Mesh(new THREE.SphereGeometry(.09, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffbd68 }));
     entryLight.position.set(.72, -height / 2 + 2.15, -depth / 2 - .1); group.add(entryLight);
     if (label) { const sign = makeSign(label, Math.min(width * 1.1, 5)); sign.position.set(0, -height / 2 + 2.7, -depth / 2 - .08); group.add(sign); }
-    this.scene.add(group); this.physics.addBuilding({ x, z, width: width + .3, depth: depth + .3 });
+    this.scene.add(group);
     return group;
   }
 }
