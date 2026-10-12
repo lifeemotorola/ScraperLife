@@ -28,18 +28,27 @@ export class DialogueSystem {
     let index = 0;
     const playNext = () => {
       if (index >= steps.length) {
-        this.duckTimer = setTimeout(() => this.music?.unduck?.(), 800);
+        this.duckTimer = setTimeout(() => this.music?.unduck?.(), 700);
         onDone?.();
         return;
       }
       const step = steps[index++];
-      const seconds = step.seconds || 4.8;
       const formatted = step.line.includes(':') ? step.line : `${step.speaker}: “${step.line}”`;
-      this.ui.subtitle(formatted, seconds);
+
+      // Subtitle duration dynamically matches word count
+      const wordCount = step.line.split(/\s+/).length;
+      const subtitleSeconds = Math.max(step.seconds || 4.2, (wordCount / 2.7) + 1.2);
+      this.ui.subtitle(formatted, subtitleSeconds);
+
       if (this.voice) {
-        this.voice.speak(formatted);
+        // Wait for the current speaker to finish speaking completely before advancing!
+        this.voice.speak(formatted, () => {
+          // Natural human conversational pause (400ms) between speakers
+          this.sequenceTimer = setTimeout(playNext, 400);
+        });
+      } else {
+        this.sequenceTimer = setTimeout(playNext, subtitleSeconds * 1000);
       }
-      this.sequenceTimer = setTimeout(playNext, seconds * 1000);
     };
 
     playNext();

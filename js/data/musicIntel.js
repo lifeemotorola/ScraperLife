@@ -1,7 +1,7 @@
 /**
  * Monrovia 94.7 Waterside FM Broadcast, News Bulletins & Music Intel
- * Features real-world radio co-host dialogues between DJ Gabriel (man) and DJ Kpannah (woman),
- * live breaking news bulletins across music sessions, and resident cultural commentary.
+ * Features real-world, authentic radio co-host dialogues between DJ Gabriel (male host)
+ * and DJ Kpannah (female co-host), live breaking news bulletins, and resident cultural commentary.
  */
 
 export const MUSIC_INTEL = {
@@ -12,12 +12,12 @@ export const MUSIC_INTEL = {
     station: '94.7 WATERSIDE FM',
     genre: 'Monrovia Hip-Hop / Kolokwa Drill',
     broadcaster: 'DJ GABRIEL & DJ KPANNAH',
-    broadcastLine: 'DJ GABRIEL: “WATERSIDE 94.7 FM! DJ Gabriel with DJ Kpannah in the studio. Turn this all the way up for Monrovia’s own Queen, MC Caro with Pillz on Money! Honest sweat over corrupt syndicates!”',
+    broadcastLine: 'DJ GABRIEL: “WATERSIDE 94.7 FM! Gabriel and Kpannah holding down the airwaves! MC Caro and Pillz dropping raw Monrovia truth!”',
     cohostDialogue: [
-      { speaker: 'DJ GABRIEL', line: 'WATERSIDE 94.7 FM! Gabriel and Kpannah holding down the airwaves above the old bridge!', seconds: 4.5 },
-      { speaker: 'DJ KPANNAH', line: 'You know we had to spin this one, Gabriel! Monrovia Queen MC Caro teamed with Pillz on Money!', seconds: 4.5 },
-      { speaker: 'DJ GABRIEL', line: 'Straight out of West Point and New Kru Town! Caro spitting pure truth about honest work versus dirty syndicate cash.', seconds: 4.8 },
-      { speaker: 'DJ KPANNAH', line: 'True talk, Gabriel! If you are sweating clean on the scrap piles today, turn your speakers all the way up!', seconds: 4.5 },
+      { speaker: 'DJ GABRIEL', line: 'Hold on, hold on, cut the noise! Kpannah, you know what time it is when this bass starts vibrating my coffee cup!', seconds: 4.8 },
+      { speaker: 'DJ KPANNAH', line: 'Look at you, Gabriel, acting like you can dance! You know Monrovia Queen MC Caro don’t play no games on the mic!', seconds: 4.8 },
+      { speaker: 'DJ GABRIEL', line: 'Pillz dropped that heavy street rhythm! Caro is talking to every scrapper and market seller sweating for clean money!', seconds: 4.8 },
+      { speaker: 'DJ KPANNAH', line: 'That’s right! No dirty syndicate shortcuts in Sector 04! If you are chasing that honest paper today, turn Waterside 94.7 FM all the way up!', seconds: 5.2 },
     ],
     culturalPoints: [
       'MC Caro is the undisputed Queen of Liberian Hip-Hop, celebrated across West Africa for razor-sharp Kolokwa wordplay and social advocacy.',
@@ -42,12 +42,12 @@ export const MUSIC_INTEL = {
     station: '94.7 WATERSIDE FM',
     genre: 'East Coast Street Rap',
     broadcaster: 'DJ GABRIEL & DJ KPANNAH',
-    broadcastLine: 'DJ GABRIEL: “94.7 WATERSIDE FM DISPATCH: DJ Gabriel and DJ Kpannah on the decks. Meek Mill jumped on the Lemon Pepper instrumental and turned it into an autobiographical survival masterclass!”',
+    broadcastLine: 'DJ GABRIEL: “94.7 WATERSIDE FM! Meek Mill tearing up the Lemon Pepper Freestyle with pure street hunger!”',
     cohostDialogue: [
-      { speaker: 'DJ GABRIEL', line: '94.7 FM in your ear! We got Philadelphia’s own Meek Mill tearing up the Lemon Pepper Freestyle!', seconds: 4.5 },
-      { speaker: 'DJ KPANNAH', line: 'Listen to that flow, Gabriel! Meek didn’t even stop to take a breath! That is real street hunger right there.', seconds: 4.6 },
-      { speaker: 'DJ GABRIEL', line: 'He took an opulent dinner beat and turned it into pure survival reflections. For every scrapper dodging the watch today—this is for you.', seconds: 5.0 },
-      { speaker: 'DJ KPANNAH', line: 'Never let anyone tell you your circumstances define your future, Waterside!', seconds: 4.0 },
+      { speaker: 'DJ GABRIEL', line: 'Kpannah, I gotta be honest with you. Every time Meek Mill gets on a track, I feel like running through a concrete wall!', seconds: 4.8 },
+      { speaker: 'DJ KPANNAH', line: 'Gabriel, please, the last time you ran you were out of breath before reaching the studio door! But look at Meek though—three whole minutes without even pausing to breathe!', seconds: 5.4 },
+      { speaker: 'DJ GABRIEL', line: 'That is real Philadelphia hunger! Surviving the blocks, beating corrupt court cases, and standing tall against the system.', seconds: 5.0 },
+      { speaker: 'DJ KPANNAH', line: 'True talk. That pain in his voice? Every young person in Monrovia carrying heavy burdens understands it word for word.', seconds: 5.0 },
     ],
     culturalPoints: [
       'Meek Mill hijacked Drake and Rick Ross’s iconic soulful instrumental to deliver a non-stop, breath-defying clinic on street trauma and redemption.',
@@ -72,12 +72,12 @@ export const MUSIC_INTEL = {
     station: '94.7 WATERSIDE FM',
     genre: 'Soul-Trap / Street Testament',
     broadcaster: 'DJ GABRIEL & DJ KPANNAH',
-    broadcastLine: 'DJ GABRIEL: “WATERSIDE AIRWAVES: DJ Gabriel and DJ Kpannah spinning Meek Mill’s ‘On My Soul’. A sacred street oath sworn on the ancestors that personal integrity cannot be bought!”',
+    broadcastLine: 'DJ GABRIEL: “WATERSIDE AIRWAVES: Meek Mill’s ‘On My Soul’. A sacred street oath that personal integrity cannot be purchased!”',
     cohostDialogue: [
-      { speaker: 'DJ KPANNAH', line: 'Slow it down small, Gabriel. This next record has real spiritual weight.', seconds: 4.2 },
-      { speaker: 'DJ GABRIEL', line: 'You know it, Kpannah. Meek Mill with On My Soul. A sacred oath sworn on his ancestors.', seconds: 4.5 },
-      { speaker: 'DJ KPANNAH', line: 'In Monrovia, a man can lose his tools, his shoes, even his stall. But when you keep your soul, nobody owns you.', seconds: 4.8 },
-      { speaker: 'DJ GABRIEL', line: 'Deep words from Mama Kpannah. Swear on your soul and keep walking tall through the rain!', seconds: 4.5 },
+      { speaker: 'DJ KPANNAH', line: 'Gabriel, bring the studio fader down small. Let the people feel this melody.', seconds: 4.2 },
+      { speaker: 'DJ GABRIEL', line: 'You know this one touches the spirit, Kpannah. Meek Mill swearing On My Soul.', seconds: 4.5 },
+      { speaker: 'DJ KPANNAH', line: 'Because out here in Waterside, Vardee and his gang think everything is for sale. But a clean conscience? That has no price tag.', seconds: 5.2 },
+      { speaker: 'DJ GABRIEL', line: 'Preach, Mama Kpannah! Swear on your soul, keep your hands clean, and let no man buy your loyalty.', seconds: 4.8 },
     ],
     culturalPoints: [
       'A solemn, gospel-infused street ballad where Meek Mill pledges his soul and legacy to never compromise his moral code.',
@@ -102,12 +102,12 @@ export const MUSIC_INTEL = {
     station: '94.7 WATERSIDE FM',
     genre: 'Classic Philly Hip-Hop',
     broadcaster: 'DJ GABRIEL & DJ KPANNAH',
-    broadcastLine: 'DJ GABRIEL: “94.7 WATERSIDE FM: Gabriel and Kpannah taking it back to the corner roots with Meek Mill’s ‘Polo and Shell Tops’. Vintage street fashion meets Waterside platform drip!”',
+    broadcastLine: 'DJ GABRIEL: “94.7 WATERSIDE FM: Gabriel and Kpannah bringing vintage corner roots with Meek Mill’s ‘Polo and Shell Tops’!”',
     cohostDialogue: [
-      { speaker: 'DJ GABRIEL', line: 'Hey Kpannah, take a look out the studio window! The whole market is dressed sharp today!', seconds: 4.5 },
-      { speaker: 'DJ KPANNAH', line: 'Ah Gabriel, that’s because Tenneh just unboxed a fresh bale of vintage collars from the Freeport container!', seconds: 4.8 },
-      { speaker: 'DJ GABRIEL', line: 'Classic vibes! Throwing it back to Philly corner roots with Meek Mill’s Polo and Shell Tops!', seconds: 4.6 },
-      { speaker: 'DJ KPANNAH', line: 'Fresh kicks, ironed shirts, even if you only got two dollars in your pocket! That is Waterside style!', seconds: 4.5 },
+      { speaker: 'DJ GABRIEL', line: 'Wait a minute, Kpannah! Look at the market below our window! Why is everybody walking like they are in a fashion show?', seconds: 4.8 },
+      { speaker: 'DJ KPANNAH', line: 'Ah, Gabriel, you didn’t hear? Tenneh just unbundled fresh vintage Adidas and Ralph Lauren collars straight off the Freeport ship!', seconds: 5.2 },
+      { speaker: 'DJ GABRIEL', line: 'Polo and Shell Tops! Vintage corner swag! Even if you only got five Liberian dollars for cold water, you dress like royalty!', seconds: 5.0 },
+      { speaker: 'DJ KPANNAH', line: 'That is the Monrovia code, Gabriel! You can be broke in your pockets, but your dignity must always be pressed and ironed!', seconds: 5.0 },
     ],
     culturalPoints: [
       'An affectionate tribute to classic 1990s Philadelphia corner fashion: Ralph Lauren Polo collars paired with Adidas shell-toe sneakers.',
@@ -132,12 +132,12 @@ export const MUSIC_INTEL = {
     station: '94.7 WATERSIDE FM',
     genre: 'High-Octane Street Trap',
     broadcaster: 'DJ GABRIEL & DJ KPANNAH',
-    broadcastLine: 'DJ GABRIEL: “94.7 WATERSIDE FM ALERT: DJ Gabriel and DJ Kpannah warning the listeners—Meek Mill, Lil Baby, and Lil Durk on ‘Sharing Locations’! Watch your coordinates and move together!”',
+    broadcastLine: 'DJ GABRIEL: “94.7 WATERSIDE FM ALERT: Meek Mill, Lil Baby, and Lil Durk joining forces on ‘Sharing Locations’!”',
     cohostDialogue: [
-      { speaker: 'DJ KPANNAH', line: 'Gabriel, hold on to your headphones! This 808 bass is shaking the studio floor!', seconds: 4.2 },
-      { speaker: 'DJ GABRIEL', line: 'Meek Mill, Lil Baby, and Lil Durk joining forces on Sharing Locations! Pure adrenaline on 94.7 FM!', seconds: 4.8 },
-      { speaker: 'DJ KPANNAH', line: 'You see how they move as an alliance? That is how our community survives. Watch your coordinates and look out for each other!', seconds: 5.0 },
-      { speaker: 'DJ GABRIEL', line: 'If you’re running scrap across Sector 04, keep your radio on and share your location with your squad!', seconds: 4.5 },
+      { speaker: 'DJ KPANNAH', line: 'Gabriel! Grab your microphone before the speaker blows up! This kick drum is rattling my teeth!', seconds: 4.5 },
+      { speaker: 'DJ GABRIEL', line: 'Meek, Lil Baby, and Durk! Triple threat heavy artillery on Waterside 94.7 FM!', seconds: 4.8 },
+      { speaker: 'DJ KPANNAH', line: 'You see how they move in a triangle? Nobody gets left behind when the pressure turns up. That is how scrappers survive!', seconds: 5.2 },
+      { speaker: 'DJ GABRIEL', line: 'Hear that, Markie? Keep your transceiver frequency shared with your crew and watch out for watch patrols!', seconds: 4.8 },
     ],
     culturalPoints: [
       'A historic street collaboration uniting three regional rap titans: Meek Mill (Philadelphia), Lil Baby (Atlanta), and Lil Durk (Chicago).',
@@ -162,12 +162,12 @@ export const MUSIC_INTEL = {
     station: '94.7 WATERSIDE FM',
     genre: 'African Hip-Hop / Soul',
     broadcaster: 'DJ GABRIEL & DJ KPANNAH',
-    broadcastLine: 'DJ GABRIEL: “94.7 WATERSIDE FM SPECIAL BROADCAST: DJ Gabriel and DJ Kpannah with Nasty C’s ‘UOK’. An open letter to his late mother Ivy, asking from the heart if she is okay in heaven.”',
+    broadcastLine: 'DJ GABRIEL: “94.7 WATERSIDE FM: Nasty C with ‘UOK’. An open letter to his late mother Ivy in the stars.”',
     cohostDialogue: [
-      { speaker: 'DJ GABRIEL', line: 'A very special broadcast across Monrovia right now. South Africa’s rap prodigy Nasty C with UOK.', seconds: 4.5 },
-      { speaker: 'DJ KPANNAH', line: 'A mother’s love, Gabriel. Nasty C poured his entire heart out for his late mother Ivy, asking if she is okay in heaven.', seconds: 4.8 },
-      { speaker: 'DJ GABRIEL', line: 'It reminds us of what we’re fighting for. For our brother Markie and everyone who lost parents too early—we dedicate this one to you.', seconds: 5.0 },
-      { speaker: 'DJ KPANNAH', line: 'Put your hands up, Waterside. Love transcends the sky.', seconds: 3.8 },
+      { speaker: 'DJ GABRIEL', line: 'Kpannah, take the mic for a second. This next record needs a gentle voice.', seconds: 4.2 },
+      { speaker: 'DJ KPANNAH', line: 'Yes, Gabriel... South Africa’s golden boy Nasty C, singing UOK straight to his mother Ivy in the stars.', seconds: 5.0 },
+      { speaker: 'DJ GABRIEL', line: 'Losing a mother when you are just a baby... that kind of hole never closes, but he turned all that grief into a masterpiece.', seconds: 5.2 },
+      { speaker: 'DJ KPANNAH', line: 'To everyone on this platform who lost their parents—especially our brother Markie working his bench—know that love never dies.', seconds: 5.4 },
     ],
     culturalPoints: [
       'A landmark emotional record from South African rap phenom Nasty C, dedicated to his mother Ivy who passed away when he was an infant.',
@@ -192,10 +192,10 @@ export const MUSIC_INTEL = {
     station: '94.7 WATERSIDE FM',
     genre: 'Afro-Instrumental / Platform Ambient',
     broadcaster: 'DJ GABRIEL & DJ KPANNAH',
-    broadcastLine: 'DJ GABRIEL: “WATERSIDE 94.7 FM: The heartbeat of Monrovia with Gabriel and Kpannah. Kollie’s workshop transformers hum and the ocean tide rolls in.”',
+    broadcastLine: 'DJ GABRIEL: “WATERSIDE 94.7 FM: The heartbeat of Monrovia with Gabriel and Kpannah. Dawn over the Mesurado.”',
     cohostDialogue: [
-      { speaker: 'DJ GABRIEL', line: '94.7 Waterside FM! Dawn over the Mesurado river. The fog is lifting and the generators are humming.', seconds: 4.5 },
-      { speaker: 'DJ KPANNAH', line: 'Old Man Kollie’s workshop is already alive. Drink your morning tea and let’s get this daily bread, my people!', seconds: 4.8 },
+      { speaker: 'DJ GABRIEL', line: 'Waterside 94.7 FM! Dawn mist is burning off the Mesurado river, and the morning seagulls are screaming!', seconds: 4.8 },
+      { speaker: 'DJ KPANNAH', line: 'Old Man Kollie’s soldering iron is already smoking, Gabriel! Wake up, drink your hot ginger tea, and let’s go get this bread!', seconds: 5.2 },
     ],
     culturalPoints: [
       'The original ambient pulse of Waterside Platform, recorded through Old Man Kollie’s restored vacuum-tube transceiver.',
@@ -223,9 +223,10 @@ export const RADIO_NEWS_BULLETINS = [
     headline: 'SECTOR 04 COMMODITY & SCRAP TARIFF REPORT',
     category: 'MARKET DISPATCH',
     steps: [
-      { speaker: 'DJ GABRIEL', line: '94.7 Waterside FM News Break! Top of the hour update on sector commodity trading and scrap tariffs.', seconds: 4.8 },
-      { speaker: 'DJ KPANNAH', line: 'Tenneh’s central market stall reports copper wire trading up fifteen percent! But scrap runners beware: watch patrols are confiscating uncertified capacitor banks near the interchange!', seconds: 5.2 },
-      { speaker: 'DJ GABRIEL', line: 'Keep your receipt stamps in your pocket, scrappers. Back to the music on 94.7 FM!', seconds: 4.0 },
+      { speaker: 'DJ GABRIEL', line: 'Hold the music, hold the music! Waterside 94.7 FM breaking market dispatch!', seconds: 4.5 },
+      { speaker: 'DJ KPANNAH', line: 'Gabriel, Tenneh sent word from the central market: clean copper scrap jumped fifteen percent this morning!', seconds: 5.2 },
+      { speaker: 'DJ GABRIEL', line: 'Fifteen percent?! I am grabbing my wrench and heading to the piles right now!', seconds: 4.5 },
+      { speaker: 'DJ KPANNAH', line: 'Sit your behind down, Gabriel, you have a radio show to host! Plus, watch patrols are snooping near the bridge, so scrappers, conceal your copper!', seconds: 5.5 },
     ],
   },
   {
@@ -233,9 +234,10 @@ export const RADIO_NEWS_BULLETINS = [
     headline: 'OLD DOCKS & WAREHOUSE 6 SURVEILLANCE ALERT',
     category: 'INVESTIGATIVE FLASH',
     steps: [
-      { speaker: 'DJ KPANNAH', line: 'Breaking news from the Old Docks! Boakai’s crane operators spotted Vardee’s lieutenants moving unmarked shipping crates near Warehouse 6.', seconds: 5.2 },
-      { speaker: 'DJ GABRIEL', line: 'Word on the docks is an official shipping ledger went missing. If you are scavenging near the northern pier, keep low and move quietly!', seconds: 5.0 },
-      { speaker: 'DJ KPANNAH', line: 'And remember: paper does not lie, but people sure do. Stay tuned to 94.7 FM!', seconds: 4.2 },
+      { speaker: 'DJ KPANNAH', line: 'Gabriel, emergency whisper just came across our studio transceiver from the Old Docks!', seconds: 4.8 },
+      { speaker: 'DJ GABRIEL', line: 'What is going down, Kpannah? Don’t tell me Boakai dropped another crate in the water!', seconds: 4.8 },
+      { speaker: 'DJ KPANNAH', line: 'No! Vardee’s top enforcers were caught trying to burn shipping manifests behind Warehouse 6! Someone is terrified of what is inside that ledger!', seconds: 5.5 },
+      { speaker: 'DJ GABRIEL', line: 'The walls are closing in on the syndicate, Waterside! Keep your eyes peeled and your tools ready!', seconds: 4.8 },
     ],
   },
   {
@@ -243,9 +245,9 @@ export const RADIO_NEWS_BULLETINS = [
     headline: 'COASTAL WEATHER & ATLANTIC SQUALL WARNING',
     category: 'MARINE BULLETIN',
     steps: [
-      { speaker: 'DJ GABRIEL', line: 'Coastal weather dispatch! Heavy Atlantic squalls approaching Monrovia coastline, winds gusting over thirty knots along the Mesurado.', seconds: 5.0 },
-      { speaker: 'DJ KPANNAH', line: 'Old Man Kollie advises all workshop runners: wrap your radio transceivers in oilcloth! Saltwater corrosion ruins precision tuning.', seconds: 5.0 },
-      { speaker: 'DJ GABRIEL', line: 'You heard the elder! Protect your gear and let the heavy bass keep you warm.', seconds: 4.2 },
+      { speaker: 'DJ GABRIEL', line: 'Weather radar update over Monrovia: massive Atlantic rain clouds coming in fast from the West Point shore!', seconds: 5.0 },
+      { speaker: 'DJ KPANNAH', line: 'Old Man Kollie phoned the booth with emergency advice: cover your electronics with heavy rubber tarps! Salt rain eats transformer coils for breakfast!', seconds: 5.5 },
+      { speaker: 'DJ GABRIEL', line: 'You heard the elder! Don’t let your salvage short-circuit in the mud! Stay dry and keep the music loud!', seconds: 5.0 },
     ],
   },
   {
@@ -253,8 +255,10 @@ export const RADIO_NEWS_BULLETINS = [
     headline: 'STREET HEROES // ALLEY COURIER SHOUTOUT',
     category: 'COMMUNITY BEAT',
     steps: [
-      { speaker: 'DJ KPANNAH', line: 'Community shoutout to our fastest alley courier, young Sia! Delivered five repaired transceivers across the sector before sunrise without getting caught once!', seconds: 5.2 },
-      { speaker: 'DJ GABRIEL', line: 'That is what Scraper Life is all about. Community taking care of community when the city turns its back. More fire coming through your speakers right now!', seconds: 5.2 },
+      { speaker: 'DJ KPANNAH', line: 'Shoutout time on 94.7 FM! We gotta give flowers to our favorite alley runner, little Sia!', seconds: 4.8 },
+      { speaker: 'DJ GABRIEL', line: 'What did Sia do this morning, Kpannah?', seconds: 3.5 },
+      { speaker: 'DJ KPANNAH', line: 'She outran three watch officers carrying a bag of salvaged radio tubes, then gave two loaves of sweet bread to the harbor elders!', seconds: 5.5 },
+      { speaker: 'DJ GABRIEL', line: 'That is our girl! The watch has guns and badges, but Waterside has heart and speed! More fire on your radio right now!', seconds: 5.2 },
     ],
   },
 ];

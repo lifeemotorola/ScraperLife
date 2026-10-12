@@ -81,8 +81,15 @@ export function profileFor(speaker) {
   }
   let gender = null;
   const upper = speaker.toUpperCase();
-  if (upper.includes('KPANNAH') || upper.includes('WOMAN') || upper.includes('GIRL')) gender = 'female';
-  else if (upper.includes('GABRIEL') || upper.includes('MAN') || upper.includes('BOY')) gender = 'male';
+  if (upper.includes('KPANNAH') || upper.includes('WOMAN') || upper.includes('GIRL') || upper.includes('LADY') || upper.includes('QUEEN')) {
+    gender = 'female';
+    pitch = 1.34;
+    rate = 1.04;
+  } else if (upper.includes('GABRIEL') || upper.includes('MAN') || upper.includes('BOY') || upper.includes('MALE')) {
+    gender = 'male';
+    pitch = 0.86;
+    rate = 1.02;
+  }
   const profile = { gender, pitch, rate };
   derivedProfiles.set(speaker, profile);
   return profile;
@@ -333,6 +340,22 @@ export class VoiceSystem {
     if (this.voiceAssignments.has(speaker)) return this.voiceAssignments.get(speaker);
     // A speaker outside the roster — a character added later, a visiting player's name —
     // is still dealt a voice of their own, skipping the ones the cast already owns.
+    if (gender === 'female') {
+      const femaleVoices = this.voices.filter((v) => guessGender(v.name) === 'female');
+      if (femaleVoices.length) {
+        const pick = femaleVoices[hashSpeaker(speaker) % femaleVoices.length];
+        this.voiceAssignments.set(speaker, pick);
+        return pick;
+      }
+    } else if (gender === 'male') {
+      const maleVoices = this.voices.filter((v) => guessGender(v.name) === 'male');
+      if (maleVoices.length) {
+        const pick = maleVoices[hashSpeaker(speaker) % maleVoices.length];
+        this.voiceAssignments.set(speaker, pick);
+        return pick;
+      }
+    }
+
     const dealt = dealVoices([{ speaker, gender }], this.voices, this.voicesTaken).get(speaker) || null;
     if (dealt) {
       this.voiceAssignments.set(speaker, dealt);
@@ -341,10 +364,17 @@ export class VoiceSystem {
     return dealt;
   }
 
-  speak(line) {
-    if (!this.ttsSupported || !this.enabled) return;
+  speak(line, onEnd = null) {
+    if (!this.ttsSupported || !this.enabled) {
+      if (onEnd) {
+        const words = String(line || '').split(/\s+/).length;
+        const ms = Math.max(2500, (words / 3.0) * 1000);
+        this.pendingTimer = setTimeout(onEnd, ms);
+      }
+      return;
+    }
     const { speaker, text } = splitSpeaker(line);
-    if (!text) return;
+    if (!text) { onEnd?.(); return; }
     clearTimeout(this.pendingTimer);
     try {
       window.speechSynthesis.cancel();
@@ -359,9 +389,34 @@ export class VoiceSystem {
           const voice = this.pickVoice(speaker, profile.gender);
           if (voice) { utterance.voice = voice; utterance.lang = voice.lang; }
           else utterance.lang = 'en-US';
+
+          let finished = false;
+          const done = () => {
+            if (finished) return;
+            finished = true;
+            onEnd?.();
+          };
+
+          utterance.onend = done;
+          utterance.onerror = done;
+
+          // Safety timeout in case speech engine drops onend
+          const words = text.split(/\s+/).length;
+          const safetyMs = Math.max(3500, (words / 2.0) * 1000 + 4000);
+          const timer = setTimeout(done, safetyMs);
+          const origEnd = utterance.onend;
+          utterance.onend = () => {
+            clearTimeout(timer);
+            origEnd();
+          };
+
           window.speechSynthesis.speak(utterance);
-        } catch { /* never break the game over speech */ }
+        } catch {
+          onEnd?.();
+        }
       }, 60);
-    } catch { /* never break the game over speech */ }
+    } catch {
+      onEnd?.();
+    }
   }
 }
