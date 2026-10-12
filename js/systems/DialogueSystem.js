@@ -6,6 +6,8 @@ export class DialogueSystem {
     this.music = music;
     this.duckTimer = null;
     this.sequenceTimer = null;
+    this.sequenceActive = false;
+    this.sequenceGeneration = 0;
   }
 
   play(id, seconds) {
@@ -14,8 +16,11 @@ export class DialogueSystem {
   }
 
   stopSequence() {
+    this.sequenceGeneration += 1;
+    this.sequenceActive = false;
     clearTimeout(this.sequenceTimer);
     clearTimeout(this.duckTimer);
+    this.voice?.stopPlayback?.();
     this.music?.unduck?.();
   }
 
@@ -23,12 +28,18 @@ export class DialogueSystem {
   playSequence(steps, onDone) {
     if (!steps || !steps.length) { onDone?.(); return; }
     this.stopSequence();
+    const generation = this.sequenceGeneration;
+    this.sequenceActive = true;
     this.music?.duck?.();
 
     let index = 0;
     const playNext = () => {
+      if (generation !== this.sequenceGeneration) return;
       if (index >= steps.length) {
-        this.duckTimer = setTimeout(() => this.music?.unduck?.(), 700);
+        this.sequenceActive = false;
+        this.duckTimer = setTimeout(() => {
+          if (generation === this.sequenceGeneration) this.music?.unduck?.();
+        }, 700);
         onDone?.();
         return;
       }
@@ -43,13 +54,15 @@ export class DialogueSystem {
       if (this.voice && step.audio) {
         // Play real .wav voice clip from assets/radioVoices/
         this.voice.playClip(step.audio, formatted, subtitleSeconds, () => {
-          this.sequenceTimer = setTimeout(playNext, 400);
+          if (generation !== this.sequenceGeneration) return;
+          this.sequenceTimer = setTimeout(playNext, 350);
         });
       } else if (this.voice) {
         // Wait for the current speaker to finish speaking completely before advancing!
         this.voice.speak(formatted, () => {
-          // Natural human conversational pause (400ms) between speakers
-          this.sequenceTimer = setTimeout(playNext, 400);
+          if (generation !== this.sequenceGeneration) return;
+          // Natural human conversational pause (350ms) between speakers
+          this.sequenceTimer = setTimeout(playNext, 350);
         });
       } else {
         this.sequenceTimer = setTimeout(playNext, subtitleSeconds * 1000);
@@ -62,6 +75,7 @@ export class DialogueSystem {
   // Subtitle on screen + spoken voice line (recorded clip first, browser voices as fallback).
   playText(line, seconds = 4, id = null) {
     if (!line) return;
+    if (this.sequenceActive) this.stopSequence();
     this.music?.duck?.();
     clearTimeout(this.duckTimer);
     this.duckTimer = setTimeout(() => this.music?.unduck?.(), seconds * 1000);
@@ -77,6 +91,7 @@ export class DialogueSystem {
       .map((id) => ({ id, line: this.dialogue[id], seconds: secondsById[id] || 5 }))
       .filter((step) => step.line);
     if (!steps.length) { onDone?.(); return; }
+    if (this.sequenceActive) this.stopSequence();
 
     this.music?.duck?.();
     const finish = () => {
