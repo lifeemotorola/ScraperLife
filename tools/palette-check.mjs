@@ -118,12 +118,51 @@ check('every character gets a distinct top and bottom outfit type',
     && new Set(wardrobeProfiles.map((wardrobe) => wardrobe.bottom)).size === ids.length,
   `${new Set(wardrobeProfiles.map((wardrobe) => wardrobe.top)).size} tops / ${new Set(wardrobeProfiles.map((wardrobe) => wardrobe.bottom)).size} bottoms`);
 
-expandCullBounds(shared.root);
+expandCullBounds(shared.root, shared.clips);
 const characters = new Map();
 for (const id of ids) {
   characters.set(id, instantiateCharacter(shared, {
     palette: paletteData.characters[id], paletteData, cull: id !== 'markie', shadow: id === 'markie',
   }));
+}
+
+// Culling regression: an animated NPC must never lose a limb to frustum culling. Every skinned
+// mesh's cull sphere has to contain every posed vertex in every clip, sampled at 60 fps.
+{
+  const sample = characters.get(ids.find((id) => id !== 'markie'));
+  const posed = new THREE.Vector3();
+  let outside = 0; let worstExcess = 0; let samples = 0;
+  const skins = [];
+  sample.root.traverse((object) => { if (object.isSkinnedMesh) skins.push(object); });
+  check('culling sphere is set on every skinned mesh of an NPC',
+    skins.length > 0 && skins.every((skin) => skin.boundingSphere && skin.boundingSphere.radius > 0),
+    `${skins.length} skinned meshes`);
+  sample.root.updateMatrixWorld(true);
+  for (const [name, action] of sample.animator.actions) {
+    sample.animator.actions.forEach((other) => other.setEffectiveWeight(0));
+    action.reset().setEffectiveWeight(1).play();
+    const duration = action.getClip().duration;
+    for (let t = 0; t <= duration + 1e-6; t += 1 / 60) {
+      action.time = Math.min(t, duration);
+      sample.animator.mixer.update(0);
+      sample.root.updateMatrixWorld(true);
+      for (const skin of skins) {
+        skin.skeleton.update();
+        const sphere = skin.boundingSphere;
+        for (let v = 0; v < skin.geometry.attributes.position.count; v += 2) {
+          skin.getVertexPosition(v, posed);
+          const excess = posed.distanceTo(sphere.center) - sphere.radius;
+          samples++;
+          if (excess > 0) { outside++; worstExcess = Math.max(worstExcess, excess); }
+        }
+      }
+    }
+  }
+  check('every posed vertex of every clip stays inside its culling sphere',
+    outside === 0,
+    `${samples} samples over ${sample.animator.actions.size} clips, ${outside} outside (worst +${worstExcess.toFixed(4)} m)`);
+  sample.animator.actions.forEach((other) => other.setEffectiveWeight(0));
+  sample.animator.actions.get('idle')?.reset().setEffectiveWeight(1).play();
 }
 
 const materialByName = (root, wanted) => {
