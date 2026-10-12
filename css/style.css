@@ -16,6 +16,18 @@ body { font-family:Outfit,Arial,sans-serif; }
 .panel-heading { color:#b6c3bb; font:500 10px/1 'DM Mono'; letter-spacing:.12em; display:flex; align-items:center; gap:7px; }
 .quest-progress { margin-top:0; }.quest-progress span,.meter-label { display:flex;justify-content:space-between;color:#e5e8dd;font:500 9px/1 'DM Mono';letter-spacing:.08em; }
 .bar,.resolve-meter { background:rgba(242,240,220,.15);height:4px;margin-top:7px;overflow:hidden; }.bar i {display:block;height:100%;width:0;background:var(--orange);box-shadow:0 0 8px var(--orange);transition:width .3s}.status-panel { position:absolute; right:31px; top:78px; width:235px; padding:13px 14px; }.status-row {display:flex;justify-content:space-between;color:#edf2e9;font:600 10px/1 'DM Mono';letter-spacing:.07em}.status-row span:last-child{color:#a5b8ae;font-size:8px}.meter-label { margin-top:16px;}.meter-label b{color:var(--teal);font-weight:500}.resolve-meter i{display:block;height:100%;width:100%;background:var(--teal);transition:width .2s}.pulse-line{display:flex;align-items:center;gap:6px;margin-top:12px;color:#bfcac1;font:500 8px/1 'DM Mono';letter-spacing:.12em}.pulse-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);box-shadow:0 0 9px var(--teal)}.world-line{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:9px;border-top:1px solid rgba(217,238,220,.12);font:500 8px/1 'DM Mono';letter-spacing:.07em;color:#d5e0d6}.world-line span:last-child{color:var(--amber)}
+.radio-line{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(217,238,220,.12);cursor:pointer}
+.radio-tag{display:flex;align-items:center;gap:4px;font:700 8px/1 'DM Mono',monospace;color:var(--amber);letter-spacing:.08em;flex-shrink:0}
+.radio-icon{font-size:11px}
+.radio-info{flex:1;min-width:0;overflow:hidden}
+.radio-track-title{display:block;font:600 8px/1.2 'DM Mono',monospace;color:var(--cream);letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.radio-tune-btn{padding:4px 7px;background:rgba(251,179,74,.2);border:1px solid rgba(251,179,74,.4);color:var(--amber);font:700 7px/1 'DM Mono';letter-spacing:.06em;cursor:pointer;border-radius:2px;flex-shrink:0}
+.radio-tune-btn:hover{background:var(--amber);color:#0d1617}
+.radio-news-btn{background:rgba(216,83,47,.22);border-color:rgba(216,83,47,.45);color:var(--orange)}
+.radio-news-btn:hover{background:var(--orange);color:#0d1617}
+.map-pulse-badge{position:absolute;bottom:4px;right:4px;z-index:3;background:rgba(11,22,23,.78);border:1px solid rgba(117,197,187,.4);color:var(--teal);font:700 6px/1 'DM Mono';letter-spacing:.08em;padding:2px 4px;border-radius:2px;pointer-events:none}
+.map-click-ripple{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid var(--teal);background:rgba(117,197,187,.35);transform:translate(-50%,-50%) scale(1);pointer-events:none;z-index:10;animation:map-ripple-expand .65s ease-out forwards}
+@keyframes map-ripple-expand{0%{transform:translate(-50%,-50%) scale(0.6);opacity:1}100%{transform:translate(-50%,-50%) scale(8);opacity:0}}
 /* Audio toggles live inside Settings instead of competing with the game HUD. */
 .settings-audio-button { width:100%; padding:8px 10px; border:1px solid rgba(117,197,187,.42); background:rgba(117,197,187,.12); color:var(--teal); font:700 9px/1 'DM Mono',monospace; letter-spacing:.1em; }
 .settings-audio-button:hover { transform:none; background:rgba(117,197,187,.24); color:#d8f5ee; }
@@ -287,12 +299,150 @@ body { font-family:Outfit,Arial,sans-serif; }
 .map-remote { position:absolute; z-index:2; width:7px; height:7px; border-radius:50%; background:#ffb454; border:1px solid #1a2426; transform:translate(-50%,-50%); box-shadow:0 0 6px rgba(255,180,84,.7); }
 .world-map-point.remote b { background:#ffb454; color:#ffb454; box-shadow:0 0 10px #ffb454; }
 
+/* Scavenger Journal & Field Workbench */
+.journal-button { position:absolute; top:26px; right:152px; z-index:8; display:flex; align-items:center; gap:8px; padding:10px 13px; border:1px solid rgba(117,197,187,.35); background:rgba(11,22,23,.75); color:#dce7dd; font:600 9px/1 'DM Mono',monospace; letter-spacing:.13em; backdrop-filter:blur(8px); pointer-events:auto; transition:transform .15s,background .15s,border-color .15s; }
+.journal-button:hover { transform:translateY(-1px); background:rgba(20,38,38,.92); color:#fff; border-color:var(--teal); }
+.journal-icon { color:var(--teal); font-size:13px; line-height:1; }
+
+.journal-overlay { position:fixed; inset:0; z-index:22; background:rgba(6,14,15,.92); display:grid; place-items:center; padding:16px; backdrop-filter:blur(10px); pointer-events:auto; }
+.journal-card { width:min(94vw,780px); background:linear-gradient(145deg,rgba(16,32,34,.98),rgba(10,20,22,.96)); border:1px solid rgba(117,197,187,.28); box-shadow:0 24px 64px rgba(0,0,0,.6); padding:22px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; }
+.journal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.journal-header h2 { font:800 28px/1 'Barlow Condensed',sans-serif; color:var(--cream); letter-spacing:.04em; margin:4px 0 6px; }
+.journal-intro { color:#9fb2a7; font-size:12px; margin:0; }
+.journal-close { background:transparent; border:1px solid rgba(229,244,229,.2); color:#c5cec4; font:700 13px/1 'DM Mono'; padding:8px 14px; cursor:pointer; }
+.journal-close:hover { background:rgba(255,112,65,.2); color:var(--orange); border-color:var(--orange); }
+
+.journal-tabs { display:flex; gap:8px; border-bottom:1px solid rgba(229,244,229,.14); padding-bottom:12px; margin-bottom:16px; }
+.journal-tab { background:rgba(14,28,30,.6); border:1px solid rgba(229,244,229,.16); color:#a8b9af; font:700 11px/1 'DM Mono'; letter-spacing:.09em; padding:9px 16px; cursor:pointer; transition:all .15s; }
+.journal-tab:hover { color:#fff; border-color:var(--teal); }
+.journal-tab.active { background:var(--teal); color:#0d1617; border-color:var(--teal); font-weight:800; }
+
+.journal-section { overflow-y:auto; flex:1; padding-right:4px; max-height:56vh; }
+.salvage-banner { display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg,rgba(117,197,187,.14),rgba(11,22,23,.5)); border:1px solid rgba(117,197,187,.3); padding:12px 16px; margin-bottom:16px; }
+.salvage-label { font:600 9px/1 'DM Mono'; letter-spacing:.12em; color:#a2b8ad; display:block; margin-bottom:4px; }
+.salvage-count { font:800 22px/1 'Barlow Condensed'; color:var(--teal); letter-spacing:.06em; }
+.salvage-hint { margin:0; font:500 10px/1.3 'DM Mono'; color:#8da195; max-width:280px; }
+
+.upgrades-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:12px; }
+.upgrade-card { background:rgba(12,24,26,.85); border:1px solid rgba(229,244,229,.12); padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:10px; transition:border-color .15s; }
+.upgrade-card.installed { border-color:rgba(117,197,187,.45); background:linear-gradient(135deg,rgba(14,35,36,.8),rgba(11,22,23,.9)); }
+.upgrade-top { display:flex; gap:12px; align-items:flex-start; }
+.upgrade-icon { font-size:24px; padding:8px; background:rgba(117,197,187,.1); border-radius:4px; border:1px solid rgba(117,197,187,.2); line-height:1; }
+.upgrade-meta { flex:1; }
+.upgrade-category { font:600 8px/1 'DM Mono'; color:var(--amber); letter-spacing:.14em; text-transform:uppercase; display:block; margin-bottom:3px; }
+.upgrade-title { font:800 16px/1.1 'Barlow Condensed'; color:var(--cream); letter-spacing:.04em; margin:0 0 5px; }
+.upgrade-desc { font:400 11px/1.4 Outfit,sans-serif; color:#a2b5aa; margin:0; }
+.upgrade-footer { display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid rgba(229,244,229,.08); }
+.upgrade-cost { font:700 10px/1 'DM Mono'; color:var(--amber); letter-spacing:.08em; }
+.upgrade-btn { padding:7px 12px; font:700 11px/1 'DM Mono'; letter-spacing:.08em; border:none; cursor:pointer; }
+.upgrade-btn.craftable { background:var(--orange); color:#0f1816; }
+.upgrade-btn.craftable:hover { background:#ff895f; }
+.upgrade-btn.installed { background:rgba(117,197,187,.18); color:var(--teal); border:1px solid var(--teal); cursor:default; }
+.upgrade-btn.locked { background:rgba(255,255,255,.07); color:#6f8078; cursor:not-allowed; }
+
+.dossier-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:12px; }
+.dossier-card { background:rgba(12,24,26,.85); border:1px solid rgba(229,244,229,.12); padding:14px; }
+.dossier-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.dossier-name { font:800 16px/1 'Barlow Condensed'; color:var(--cream); letter-spacing:.04em; margin:0; }
+.dossier-status { font:700 8px/1 'DM Mono'; padding:3px 6px; border-radius:2px; letter-spacing:.08em; }
+.dossier-status.ALLIED { background:rgba(117,197,187,.2); color:var(--teal); }
+.dossier-status.ACTIVE { background:rgba(255,112,65,.2); color:var(--orange); }
+.dossier-status.HOSTILE { background:rgba(255,59,59,.2); color:#ff5e5e; }
+.dossier-status.CONFIRMED { background:rgba(251,179,74,.2); color:var(--amber); }
+.dossier-status.NEUTRAL { background:rgba(160,180,170,.2); color:#a0b4aa; }
+.dossier-status.COMPROMISED { background:rgba(216,168,90,.2); color:#d8a85a; }
+.dossier-role { font:600 9px/1 'DM Mono'; color:var(--amber); display:block; margin-bottom:2px; }
+.dossier-district { font:500 8px/1 'DM Mono'; color:#7e9287; display:block; margin-bottom:8px; }
+.dossier-bio { font:400 11px/1.4 Outfit,sans-serif; color:#b5c4bc; margin:0; }
+
+.intel-list { display:flex; flex-direction:column; gap:12px; }
+.intel-card { background:rgba(12,24,26,.85); border:1px solid rgba(229,244,229,.12); padding:14px; border-left:3px solid var(--orange); }
+.intel-title { font:800 15px/1 'Barlow Condensed'; color:var(--cream); margin:0 0 5px; }
+.intel-desc { font:400 11px/1.4 Outfit,sans-serif; color:#b5c4bc; margin:0; }
+
+/* Radio Broadcast & Music Intel */
+.radio-intel-list { display:flex; flex-direction:column; gap:16px; }
+.radio-intel-card { background:rgba(12,24,26,.88); border:1px solid rgba(229,244,229,.14); border-left:4px solid var(--amber); padding:16px; border-radius:2px; display:flex; flex-direction:column; gap:12px; }
+.radio-intel-card.now-playing { border-left-color:var(--teal); background:rgba(16,36,37,.92); box-shadow:0 0 16px rgba(117,197,187,.15); }
+.radio-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+.radio-card-badges { display:flex; align-items:center; gap:6px; margin-bottom:5px; flex-wrap:wrap; }
+.radio-badge-station { font:700 8px/1 'DM Mono'; color:var(--amber); background:rgba(251,179,74,.15); border:1px solid rgba(251,179,74,.35); padding:2px 6px; border-radius:2px; letter-spacing:.06em; }
+.radio-badge-genre { font:600 8px/1 'DM Mono'; color:#a2b8ad; background:rgba(255,255,255,.06); padding:2px 6px; border-radius:2px; }
+.radio-badge-live { font:700 8px/1 'DM Mono'; color:#0d1617; background:var(--teal); padding:2px 6px; border-radius:2px; animation:blink 1.2s infinite alternate; }
+.radio-card-title { font:800 18px/1.1 'Barlow Condensed'; color:var(--cream); margin:0 0 3px; letter-spacing:.04em; }
+.radio-card-artist { font:600 10px/1 'DM Mono'; color:var(--orange); margin:0; letter-spacing:.07em; }
+.radio-tune-track-btn { padding:7px 12px; font:700 10px/1 'DM Mono'; background:rgba(251,179,74,.18); border:1px solid rgba(251,179,74,.4); color:var(--amber); letter-spacing:.06em; cursor:pointer; border-radius:2px; }
+.radio-tune-track-btn:hover { background:var(--amber); color:#0d1617; }
+.radio-broadcast-quote { background:rgba(0,0,0,.35); border-left:3px solid var(--teal); padding:10px 12px; border-radius:2px; }
+.radio-broadcast-head { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:5px; }
+.radio-broadcast-tag { font:700 8px/1 'DM Mono'; color:var(--teal); letter-spacing:.08em; }
+.radio-broadcast-status { font:600 8px/1 'DM Mono'; color:#8faaa0; }
+.radio-broadcast-p { font:500 11px/1.45 'DM Mono'; color:#dbe7dc; margin:0; }
+.radio-points-block { background:rgba(255,255,255,.03); padding:10px 12px; border-radius:2px; border:1px solid rgba(255,255,255,.05); }
+.radio-points-heading, .radio-residents-heading { font:700 9px/1 'DM Mono'; color:var(--amber); letter-spacing:.08em; margin:0 0 8px; }
+.radio-points-list { margin:0; padding-left:16px; display:flex; flex-direction:column; gap:4px; }
+.radio-points-list li { font:400 11px/1.4 Outfit,sans-serif; color:#b8c7bf; }
+.npc-commentary-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px; }
+.npc-commentary-row { background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.06); padding:8px 10px; border-radius:2px; border-left:2px solid #556; }
+.npc-commentary-row.unlocked { border-left-color:var(--teal); background:rgba(18,38,36,.4); }
+.npc-commentary-head { display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px; }
+.npc-commentary-name { font:700 8px/1 'DM Mono'; color:var(--cream); letter-spacing:.06em; }
+.npc-commentary-status { font:600 7px/1 'DM Mono'; color:#6a8479; letter-spacing:.05em; }
+.npc-commentary-row.unlocked .npc-commentary-status { color:var(--teal); }
+.npc-commentary-text { font:400 10.5px/1.35 Outfit,sans-serif; color:#aebfb6; margin:0; }
+
+/* Radio News & Co-host Dialogue */
+.radio-news-block { background:rgba(12,24,26,.65); border:1px solid rgba(216,83,47,.3); padding:14px; border-radius:2px; margin-bottom:16px; }
+.radio-news-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.radio-news-badge { font:700 8px/1 'DM Mono'; color:#fff; background:var(--orange); padding:3px 6px; border-radius:2px; letter-spacing:.06em; }
+.radio-news-title { font:800 14px/1 'Barlow Condensed'; color:var(--cream); margin:0; letter-spacing:.06em; }
+.radio-news-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:10px; }
+.radio-news-card { background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.07); padding:10px 12px; border-radius:2px; display:flex; flex-direction:column; gap:8px; border-left:3px solid var(--orange); }
+.radio-news-card.unlocked { border-left-color:var(--teal); background:rgba(18,38,36,.35); }
+.radio-news-card-head { display:flex; justify-content:space-between; align-items:center; gap:6px; }
+.radio-news-card-cat { font:700 7.5px/1 'DM Mono'; color:var(--amber); letter-spacing:.06em; }
+.radio-news-card-status { font:600 7.5px/1 'DM Mono'; color:#8faaa0; }
+.radio-news-card-title { font:800 13px/1.1 'Barlow Condensed'; color:var(--cream); margin:0; letter-spacing:.04em; }
+.radio-news-dialogue-box { display:flex; flex-direction:column; gap:4px; background:rgba(0,0,0,.25); padding:6px 8px; border-radius:2px; }
+.radio-air-news-btn { align-self:flex-start; padding:5px 9px; font:700 8px/1 'DM Mono'; background:rgba(216,83,47,.2); border:1px solid rgba(216,83,47,.5); color:var(--orange); border-radius:2px; cursor:pointer; }
+.radio-air-news-btn:hover { background:var(--orange); color:#0d1617; }
+
+.radio-cohost-conversation { display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+.radio-dialogue-turn { font:500 10px/1.4 'DM Mono'; color:#dbe7dc; padding:4px 6px; border-radius:2px; background:rgba(0,0,0,.2); border-left:2px solid #667; }
+.radio-dialogue-turn.male-host { border-left-color:#75c5bb; color:#dcf4f1; }
+.radio-dialogue-turn.female-host { border-left-color:#ffd166; color:#fff5da; }
+.radio-dialogue-turn b { font-weight:700; color:var(--cream); letter-spacing:.04em; margin-right:4px; }
+.radio-dialogue-turn.male-host b { color:var(--teal); }
+.radio-dialogue-turn.female-host b { color:var(--amber); }
+
+.journal-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; padding-top:12px; border-top:1px solid rgba(229,244,229,.12); font:500 9px/1 'DM Mono'; color:#8b9e94; flex-wrap:wrap; }
+
+/* Radar ping minimap indicator */
+.map-scrap-ping { position:absolute; z-index:4; width:12px; height:12px; border-radius:50%; border:2px solid var(--teal); background:rgba(117,197,187,.45); transform:translate(-50%,-50%); pointer-events:none; box-shadow:0 0 10px var(--teal); }
+@keyframes ping-wave {
+  0% { transform:translate(-50%,-50%) scale(0.6); opacity:1; }
+  100% { transform:translate(-50%,-50%) scale(2.8); opacity:0; }
+}
+.map-scrap-ping.pulsing:after {
+  content:""; position:absolute; inset:-4px; border:2px solid var(--teal); border-radius:50%;
+  animation:ping-wave 1.3s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+
+/* Touch dash & journal buttons */
+.touch-dash { background:rgba(117,197,187,.22); border-color:rgba(117,197,187,.6); color:var(--teal); }
+.touch-dash.active { background:var(--teal); color:#0d1617; }
+.touch-journal { background:rgba(251,179,74,.18); border-color:rgba(251,179,74,.4); color:var(--amber); }
+.touch-journal.active { background:var(--amber); color:#0d1617; }
+
 @media (max-width: 900px) {
   .session-roster { width:196px; }
   .roster-list { max-height:260px; }
   .session-card { padding:16px; }
   .character-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
   .card-portrait { width:84px; height:84px; }
+  .journal-button { right:132px; padding:8px 10px; font-size:8px; }
+  .upgrades-grid { grid-template-columns:1fr; }
+  .dossier-grid { grid-template-columns:1fr; }
 }
 
 /* Touch screens: chat folds away behind the CHAT key so it does not cover the thumb controls. */

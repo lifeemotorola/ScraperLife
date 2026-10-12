@@ -15,6 +15,9 @@
     <div id="game"></div>
 
     <div id="ui" aria-live="polite">
+      <button id="journal-button" class="journal-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="journal-panel">
+        <span class="journal-icon" aria-hidden="true">📓</span><span>JOURNAL</span>
+      </button>
       <button id="settings-button" class="settings-button" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-panel">
         <span class="settings-icon" aria-hidden="true">⚙</span><span>SETTINGS</span>
       </button>
@@ -32,6 +35,12 @@
         <div class="resolve-meter"><i id="resolve-bar"></i></div>
         <div class="pulse-line"><span class="pulse-dot"></span><span id="pulse-status">SCRAP PULSE READY</span></div>
         <div class="world-line"><span id="world-time">DAY 01 // 06:00</span><span id="weather-label">COASTAL CLEAR</span></div>
+        <div class="radio-line" id="radio-station-line" title="Tune 94.7 Waterside FM [R] // Air News [N]">
+          <div class="radio-tag"><span class="radio-icon">📻</span><span class="radio-station-name">94.7 FM</span></div>
+          <div class="radio-info"><span id="radio-track-name" class="radio-track-title">PLATFORM THEME</span></div>
+          <button id="radio-tune-btn" class="radio-tune-btn" type="button" aria-label="Tune next track">TUNE ❯</button>
+          <button id="radio-news-btn" class="radio-tune-btn radio-news-btn" type="button" aria-label="Air breaking radio news">NEWS 📢</button>
+        </div>
       </section>
 
       <section id="map-panel" class="map-panel glass" role="button" tabindex="0" aria-label="Open expanded map">
@@ -45,6 +54,7 @@
           <i class="map-npc npc-tenneh" id="map-npc-tenneh" style="left:72%;top:28%"></i>
           <i class="map-npc npc-boakai" id="map-npc-boakai" style="left:82%;top:52%"></i>
           <i class="map-npc npc-vardee" id="map-npc-vardee" style="left:14%;top:76%"></i>
+          <span class="map-pulse-badge">CLICK TO PULSE</span>
         </div>
         <div class="map-key"><span><i class="key-player"></i>MARKIE</span><span><i class="key-objective"></i>JOB</span><span><i style="background:#d8a85a"></i>KOLLIE</span><span><i style="background:#c760b0"></i>TENNEH</span></div>
         <span class="map-platform-badge">PLATFORM MAP</span>
@@ -76,12 +86,14 @@
         </div>
         <div class="mobile-actions" aria-label="Actions">
           <button id="touch-run" class="touch-button touch-run" aria-label="Hold to run">RUN</button>
+          <button id="touch-dash" class="touch-button touch-dash" aria-label="Quick dash">DASH</button>
           <button id="touch-pulse" class="touch-button touch-pulse" aria-label="Use Scrap Pulse">PULSE</button>
           <button id="touch-interact" class="touch-button touch-use" aria-label="Interact">USE</button>
         </div>
         <div class="mobile-system" aria-label="System controls">
           <button id="touch-camera" class="touch-button touch-camera" type="button" aria-label="Change camera view">CAM</button>
           <button id="touch-map" class="touch-button touch-map" type="button" aria-label="Open map">MAP</button>
+          <button id="touch-journal" class="touch-button touch-journal" type="button" aria-label="Open journal">LOG</button>
           <button id="chat-toggle" class="touch-button touch-chat hidden" type="button" aria-label="Open session chat">CHAT</button>
         </div>
       </section>
@@ -103,12 +115,16 @@
             <h3 id="keyboard-controls-title">KEYBOARD &amp; MOUSE</h3>
             <div class="settings-row"><kbd>W A S D / ↑ ↓ ← →</kbd><span>Move Markie</span></div>
             <div class="settings-row"><kbd>SHIFT</kbd><span>Run</span></div>
+            <div class="settings-row"><kbd>Q</kbd><span>Quick Dash / Evade</span></div>
             <div class="settings-row"><kbd>SPACE</kbd><span>Scrap Pulse</span></div>
             <div class="settings-row"><kbd>E</kbd><span>Interact</span></div>
             <div class="settings-row"><kbd>DRAG</kbd><span>Look around</span></div>
             <div class="settings-row"><kbd>C</kbd><span>Cycle camera <small id="camera-label">WIDE VIEW</small></span></div>
             <div class="settings-row"><kbd>ENTER</kbd><span>Chat with your session</span></div>
+            <div class="settings-row"><kbd>J</kbd><span>Scavenger Journal &amp; Field Mods</span></div>
             <div class="settings-row"><kbd>M</kbd><span>Open / close map</span></div>
+            <div class="settings-row"><kbd>R</kbd><span>Tune Radio Station (94.7 FM)</span></div>
+            <div class="settings-row"><kbd>N</kbd><span>Air Breaking Radio News (94.7 FM)</span></div>
             <div class="settings-row"><kbd>V</kbd><span>Toggle character voices</span></div>
             <div class="settings-row"><kbd>B</kbd><span>Toggle background music</span></div>
           </section>
@@ -117,11 +133,14 @@
             <h3 id="touch-controls-title">TOUCH CONTROLS</h3>
             <div class="settings-row"><kbd>LEFT STICK</kbd><span>Move Markie</span></div>
             <div class="settings-row"><kbd>HOLD RUN</kbd><span>Run</span></div>
+            <div class="settings-row"><kbd>DASH</kbd><span>Quick Dash / Evade</span></div>
             <div class="settings-row"><kbd>PULSE</kbd><span>Scrap Pulse</span></div>
             <div class="settings-row"><kbd>USE</kbd><span>Interact</span></div>
             <div class="settings-row"><kbd>DRAG</kbd><span>Look around</span></div>
             <div class="settings-row"><kbd>CAM</kbd><span>Cycle camera</span></div>
+            <div class="settings-row"><kbd>LOG</kbd><span>Scavenger Journal</span></div>
             <div class="settings-row"><kbd>MAP</kbd><span>Open the platform map</span></div>
+            <div class="settings-row"><kbd>TAP MAP</kbd><span>Trigger Scrap Pulse</span></div>
             <div class="settings-row"><kbd>CHAT</kbd><span>Chat with your session</span></div>
           </section>
 
@@ -135,6 +154,10 @@
               <div class="settings-audio-item">
                 <span>Background music</span>
                 <button id="music-toggle" class="settings-audio-button music-toggle" type="button" aria-label="Toggle background music" aria-pressed="true">♫ MUSIC ON</button>
+              </div>
+              <div class="settings-audio-item">
+                <span>Radio Station (94.7 FM)</span>
+                <button id="radio-tune-settings-btn" class="settings-audio-button radio-tune-button" type="button">📻 TUNE NEXT TRACK ❯</button>
               </div>
             </div>
           </section>
@@ -188,6 +211,70 @@
             <p style="margin:6px 0 0;font:500 11px/1.4 'DM Mono';color:#c5cec4">Ten linked jobs are tracked across the platform. The orange marker identifies Markie’s current objective.</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Scavenger Journal & Field Workbench -->
+    <div id="journal-panel" class="journal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="journal-title">
+      <div class="journal-card">
+        <header class="journal-header">
+          <div>
+            <p class="eyebrow">WATERSIDE // FIELD LOG &amp; WORKBENCH</p>
+            <h2 id="journal-title">SCAVENGER JOURNAL</h2>
+            <p class="journal-intro">Scrap modifications, street dossiers, and salvaged intelligence.</p>
+          </div>
+          <button id="journal-close" class="journal-close" type="button" aria-label="Close journal">✕</button>
+        </header>
+
+        <nav class="journal-tabs" role="tablist">
+          <button id="tab-upgrades" class="journal-tab active" role="tab" aria-selected="true" type="button">⚡ FIELD MODS</button>
+          <button id="tab-dossier" class="journal-tab" role="tab" aria-selected="false" type="button">🗂 DOSSIER</button>
+          <button id="tab-intel" class="journal-tab" role="tab" aria-selected="false" type="button">📜 INTEL &amp; LEADS</button>
+          <button id="tab-radio-intel" class="journal-tab" role="tab" aria-selected="false" type="button">📻 94.7 FM BROADCASTS</button>
+        </nav>
+
+        <section id="journal-content-upgrades" class="journal-section">
+          <div class="salvage-banner">
+            <div>
+              <span class="salvage-label">FIELD SALVAGE AVAILABLE</span>
+              <b id="salvage-points-count" class="salvage-count">0 UNITS</b>
+            </div>
+            <p class="salvage-hint">Collect scrap across Waterside to fabricate equipment mods.</p>
+          </div>
+          <div id="upgrades-list" class="upgrades-grid"></div>
+        </section>
+
+        <section id="journal-content-dossier" class="journal-section hidden">
+          <div class="dossier-grid" id="dossier-list"></div>
+        </section>
+
+        <section id="journal-content-intel" class="journal-section hidden">
+          <div class="intel-list" id="intel-list"></div>
+        </section>
+
+        <section id="journal-content-radio-intel" class="journal-section hidden">
+          <div class="salvage-banner radio-intel-banner">
+            <div>
+              <span class="salvage-label">MONROVIA 94.7 FM BROADCAST ARCHIVE</span>
+              <b id="radio-intel-stats" class="salvage-count">6 TRACKS // AIRWAVES ACTIVE</b>
+            </div>
+            <p class="salvage-hint">Listen to DJ Gabriel &amp; DJ Kpannah’s radio show banter and breaking news sessions to gather salvage points.</p>
+          </div>
+          <div class="radio-news-block">
+            <div class="radio-news-header">
+              <span class="radio-news-badge">🔴 LIVE DISPATCHES</span>
+              <h4 class="radio-news-title">TOP OF THE HOUR NEWS SESSIONS</h4>
+            </div>
+            <div class="radio-news-grid" id="radio-news-list"></div>
+          </div>
+          <div class="radio-intel-list" id="radio-intel-list"></div>
+        </section>
+
+        <footer class="journal-footer">
+          <span><kbd>J</kbd> or <kbd>ESC</kbd> Close Journal</span>
+          <span><kbd>Q</kbd> Quick Dash</span>
+          <span><kbd>SPACE</kbd> Scrap Pulse</span>
+        </footer>
       </div>
     </div>
 

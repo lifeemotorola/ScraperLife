@@ -10,13 +10,15 @@ export class ScrapPulse {
       if (ring.material.opacity <= 0) { this.scene.remove(ring); this.rings.splice(i, 1); }
     }
   }
-  activate(position, enemies) {
+  activate(position, enemies, { range = null, stunSeconds = null } = {}) {
     if (this.charge < this.definition.chargeCost) return null;
     this.charge -= this.definition.chargeCost;
+    const effectiveRange = range ?? this.definition.range;
+    const effectiveStun = stunSeconds ?? this.definition.stunSeconds;
     const ring = new THREE.Mesh(new THREE.RingGeometry(.25, .46, 32), new THREE.MeshBasicMaterial({ color: 0x75c5bb, transparent: true, opacity: .95, side: THREE.DoubleSide, depthWrite: false }));
     ring.rotation.x = -Math.PI / 2; ring.position.set(position.x, .08, position.z); this.scene.add(ring); this.rings.push(ring);
     let stunned = 0;
-    enemies.forEach((enemy) => { if (enemy.position.distanceTo(position) < this.definition.range) { enemy.stun(this.definition.stunSeconds); stunned += 1; } });
+    enemies.forEach((enemy) => { if (enemy.position.distanceTo(position) < effectiveRange) { enemy.stun(effectiveStun); stunned += 1; } });
     return stunned;
   }
 }

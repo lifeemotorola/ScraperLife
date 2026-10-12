@@ -45,8 +45,54 @@ export class Player {
     this.glow = new THREE.PointLight(0x75c5bb, .55, 5);
     this.glow.position.set(0, 2, 0); this.group.add(this.glow);
     scene.add(this.group);
+
+    this.dashTimer = 0;
+    this.dashCooldown = 0;
+    this.dashMultiplier = 1;
+    this.dashBaseCooldown = 1.1;
+    this.dashTrails = [];
   }
   get position() { return this.group.position; }
+
+  triggerDash(speedMultiplier = 1, cooldownReduction = 1) {
+    if (this.dashCooldown > 0) return false;
+    this.dashTimer = 0.22;
+    this.dashMultiplier = speedMultiplier;
+    this.dashCooldown = this.dashBaseCooldown * cooldownReduction;
+    this.createDashGhost();
+    return true;
+  }
+
+  isDashing() {
+    return this.dashTimer > 0;
+  }
+
+  createDashGhost() {
+    if (!this.scene) return;
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(0.18, 0.58, 16),
+      new THREE.MeshBasicMaterial({ color: 0x75c5bb, transparent: true, opacity: 0.75, side: THREE.DoubleSide, depthWrite: false })
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.set(this.position.x, 0.08, this.position.z);
+    this.scene.add(ring);
+    this.dashTrails.push({ mesh: ring, life: 0.25, maxLife: 0.25 });
+  }
+
+  updateDashTrails(delta) {
+    for (let i = this.dashTrails.length - 1; i >= 0; i--) {
+      const trail = this.dashTrails[i];
+      trail.life -= delta;
+      trail.mesh.scale.multiplyScalar(1 + delta * 2.2);
+      trail.mesh.material.opacity = Math.max(0, (trail.life / trail.maxLife) * 0.75);
+      if (trail.life <= 0) {
+        this.scene.remove(trail.mesh);
+        trail.mesh.geometry.dispose();
+        trail.mesh.material.dispose();
+        this.dashTrails.splice(i, 1);
+      }
+    }
+  }
 
   // Loads the included COLLADA character. The procedural character remains as a safe fallback if loading fails.
   loadDAE(url, onReady) {
@@ -156,9 +202,34 @@ export class Player {
   }
 
   update(delta, input, physics, time) {
+    this.updateDashTrails(delta);
+    if (this.dashCooldown > 0) {
+      this.dashCooldown = Math.max(0, this.dashCooldown - delta);
+    }
+
     const { x, z, running } = input.getMovement();
     const moving = Boolean(x || z);
-    if (moving) {
+
+    if (this.dashTimer > 0) {
+      this.dashTimer = Math.max(0, this.dashTimer - delta);
+      const dashSpeed = 16.0 * this.dashMultiplier;
+      const step = dashSpeed * delta;
+      const dir = moving
+        ? new THREE.Vector3(x, 0, z).normalize()
+        : new THREE.Vector3(Math.sin(this.group.rotation.y), 0, Math.cos(this.group.rotation.y));
+      const next = this.position.clone().addScaledVector(dir, step);
+      if (physics.canMove(next)) {
+        this.position.copy(next);
+      } else {
+        const slideX = this.position.clone(); slideX.x += dir.x * step;
+        const slideZ = this.position.clone(); slideZ.z += dir.z * step;
+        if (physics.canMove(slideX)) this.position.copy(slideX);
+        else if (physics.canMove(slideZ)) this.position.copy(slideZ);
+      }
+      this.lastSafe.copy(this.position);
+      physics.constrain(this.position);
+      this.group.rotation.y = Math.atan2(dir.x, dir.z);
+    } else if (moving) {
       const direction = new THREE.Vector3(x, 0, z).normalize();
       const speed = running ? 7.2 : 4.25;
       const step = speed * delta;

@@ -70,31 +70,37 @@ export const SMALL_TALK = {
       'Peace, my child. The morning is a good sign.',
       'You eat before you walk so far?',
       'Sit small. The day is long.',
+      'The radio transceiver is singing clean today. Good music in the air.',
     ],
     tenneh: [
       'Ehn, my sister! The market open early today.',
       'You come to buy or you come to look?',
       'Markie, you too thin. Come and eat.',
+      'You hear 94.7 FM? MC Caro shaking the whole market!',
     ],
     flomo: [
       'Oo, my man! Where you going with that bag?',
       'I got a story for you, but you must not laugh.',
       'Walk with me small.',
+      'Meek Mill and Lil Baby on the radio! That bass shaking my boots!',
     ],
     sia: [
       'Look what I find in the scrap field!',
       'You fix it, Markie? You fix everything.',
       'I can carry it. I strong!',
+      'The radio playing so sweet today! Makes me want to dance!',
     ],
     garmai: [
       'You hear the thing they saying at the market?',
       'Careful who you greet in the open.',
       'Information is not free. For you, small price.',
+      'Knowledge is in the streets, but rhythm rules the market.',
     ],
     boakai: [
       'Parts come in this morning. Good ones.',
       'You need a battery or you need a miracle?',
       'Price is price, my friend.',
+      'Turn that workshop radio up small. Good rhythm for dock work.',
     ],
     jallah: [
       'You walking in my street today?',

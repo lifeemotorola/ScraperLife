@@ -18,8 +18,9 @@ import { VoiceSystem } from '../systems/VoiceSystem.js';
 import { MusicSystem } from '../systems/MusicSystem.js';
 import { SoundEffectsSystem } from '../systems/SoundEffectsSystem.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
-import { InventorySystem } from '../systems/InventorySystem.js';
+import { InventorySystem, UPGRADE_DEFINITIONS } from '../systems/InventorySystem.js';
 import { DIALOGUE } from '../data/dialogues.js';
+import { RADIO_NEWS_BULLETINS } from '../data/musicIntel.js';
 import { PortraitStudio } from '../multiplayer/Portraits.js';
 import { RemotePlayers, SpeechBubbleSlot, characterName } from '../multiplayer/RemotePlayers.js';
 import { SessionPanel } from '../multiplayer/SessionPanel.js';
@@ -82,9 +83,11 @@ export class Game {
     this.inventory = new InventorySystem();
     this.missions = new MissionSystem(this.inventory);
     this.voice = new VoiceSystem();
-    this.music = new MusicSystem();
+    this.music = new MusicSystem({
+      onTrackChange: (track, meta) => this.onRadioTrackChange(track, meta),
+    });
     this.sfx = new SoundEffectsSystem();
-    this.dialogue = new DialogueSystem(this.ui, DIALOGUE, this.voice);
+    this.dialogue = new DialogueSystem(this.ui, DIALOGUE, this.voice, this.music);
     this.combat = new CombatSystem();
     this.physics = new PhysicsEngine({ limit: 48 });
     this.city = new City(this.scene, this.physics); this.city.build({ lampLightCount: this.isMobile ? 3 : 5 });
@@ -162,15 +165,35 @@ export class Game {
       console.warn('Shared character rig could not load; keeping placeholder people:', error);
     });
     this.scrap = this.createScrap();
+    this.radarBeacon = null;
+    this.radarBeaconTimer = 0;
     this.input = new InputManager({
       element: this.renderer.domElement,
       onInteract: () => this.interact(),
       onPulse: () => this.usePulse(),
       onCamera: () => this.cycleCamera(),
       onLook: (deltaX, deltaY) => this.dragCamera(deltaX, deltaY),
+      onDash: () => this.performDash(),
+      onJournal: () => this.ui.toggleJournal(),
     });
     this.mobileController = new MobileController(this.input);
+    this.unlockedMusicPoints = new Set();
+    this.currentNewsIndex = -1;
+    this.trackChangeCounter = 0;
     this.ui.bindStart(() => this.start(), () => location.reload());
+    this.ui.bindJournalHandlers({
+      inventory: this.inventory,
+      missions: this.missions,
+      music: this.music,
+      unlockedMusicPoints: this.unlockedMusicPoints,
+      onTuneTrack: (id) => this.tuneTrackById(id),
+      onAirNews: (id) => this.airNewsBulletin(id),
+      onCraft: (upgradeId) => this.craftUpgrade(upgradeId),
+    });
+    this.ui.bindRadioTune(() => this.tuneRadio());
+    this.ui.bindAirNews((id) => this.airNewsBulletin(id));
+    this.ui.bindMapPulse(() => this.usePulse());
+    this.ui.setRadioTrack(this.music.currentTrack());
     this.ui.bindVoiceToggle(() => {
       const on = this.voice.toggle();
       this.ui.toast(on ? 'VOICES // ON' : 'VOICES // OFF');
@@ -400,8 +423,10 @@ export class Game {
     else this.sfx.play('interact', 0.8);
     if (hit.type === 'scrap') {
       hit.object.userData.collected = true; hit.object.visible = false; this.scrapGlow.setColor(hit.object.userData.glowIndex, 0);
-      const total = this.inventory.collectScrap(); this.ui.toast(`SALVAGE SECURED // ${total} PIECE${total === 1 ? '' : 'S'}`);
+      const total = this.inventory.collectScrap();
+      this.ui.toast(`SALVAGE SECURED // ${total} PIECE${total === 1 ? '' : 'S'} (+1 SALVAGE MOD)`);
       this.player.play('interact');   // reach-down on the piece he just lifted
+      if (this.ui.journalOpen) this.ui.renderJournal();
       if (total === 1) this.dialogue.play('firstScrap', 4);
       if (total === 7) { this.ui.toast('ALL MATERIALS FOUND // RETURN TO KOLLIE'); this.dialogue.play('allScrap', 5); }
       this.updateQuest();
@@ -472,9 +497,29 @@ export class Game {
         { finale: 7, warehouse: 6, siaThanks: 5, siaHope: 7, tennehTogether: 6 },
       );
     } else if (hit.type === 'npc') {
-      // Voice the side character with their recorded clip when one exists.
-      if (hit.object.quoteId) this.dialogue.play(hit.object.quoteId, 4);
-      else this.dialogue.playText(hit.object.quote, 4);
+      const npcId = hit.object.id;
+      const track = this.music.currentTrack();
+      const intel = this.music.currentIntel();
+      const npcQuote = intel?.npcQuotes?.[npcId];
+      const pointKey = `${npcId}-${track?.id}`;
+      const isNewPoint = npcQuote && !this.unlockedMusicPoints.has(pointKey);
+
+      if (isNewPoint) {
+        // NPC gives their point on what they know about the music!
+        this.unlockedMusicPoints.add(pointKey);
+        this.inventory.addSalvagePoints(1);
+        this.sfx.play('pickup', 1.0);
+        hit.object.say?.(npcQuote, 6);
+        this.dialogue.playText(`${hit.object.label}: “${npcQuote}”`, 6);
+        this.ui.toast(`+1 SALVAGE // ${hit.object.label}’S POINT ON ${track.title.toUpperCase()} RECORDED!`);
+      } else if (npcQuote && Math.random() < 0.45) {
+        hit.object.say?.(npcQuote, 5);
+        this.dialogue.playText(`${hit.object.label}: “${npcQuote}”`, 5);
+      } else {
+        // Voice the side character with their recorded clip when one exists.
+        if (hit.object.quoteId) this.dialogue.play(hit.object.quoteId, 4);
+        else this.dialogue.playText(hit.object.quote, 4);
+      }
     }
   }
 
@@ -487,13 +532,191 @@ export class Game {
     }
   }
 
+  performDash() {
+    if (!this.running) return;
+    const hasCoil = this.inventory.hasUpgrade('kinetic_coil');
+    const speedMult = hasCoil ? 1.35 : 1.0;
+    const cdReduction = hasCoil ? 0.6 : 1.0;
+    const dashed = this.player.triggerDash(speedMult, cdReduction);
+    if (dashed) {
+      this.sfx.play('dash', 1.0);
+      this.ui.toast(hasCoil ? 'KINETIC SURGE // EVASIVE DASH' : 'QUICK DASH // EVADE');
+    }
+  }
+
+  tuneRadio() {
+    const track = this.music.tuneNext();
+    this.sfx.play('tune', 1.0);
+    this.ui.setRadioTrack(track);
+    this.broadcastCurrentTrack(track);
+  }
+
+  tuneTrackById(trackId) {
+    const idx = this.music.station.tracks.findIndex((t) => t.id === trackId);
+    if (idx !== -1) {
+      this.music.selectTrack(idx);
+      this.sfx.play('tune', 1.0);
+      const track = this.music.currentTrack();
+      this.ui.setRadioTrack(track);
+      this.broadcastCurrentTrack(track);
+    }
+  }
+
+  broadcastCurrentTrack(track) {
+    const intel = this.music.currentIntel();
+    if (!intel) {
+      this.ui.toast(`📻 94.7 WATERSIDE FM // ${track.title.toUpperCase()}`);
+      return;
+    }
+    const broadcastKey = `broadcast-${track.id}`;
+    const isNew = !this.unlockedMusicPoints.has(broadcastKey);
+    if (isNew) {
+      this.unlockedMusicPoints.add(broadcastKey);
+      this.inventory.addSalvagePoints(1);
+      this.sfx.play('pickup', 0.9);
+      this.ui.toast(`+1 SALVAGE // BROADCAST INTEL: ${track.title.toUpperCase()}`);
+    } else {
+      this.ui.toast(`📻 94.7 FM // ${track.title.toUpperCase()}`);
+    }
+
+    // Two-host radio broadcast dialogue between DJ Gabriel (man) and DJ Kpannah (woman)
+    if (intel.cohostDialogue && intel.cohostDialogue.length) {
+      this.dialogue.playSequence(intel.cohostDialogue);
+    } else if (intel.broadcastLine) {
+      this.dialogue.playText(intel.broadcastLine, 7);
+    }
+  }
+
+  airNewsBulletin(bulletinId = null) {
+    let bulletin = null;
+    if (bulletinId) {
+      bulletin = RADIO_NEWS_BULLETINS.find((b) => b.id === bulletinId);
+    }
+    if (!bulletin) {
+      this.currentNewsIndex = ((this.currentNewsIndex ?? -1) + 1) % RADIO_NEWS_BULLETINS.length;
+      bulletin = RADIO_NEWS_BULLETINS[this.currentNewsIndex];
+    }
+    if (!bulletin) return;
+
+    this.sfx.play('tune', 1.0);
+    const newsKey = `news-${bulletin.id}`;
+    const isNew = !this.unlockedMusicPoints.has(newsKey);
+    if (isNew) {
+      this.unlockedMusicPoints.add(newsKey);
+      this.inventory.addSalvagePoints(1);
+      this.sfx.play('pickup', 1.0);
+      this.ui.toast(`+1 SALVAGE // NEWS FLASH: ${bulletin.headline}`);
+    } else {
+      this.ui.toast(`🔴 94.7 FM LIVE NEWS // ${bulletin.headline}`);
+    }
+
+    // Co-hosts deliver the news dispatch in sequenced dialogue
+    this.dialogue.playSequence(bulletin.steps);
+  }
+
+  onRadioTrackChange(track, { auto = false } = {}) {
+    this.ui.setRadioTrack(track);
+    this.trackChangeCounter = (this.trackChangeCounter || 0) + 1;
+
+    // Every 3 track transitions, cut in with a breaking news bulletin session!
+    if (this.trackChangeCounter % 3 === 0 && this.running) {
+      this.airNewsBulletin();
+    } else if (auto && this.running) {
+      this.sfx.play('tune', 0.6);
+      this.broadcastCurrentTrack(track);
+    }
+  }
+
+  craftUpgrade(upgradeId) {
+    if (!this.inventory.canCraft(upgradeId)) return false;
+    if (this.inventory.craft(upgradeId)) {
+      this.sfx.play('upgrade', 1.0);
+      const def = UPGRADE_DEFINITIONS[upgradeId];
+      this.applyUpgradeEffects(upgradeId);
+      this.ui.toast(`MOD INSTALLED // ${def?.name?.toUpperCase() || upgradeId.toUpperCase()}`);
+      return true;
+    }
+    return false;
+  }
+
+  applyUpgradeEffects(upgradeId) {
+    if (upgradeId === 'insulated_vest') {
+      this.combat.setMaxResolve(135);
+      this.combat.setPassiveRegen(true);
+      this.combat.setDefenseMultiplier(0.75);
+    } else if (upgradeId === 'pulse_overcharge') {
+      this.pulse.definition.range = 8.2;
+      this.pulse.definition.stunSeconds = 7.5;
+      this.pulse.definition.rechargePerSecond = 19;
+    }
+  }
+
+  scanNearestScrap() {
+    let nearest = null;
+    let minDist = Infinity;
+    for (const piece of this.scrap) {
+      if (piece.userData.collected) continue;
+      const d = this.player.position.distanceTo(piece.position);
+      if (d < minDist) {
+        minDist = d;
+        nearest = piece;
+      }
+    }
+    if (!nearest) return null;
+    const dx = nearest.position.x - this.player.position.x;
+    const dz = nearest.position.z - this.player.position.z;
+    const angle = Math.atan2(dx, -dz);
+    const bearings = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    const bIndex = Math.round(((angle + Math.PI * 2) % (Math.PI * 2)) / (Math.PI / 4)) % 8;
+    return {
+      scrap: nearest,
+      distance: Math.round(minDist),
+      bearing: bearings[bIndex],
+      position: nearest.position,
+    };
+  }
+
+  highlightScrapPing(scrap) {
+    if (!scrap) return;
+    if (this.radarBeacon) {
+      this.scene.remove(this.radarBeacon);
+      this.radarBeacon.geometry?.dispose?.();
+      this.radarBeacon.material?.dispose?.();
+      this.radarBeacon = null;
+    }
+    const beacon = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.45, 6, 16, 1, true),
+      new THREE.MeshBasicMaterial({ color: 0x75c5bb, transparent: true, opacity: 0.75, side: THREE.DoubleSide, depthWrite: false })
+    );
+    beacon.position.set(scrap.position.x, 3.0, scrap.position.z);
+    this.scene.add(beacon);
+    this.radarBeacon = beacon;
+    this.radarBeaconTimer = 8.0;
+    this.ui.showRadarPing(scrap.position);
+  }
+
   usePulse() {
     if (!this.running) return;
-    const stunned = this.pulse.activate(this.player.position, this.enemies);
+    const hasOvercharge = this.inventory.hasUpgrade('pulse_overcharge');
+    const hasRadar = this.inventory.hasUpgrade('radar_echo');
+    const range = hasOvercharge ? 8.2 : 5.6;
+    const stunSeconds = hasOvercharge ? 7.5 : 5.0;
+    const stunned = this.pulse.activate(this.player.position, this.enemies, { range, stunSeconds });
     if (stunned === null) return;
     this.sfx.play('pulse', stunned > 0 ? 1 : 0.82);
     this.player.play('pulse');
-    this.ui.toast(stunned ? `SCRAP PULSE // ${stunned} WATCH${stunned > 1 ? 'ES' : ''} DISRUPTED` : 'SCRAP PULSE // AREA CLEAR');
+
+    const ping = this.scanNearestScrap();
+    if (ping) {
+      this.sfx.play('ping', 0.95);
+      const enemyMsg = stunned > 0 ? `${stunned} WATCH DISRUPTED // ` : '';
+      this.ui.toast(`${enemyMsg}SALVAGE ECHO: ${ping.distance}M ${ping.bearing}`);
+      if (hasRadar) {
+        this.highlightScrapPing(ping.scrap);
+      }
+    } else {
+      this.ui.toast(stunned ? `SCRAP PULSE // ${stunned} WATCH${stunned > 1 ? 'ES' : ''} DISRUPTED` : 'SCRAP PULSE // AREA CLEAR');
+    }
   }
 
   updateQuest() { this.ui.updateQuest(this.missions.mission, this.inventory.scrap); }
@@ -559,12 +782,24 @@ export class Game {
       this.city.ledger.ledger.rotation.y += delta * 0.6;
       this.city.ledger.ledger.position.y = 1.42 + Math.sin(this.time * 2.5) * 0.07;
     }
+    if (this.radarBeacon) {
+      this.radarBeaconTimer -= delta;
+      this.radarBeacon.rotation.y += delta * 1.5;
+      this.radarBeacon.material.opacity = Math.min(0.75, (this.radarBeaconTimer / 8.0) * 0.75);
+      if (this.radarBeaconTimer <= 0) {
+        this.scene.remove(this.radarBeacon);
+        this.radarBeacon.geometry?.dispose?.();
+        this.radarBeacon.material?.dispose?.();
+        this.radarBeacon = null;
+        this.ui.hideRadarPing();
+      }
+    }
     this.crowd.update(delta, this.player.position);
     this.syncPresence(delta);
     this.ownBubble.update(delta);
     this.combat.update(delta); this.pulse.update(delta);
     this.enemies.forEach((enemy) => {
-      if (enemy.threaten(delta, this.time, this.player.position) && this.combat.takePressure(12)) {
+      if (!this.player.isDashing() && enemy.threaten(delta, this.time, this.player.position) && this.combat.takePressure(12)) {
         this.sfx.play('impact');
         this.player.play('hit');   // recoil clip; ignored when the model has no clips
         this.ui.toast('VARDEE’S WATCH // STAY MOVING');
@@ -577,6 +812,7 @@ export class Game {
     if (this.dotTimer > 0.1) { this.dotTimer = 0; this.refreshRemoteDots(); }
     this.ui.updateStatus({
       resolve: this.combat.resolve,
+      maxResolve: this.combat.maxResolve,
       pulse: this.pulse.charge,
       player: this.player.position,
       target: this.objectiveTarget(),
