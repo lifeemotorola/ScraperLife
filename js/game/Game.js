@@ -176,10 +176,14 @@ export class Game {
       onJournal: () => this.ui.toggleJournal(),
     });
     this.mobileController = new MobileController(this.input);
+    this.unlockedMusicPoints = new Set();
     this.ui.bindStart(() => this.start(), () => location.reload());
     this.ui.bindJournalHandlers({
       inventory: this.inventory,
       missions: this.missions,
+      music: this.music,
+      unlockedMusicPoints: this.unlockedMusicPoints,
+      onTuneTrack: (id) => this.tuneTrackById(id),
       onCraft: (upgradeId) => this.craftUpgrade(upgradeId),
     });
     this.ui.bindRadioTune(() => this.tuneRadio());
@@ -488,9 +492,29 @@ export class Game {
         { finale: 7, warehouse: 6, siaThanks: 5, siaHope: 7, tennehTogether: 6 },
       );
     } else if (hit.type === 'npc') {
-      // Voice the side character with their recorded clip when one exists.
-      if (hit.object.quoteId) this.dialogue.play(hit.object.quoteId, 4);
-      else this.dialogue.playText(hit.object.quote, 4);
+      const npcId = hit.object.id;
+      const track = this.music.currentTrack();
+      const intel = this.music.currentIntel();
+      const npcQuote = intel?.npcQuotes?.[npcId];
+      const pointKey = `${npcId}-${track?.id}`;
+      const isNewPoint = npcQuote && !this.unlockedMusicPoints.has(pointKey);
+
+      if (isNewPoint) {
+        // NPC gives their point on what they know about the music!
+        this.unlockedMusicPoints.add(pointKey);
+        this.inventory.addSalvagePoints(1);
+        this.sfx.play('pickup', 1.0);
+        hit.object.say?.(npcQuote, 6);
+        this.dialogue.playText(`${hit.object.label}: “${npcQuote}”`, 6);
+        this.ui.toast(`+1 SALVAGE // ${hit.object.label}’S POINT ON ${track.title.toUpperCase()} RECORDED!`);
+      } else if (npcQuote && Math.random() < 0.45) {
+        hit.object.say?.(npcQuote, 5);
+        this.dialogue.playText(`${hit.object.label}: “${npcQuote}”`, 5);
+      } else {
+        // Voice the side character with their recorded clip when one exists.
+        if (hit.object.quoteId) this.dialogue.play(hit.object.quoteId, 4);
+        else this.dialogue.playText(hit.object.quote, 4);
+      }
     }
   }
 
@@ -519,14 +543,46 @@ export class Game {
     const track = this.music.tuneNext();
     this.sfx.play('tune', 1.0);
     this.ui.setRadioTrack(track);
-    this.ui.toast(`📻 94.7 WATERSIDE FM // ${track.title.toUpperCase()}`);
+    this.broadcastCurrentTrack(track);
+  }
+
+  tuneTrackById(trackId) {
+    const idx = this.music.station.tracks.findIndex((t) => t.id === trackId);
+    if (idx !== -1) {
+      this.music.selectTrack(idx);
+      this.sfx.play('tune', 1.0);
+      const track = this.music.currentTrack();
+      this.ui.setRadioTrack(track);
+      this.broadcastCurrentTrack(track);
+    }
+  }
+
+  broadcastCurrentTrack(track) {
+    const intel = this.music.currentIntel();
+    if (!intel) {
+      this.ui.toast(`📻 94.7 WATERSIDE FM // ${track.title.toUpperCase()}`);
+      return;
+    }
+    const broadcastKey = `broadcast-${track.id}`;
+    const isNew = !this.unlockedMusicPoints.has(broadcastKey);
+    if (isNew) {
+      this.unlockedMusicPoints.add(broadcastKey);
+      this.inventory.addSalvagePoints(1);
+      this.sfx.play('pickup', 0.9);
+      this.ui.toast(`+1 SALVAGE // BROADCAST INTEL: ${track.title.toUpperCase()}`);
+    } else {
+      this.ui.toast(`📻 94.7 FM BROADCAST // ${track.title.toUpperCase()}`);
+    }
+    if (intel.broadcastLine) {
+      this.dialogue.playText(intel.broadcastLine, 7);
+    }
   }
 
   onRadioTrackChange(track, { auto = false } = {}) {
     this.ui.setRadioTrack(track);
     if (auto && this.running) {
       this.sfx.play('tune', 0.6);
-      this.ui.toast(`📻 NOW PLAYING // ${track.title.toUpperCase()}`);
+      this.broadcastCurrentTrack(track);
     }
   }
 

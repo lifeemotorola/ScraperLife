@@ -358,6 +358,37 @@ body { font-family:Outfit,Arial,sans-serif; }
 .intel-title { font:800 15px/1 'Barlow Condensed'; color:var(--cream); margin:0 0 5px; }
 .intel-desc { font:400 11px/1.4 Outfit,sans-serif; color:#b5c4bc; margin:0; }
 
+/* Radio Broadcast & Music Intel */
+.radio-intel-list { display:flex; flex-direction:column; gap:16px; }
+.radio-intel-card { background:rgba(12,24,26,.88); border:1px solid rgba(229,244,229,.14); border-left:4px solid var(--amber); padding:16px; border-radius:2px; display:flex; flex-direction:column; gap:12px; }
+.radio-intel-card.now-playing { border-left-color:var(--teal); background:rgba(16,36,37,.92); box-shadow:0 0 16px rgba(117,197,187,.15); }
+.radio-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+.radio-card-badges { display:flex; align-items:center; gap:6px; margin-bottom:5px; flex-wrap:wrap; }
+.radio-badge-station { font:700 8px/1 'DM Mono'; color:var(--amber); background:rgba(251,179,74,.15); border:1px solid rgba(251,179,74,.35); padding:2px 6px; border-radius:2px; letter-spacing:.06em; }
+.radio-badge-genre { font:600 8px/1 'DM Mono'; color:#a2b8ad; background:rgba(255,255,255,.06); padding:2px 6px; border-radius:2px; }
+.radio-badge-live { font:700 8px/1 'DM Mono'; color:#0d1617; background:var(--teal); padding:2px 6px; border-radius:2px; animation:blink 1.2s infinite alternate; }
+.radio-card-title { font:800 18px/1.1 'Barlow Condensed'; color:var(--cream); margin:0 0 3px; letter-spacing:.04em; }
+.radio-card-artist { font:600 10px/1 'DM Mono'; color:var(--orange); margin:0; letter-spacing:.07em; }
+.radio-tune-track-btn { padding:7px 12px; font:700 10px/1 'DM Mono'; background:rgba(251,179,74,.18); border:1px solid rgba(251,179,74,.4); color:var(--amber); letter-spacing:.06em; cursor:pointer; border-radius:2px; }
+.radio-tune-track-btn:hover { background:var(--amber); color:#0d1617; }
+.radio-broadcast-quote { background:rgba(0,0,0,.35); border-left:3px solid var(--teal); padding:10px 12px; border-radius:2px; }
+.radio-broadcast-head { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:5px; }
+.radio-broadcast-tag { font:700 8px/1 'DM Mono'; color:var(--teal); letter-spacing:.08em; }
+.radio-broadcast-status { font:600 8px/1 'DM Mono'; color:#8faaa0; }
+.radio-broadcast-p { font:500 11px/1.45 'DM Mono'; color:#dbe7dc; margin:0; }
+.radio-points-block { background:rgba(255,255,255,.03); padding:10px 12px; border-radius:2px; border:1px solid rgba(255,255,255,.05); }
+.radio-points-heading, .radio-residents-heading { font:700 9px/1 'DM Mono'; color:var(--amber); letter-spacing:.08em; margin:0 0 8px; }
+.radio-points-list { margin:0; padding-left:16px; display:flex; flex-direction:column; gap:4px; }
+.radio-points-list li { font:400 11px/1.4 Outfit,sans-serif; color:#b8c7bf; }
+.npc-commentary-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:8px; }
+.npc-commentary-row { background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.06); padding:8px 10px; border-radius:2px; border-left:2px solid #556; }
+.npc-commentary-row.unlocked { border-left-color:var(--teal); background:rgba(18,38,36,.4); }
+.npc-commentary-head { display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px; }
+.npc-commentary-name { font:700 8px/1 'DM Mono'; color:var(--cream); letter-spacing:.06em; }
+.npc-commentary-status { font:600 7px/1 'DM Mono'; color:#6a8479; letter-spacing:.05em; }
+.npc-commentary-row.unlocked .npc-commentary-status { color:var(--teal); }
+.npc-commentary-text { font:400 10.5px/1.35 Outfit,sans-serif; color:#aebfb6; margin:0; }
+
 .journal-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; padding-top:12px; border-top:1px solid rgba(229,244,229,.12); font:500 9px/1 'DM Mono'; color:#8b9e94; flex-wrap:wrap; }
 
 /* Radar ping minimap indicator */

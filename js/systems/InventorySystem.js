@@ -46,6 +46,11 @@ export class InventorySystem {
     return this.scrap;
   }
 
+  addSalvagePoints(amount = 1) {
+    this.salvagePoints += amount;
+    return this.salvagePoints;
+  }
+
   hasScrap(amount) {
     return this.scrap >= amount;
   }

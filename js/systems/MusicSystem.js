@@ -1,3 +1,5 @@
+import { MUSIC_INTEL } from '../data/musicIntel.js';
+
 const DEFAULT_LOOP_URL = new URL('../../assets/audio/platform-loop.wav', import.meta.url).href;
 const MUSIC_STORAGE_KEY = 'scraper-life-music';
 const RADIO_STORAGE_KEY = 'scraper-life-radio-track';
@@ -134,6 +136,10 @@ export class MusicSystem {
     return this.tuneIndex((this.trackIndex - 1 + this.station.tracks.length) % this.station.tracks.length);
   }
 
+  selectTrack(index) {
+    return this.tuneIndex(index);
+  }
+
   tuneIndex(index, { auto = false } = {}) {
     this.trackIndex = Math.max(0, Math.min(this.station.tracks.length - 1, index));
     const track = this.station.tracks[this.trackIndex];
@@ -153,8 +159,14 @@ export class MusicSystem {
         }
       }
     }
-    this.onTrackChange?.(track, { auto });
+    const intel = this.currentIntel();
+    this.onTrackChange?.(track, { auto, intel });
     return track;
+  }
+
+  currentIntel() {
+    const track = this.currentTrack();
+    return track ? (MUSIC_INTEL[track.id] || null) : null;
   }
 
   // Dialogue audio ducking (radio volume lowers quietly when characters speak)

@@ -1,6 +1,7 @@
 import { isEditableTarget } from './InputManager.js';
 import { UPGRADE_DEFINITIONS } from '../systems/InventorySystem.js';
 import { CHARACTER_DOSSIERS, DISTRICT_INTEL } from '../data/dossier.js';
+import { MUSIC_INTEL } from '../data/musicIntel.js';
 
 export class UIManager {
   constructor() {
@@ -21,9 +22,9 @@ export class UIManager {
       radioLine: $('radio-station-line'), radioTrackName: $('radio-track-name'), radioTuneBtn: $('radio-tune-btn'), radioTuneSettingsBtn: $('radio-tune-settings-btn'),
       // Scavenger Journal & Workbench
       journalButton: $('journal-button'), journalPanel: $('journal-panel'), journalClose: $('journal-close'),
-      tabUpgrades: $('tab-upgrades'), tabDossier: $('tab-dossier'), tabIntel: $('tab-intel'),
-      sectionUpgrades: $('journal-content-upgrades'), sectionDossier: $('journal-content-dossier'), sectionIntel: $('journal-content-intel'),
-      salvageCount: $('salvage-points-count'), upgradesList: $('upgrades-list'), dossierList: $('dossier-list'), intelList: $('intel-list'),
+      tabUpgrades: $('tab-upgrades'), tabDossier: $('tab-dossier'), tabIntel: $('tab-intel'), tabRadioIntel: $('tab-radio-intel'),
+      sectionUpgrades: $('journal-content-upgrades'), sectionDossier: $('journal-content-dossier'), sectionIntel: $('journal-content-intel'), sectionRadioIntel: $('journal-content-radio-intel'),
+      salvageCount: $('salvage-points-count'), upgradesList: $('upgrades-list'), dossierList: $('dossier-list'), intelList: $('intel-list'), radioIntelList: $('radio-intel-list'), radioIntelStats: $('radio-intel-stats'),
       touchJournal: $('touch-journal'), touchDash: $('touch-dash'),
     };
     this.worldBounds = 48; // matches PhysicsEngine limit + water offset; platform expanded to 92 units
@@ -65,6 +66,7 @@ export class UIManager {
     this.el.tabUpgrades?.addEventListener('click', () => this.switchJournalTab('upgrades'));
     this.el.tabDossier?.addEventListener('click', () => this.switchJournalTab('dossier'));
     this.el.tabIntel?.addEventListener('click', () => this.switchJournalTab('intel'));
+    this.el.tabRadioIntel?.addEventListener('click', () => this.switchJournalTab('radio'));
 
     // Radio station tuning
     this.el.radioTuneBtn?.addEventListener('click', (event) => {
@@ -162,10 +164,13 @@ export class UIManager {
   }
 
   // Scavenger Journal & Workbench
-  bindJournalHandlers({ onCraft, inventory, missions }) {
+  bindJournalHandlers({ onCraft, inventory, missions, music = null, unlockedMusicPoints = null, onTuneTrack = null }) {
     this.onCraftCallback = onCraft;
     this.inventoryRef = inventory;
     this.missionsRef = missions;
+    this.musicRef = music;
+    this.unlockedMusicPointsRef = unlockedMusicPoints;
+    this.onTuneTrackCallback = onTuneTrack;
   }
 
   toggleJournal() {
@@ -195,6 +200,7 @@ export class UIManager {
       { name: 'upgrades', button: this.el.tabUpgrades, section: this.el.sectionUpgrades },
       { name: 'dossier', button: this.el.tabDossier, section: this.el.sectionDossier },
       { name: 'intel', button: this.el.tabIntel, section: this.el.sectionIntel },
+      { name: 'radio', button: this.el.tabRadioIntel, section: this.el.sectionRadioIntel },
     ];
     tabs.forEach(({ name, button, section }) => {
       const active = name === tabName;
@@ -300,6 +306,98 @@ export class UIManager {
         `;
         this.el.intelList.appendChild(card);
       });
+    }
+
+    // Render Radio Broadcasts & Music Intel
+    this.renderRadioIntel();
+  }
+
+  renderRadioIntel() {
+    if (!this.el.radioIntelList) return;
+    this.el.radioIntelList.innerHTML = '';
+    const currentTrack = this.musicRef?.currentTrack?.();
+    const unlocked = this.unlockedMusicPointsRef || new Set();
+
+    let totalPoints = 0;
+    let unlockedPoints = 0;
+
+    Object.values(MUSIC_INTEL).forEach((item) => {
+      const isCurrent = currentTrack?.id === item.id;
+      const card = document.createElement('div');
+      card.className = `radio-intel-card ${isCurrent ? 'now-playing' : ''}`;
+
+      const residentIds = Object.keys(item.npcQuotes || {});
+      totalPoints += residentIds.length + 1; // 1 broadcast + 1 per resident
+      const broadcastUnlocked = unlocked.has(`broadcast-${item.id}`);
+      if (broadcastUnlocked) unlockedPoints += 1;
+
+      const pointsHtml = item.culturalPoints.map((pt) => `<li>${pt}</li>`).join('');
+
+      const quotesHtml = residentIds.map((npcId) => {
+        const quote = item.npcQuotes[npcId];
+        const isUnlocked = unlocked.has(`${npcId}-${item.id}`);
+        if (isUnlocked) unlockedPoints += 1;
+        const npcName = npcId.toUpperCase();
+        return `
+          <div class="npc-commentary-row ${isUnlocked ? 'unlocked' : 'locked'}">
+            <div class="npc-commentary-head">
+              <span class="npc-commentary-name">👤 ${npcName}</span>
+              <span class="npc-commentary-status">${isUnlocked ? '✓ POINT COLLECTED (+1 SALVAGE)' : '🔒 TALK TO ' + npcName}</span>
+            </div>
+            <p class="npc-commentary-text">“${quote}”</p>
+          </div>
+        `;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="radio-card-header">
+          <div>
+            <div class="radio-card-badges">
+              <span class="radio-badge-station">${item.station}</span>
+              <span class="radio-badge-genre">${item.genre}</span>
+              ${isCurrent ? '<span class="radio-badge-live">● ON AIR NOW</span>' : ''}
+            </div>
+            <h3 class="radio-card-title">${item.title}</h3>
+            <h4 class="radio-card-artist">BY ${item.artist.toUpperCase()}</h4>
+          </div>
+          <button class="radio-tune-track-btn" data-track-id="${item.id}" type="button">
+            ${isCurrent ? '▶ PLAYING NOW' : '📻 TUNE TRACK ❯'}
+          </button>
+        </div>
+
+        <div class="radio-broadcast-quote">
+          <div class="radio-broadcast-head">
+            <span class="radio-broadcast-tag">📻 LIVE AIRWAVES // ${item.broadcaster}</span>
+            <span class="radio-broadcast-status">${broadcastUnlocked ? '✓ BROADCAST RECORDED' : '🔒 LISTEN ON RADIO'}</span>
+          </div>
+          <p class="radio-broadcast-p">${item.broadcastLine}</p>
+        </div>
+
+        <div class="radio-points-block">
+          <h5 class="radio-points-heading">WHAT WE KNOW ABOUT THIS MUSIC:</h5>
+          <ul class="radio-points-list">
+            ${pointsHtml}
+          </ul>
+        </div>
+
+        <div class="radio-residents-block">
+          <h5 class="radio-residents-heading">WATERSIDE VOICES // RESIDENT PERSPECTIVES:</h5>
+          <div class="npc-commentary-grid">
+            ${quotesHtml}
+          </div>
+        </div>
+      `;
+
+      card.querySelector('.radio-tune-track-btn')?.addEventListener('click', () => {
+        this.onTuneTrackCallback?.(item.id);
+        this.renderRadioIntel();
+      });
+
+      this.el.radioIntelList.appendChild(card);
+    });
+
+    if (this.el.radioIntelStats) {
+      this.el.radioIntelStats.textContent = `${unlockedPoints} / ${totalPoints} MUSIC POINTS DISCOVERED`;
     }
   }
 
