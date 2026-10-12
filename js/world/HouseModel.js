@@ -56,13 +56,40 @@ export function loadHouseTemplate(url = HOUSE_URL) {
   return templatePromise;
 }
 
-// Places one house so it fills a footprint of width x depth and reaches the given height.
+// Weathered paint schemes, multiplied over the wall and porch textures (white keeps the original look).
+const WALL_TINTS = [0xffffff, 0xc4d3dd, 0xe6c79c, 0xd4a18c, 0xb9cba9, 0xeedca8];
+const PORCH_TINTS = [0xffffff, 0x9fb1bb, 0xb89a74, 0xa87565, 0x8fa388, 0xc9b98c];
+
+// Every house gets a different paint scheme and a slightly different width, so no two blocks match.
+// The index is the block's position in City's list, so the look is the same on every load.
+export function houseVariant(index) {
+  return {
+    wall: new THREE.Color(WALL_TINTS[index % WALL_TINTS.length]),
+    porch: new THREE.Color(PORCH_TINTS[index % PORCH_TINTS.length]),
+    widthScale: 0.9 + ((index * 37) % 11) / 100, // 0.90 .. 1.00 of the footprint
+  };
+}
+
+// Places one house so it fills its footprint and reaches the given height.
 // The house keeps its proportions in X/Z (uniform fit) and is stretched vertically to the storey height.
-export function placeHouse(scene, template, { x, z, width, depth, height, label, rotationY = 0 }) {
+export function placeHouse(scene, template, { x, z, width, depth, height, label, rotationY = 0 }, variant = null) {
   const size = template.userData.size;
-  const fit = Math.min(width / size.x, depth / size.z);
+  const fit = Math.min(width / size.x, depth / size.z) * (variant?.widthScale ?? 1);
   const house = template.clone(true);
   house.scale.set(fit, height / size.y, fit);
+  if (variant) {
+    // Each house needs its own material copies so one tint does not recolour every house.
+    house.traverse((object) => {
+      if (!object.isMesh) return;
+      const copies = [object.material].flat().map((material) => {
+        const copy = material.clone();
+        if (material.name === 'Walls') copy.color.copy(variant.wall);
+        else if (material.name === 'Porch') copy.color.copy(variant.porch);
+        return copy;
+      });
+      object.material = Array.isArray(object.material) ? copies : copies[0];
+    });
+  }
   const group = new THREE.Group();
   group.position.set(x, 0, z);
   group.rotation.y = rotationY;
