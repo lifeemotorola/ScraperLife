@@ -130,7 +130,10 @@ SLOTS = [
 ]
 
 # Slots every character must have a colour for. `brows` is derived from `hair`.
-REQUIRED_SLOTS = ["skin", "hair", "brows", "shirt", "pants", "shoes", "gloves", "pack"]
+# The current body is one skinned mesh from fbx/Walking.fbx (material "Body2") with no separate
+# hair, clothing, gloves, pack, eyes or mouth parts. Only skin can be coloured. The wardrobe
+# lists below stay for when a multi-part body is exported again.
+REQUIRED_SLOTS = ["skin"]
 # Palette wardrobe IDs are mirrored by CharacterRig's procedural outfit shader/accessories.
 WARDROBE_TOP_STYLES = (
     "street-tee", "print-blouse", "work-shirt", "wrap-blouse", "football-jersey",
@@ -147,7 +150,7 @@ WARDROBE_HEADWEAR_STYLES = (
     "none", "cap", "sports-cap", "flat-cap", "headwrap", "headband", "beanie", "kufi", "hardhat", "bandana",
 )
 # Slots coloured once for the whole cast (see SHARED_COLOURS).
-SHARED_SLOTS = ["eyes", "mouth"]
+SHARED_SLOTS = []
 
 
 def classify_materials(names):
