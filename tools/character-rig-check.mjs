@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, isAbsolute, join } from 'node:path';
 import { JSDOM } from 'jsdom';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from '../js/loaders/gltf.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const assetDir = join(root, 'assets', 'models');
@@ -58,7 +58,7 @@ const buffer = readFileSync(glbPath);
 const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 const gltf = await new Promise((resolve, reject) => {
   const timer = setTimeout(() => reject(new Error('GLTFLoader.parse did not settle (texture or extension problem?)')), 30000);
-  new GLTFLoader().parse(arrayBuffer, '', (data) => { clearTimeout(timer); resolve(data); }, (error) => { clearTimeout(timer); reject(error); });
+  createGLTFLoader().parse(arrayBuffer, '', (data) => { clearTimeout(timer); resolve(data); }, (error) => { clearTimeout(timer); reject(error); });
 });
 
 const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null;
