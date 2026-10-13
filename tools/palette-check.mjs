@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { JSDOM } from 'jsdom';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from '../js/loaders/gltf.js';
 import {
   expandCullBounds,
   instantiateCharacter,
@@ -66,7 +66,7 @@ THREE.TextureLoader.prototype.load = (url, onLoad) => {
 const bytes = readFileSync(modelPath);
 const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
 const gltf = await new Promise((resolve, reject) => {
-  new GLTFLoader().parse(buffer, '', resolve, reject);
+  createGLTFLoader().parse(buffer, '', resolve, reject);
 });
 const shared = {
   root: gltf.scene || gltf.scenes?.[0],

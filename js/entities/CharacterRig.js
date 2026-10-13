@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from '../loaders/gltf.js';
 // This build of the addon exports bare functions (`retarget`, `retargetClip`, `clone`), not a
 // `SkeletonUtils` namespace — importing a namespace here would resolve to `undefined`.
 import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
@@ -354,7 +354,7 @@ export function loadCharacter(url, { manifest = null, onProgress } = {}) {
   // Resolves { gltf, manifest, animator }. Rejects only when the GLB itself fails to load -
   // a missing manifest is fine, the clip names are matched by name in that case.
   const gltfPromise = new Promise((resolve, reject) => {
-    new GLTFLoader().load(url, resolve, onProgress, (error) => reject(error));
+    createGLTFLoader().load(url, resolve, onProgress, (error) => reject(error));
   });
   return Promise.all([gltfPromise, manifest ? loadCharacterManifest(manifest) : Promise.resolve(null)])
     .then(([gltf, data]) => {

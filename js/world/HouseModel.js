@@ -1,25 +1,12 @@
 import * as THREE from 'three';
-import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
+import { createGLTFLoader } from '../loaders/gltf.js';
 import { makeSign } from './Building.js';
 
-// The authored house (assets/Environment/old-house.dae, exported from 3ds Max / Clara.io).
-// It is loaded once; every city block gets a cheap clone that shares geometry and materials.
-const HOUSE_URL = new URL('../../assets/Environment/old-house.dae', import.meta.url).href;
-
-// The COLLADA file points its textures at the author's F:\ drive. Map those file names to the
-// copies bundled next to the model so the walls, porch and windows load in the browser.
-const HOUSE_TEXTURES = {
-  'List_1_dom_derevnja.jpg': new URL('../../assets/Environment/List_1_dom_derevnja.jpg', import.meta.url).href,
-  'List_2_dom_derevnja.jpg': new URL('../../assets/Environment/List_2_dom_derevnja.jpg', import.meta.url).href,
-  'List_3_dom_derevnja.jpg': new URL('../../assets/Environment/List_3_dom_derevnja.jpg', import.meta.url).href,
-};
+// The authored house, converted from assets/Environment/old-house.dae by tools/convert_house_glb.py.
+// A binary GLB parses far faster than the 4.7 MB COLLADA XML, and its textures are embedded and resized.
+const HOUSE_URL = new URL('../../assets/Environment/old-house.glb', import.meta.url).href;
 
 let templatePromise = null;
-
-function resolveTextureUrl(url) {
-  const name = decodeURIComponent(url).split(/[\\/]/).pop();
-  return HOUSE_TEXTURES[name] || url;
-}
 
 // Centre the model on X/Z, stand it on y = 0, and record its real size in metres.
 function prepareTemplate(scene) {
@@ -27,7 +14,6 @@ function prepareTemplate(scene) {
     if (!object.isMesh) return;
     object.castShadow = true;
     object.receiveShadow = true;
-    if (object.material?.map) object.material.map.colorSpace = THREE.SRGBColorSpace;
   });
   const box = new THREE.Box3().setFromObject(scene);
   const centre = box.getCenter(new THREE.Vector3());
@@ -38,21 +24,13 @@ function prepareTemplate(scene) {
   return pivot;
 }
 
-// Resolves to a reusable house template, or rejects if the model cannot be loaded.
+// Resolves to the house template, or rejects if the model cannot be loaded.
 export function loadHouseTemplate(url = HOUSE_URL) {
   if (!templatePromise) {
     templatePromise = new Promise((resolve, reject) => {
-      const manager = new THREE.LoadingManager();
-      manager.setURLModifier(resolveTextureUrl);
-      // The loader starts the texture downloads while parsing the .dae, and onLoad only fires once
-      // all of them are done. Wait for both so the city never appears with blank walls.
-      let scene = null;
-      let texturesDone = false;
-      const finishIfReady = () => { if (scene && texturesDone) resolve(prepareTemplate(scene)); };
-      manager.onLoad = () => { texturesDone = true; finishIfReady(); };
-      new ColladaLoader(manager).load(
+      createGLTFLoader().load(
         url,
-        (collada) => { scene = collada.scene; finishIfReady(); },
+        (gltf) => resolve(prepareTemplate(gltf.scene)),
         undefined,
         (error) => reject(error),
       );
@@ -76,38 +54,48 @@ export function houseVariant(index) {
   };
 }
 
-// Places one house so it fills its footprint and reaches the given height.
-// The house keeps its proportions in X/Z (uniform fit) and is stretched vertically to the storey height.
-export function placeHouse(scene, template, { x, z, width, depth, height, label, rotationY = 0 }, variant = null) {
+// Places every house in one go. Each model part becomes a single InstancedMesh, so all houses
+// cost one draw call per part (and one per part in the shadow pass) instead of one per house.
+// Each house still fills its footprint and reaches its storey height, keeping its X/Z proportions.
+export function placeHouses(scene, template, placements) {
   const size = template.userData.size;
-  const fit = Math.min(width / size.x, depth / size.z) * (variant?.widthScale ?? 1);
-  const house = template.clone(true);
-  house.scale.set(fit, height / size.y, fit);
-  if (variant) {
-    // Each house needs its own material copies so one tint does not recolour every house.
-    house.traverse((object) => {
-      if (!object.isMesh) return;
-      const copies = [object.material].flat().map((material) => {
-        const copy = material.clone();
-        if (material.name === 'Walls') copy.color.copy(variant.wall);
-        else if (material.name === 'Porch') copy.color.copy(variant.porch);
-        return copy;
-      });
-      object.material = Array.isArray(object.material) ? copies : copies[0];
+  template.updateMatrixWorld(true);
+
+  const houseMatrices = placements.map(({ x, z, width, depth, height, variant }) => {
+    const fit = Math.min(width / size.x, depth / size.z) * (variant?.widthScale ?? 1);
+    return new THREE.Matrix4().compose(
+      new THREE.Vector3(x, 0, z),
+      new THREE.Quaternion(),
+      new THREE.Vector3(fit, height / size.y, fit),
+    );
+  });
+
+  const parts = [];
+  template.traverse((object) => { if (object.isMesh) parts.push(object); });
+  const instanceMatrix = new THREE.Matrix4();
+  for (const part of parts) {
+    const material = part.material;
+    const instanced = new THREE.InstancedMesh(part.geometry, material, placements.length);
+    instanced.castShadow = true;
+    instanced.receiveShadow = true;
+    placements.forEach((placement, i) => {
+      instanced.setMatrixAt(i, instanceMatrix.multiplyMatrices(houseMatrices[i], part.matrixWorld));
+      const tint = placement.variant && (material.name === 'Walls' ? placement.variant.wall
+        : material.name === 'Porch' ? placement.variant.porch : null);
+      if (tint) instanced.setColorAt(i, tint);
     });
+    instanced.instanceMatrix.needsUpdate = true;
+    if (instanced.instanceColor) instanced.instanceColor.needsUpdate = true;
+    scene.add(instanced);
   }
-  const group = new THREE.Group();
-  group.position.set(x, 0, z);
-  group.rotation.y = rotationY;
-  group.add(house);
-  if (label) {
-    // The model has no sign of its own, so the street name goes over the front (-Z) face.
+
+  // The model has no sign of its own, so each street name goes over its house's front (-Z) face.
+  placements.forEach(({ x, z, width, depth, height, label }) => {
+    if (!label) return;
     const sign = makeSign(label, Math.min(width * 1.1, 5));
-    sign.position.set(0, Math.min(height, 3.2) - .35, -depth / 2 - .08);
+    sign.position.set(x, Math.min(height, 3.2) - .35, z - depth / 2 - .08);
     // A plane faces +Z by default; turn it so its text reads from the street side (-Z).
     sign.rotation.y = Math.PI;
-    group.add(sign);
-  }
-  scene.add(group);
-  return group;
+    scene.add(sign);
+  });
 }

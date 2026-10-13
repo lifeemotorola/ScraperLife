@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { COLORS, LampLightPool, addGlowPoints, addGlowSprite, lamp, road } from './Environment.js';
 import { Building, makeSign } from './Building.js';
-import { houseVariant, loadHouseTemplate, placeHouse } from './HouseModel.js';
+import { houseVariant, loadHouseTemplate, placeHouses } from './HouseModel.js';
 
 export class City {
   constructor(scene, physics) { this.scene = scene; this.physics = physics; this.generator = null; this.generatorPosition = new THREE.Vector3(-3, 0, -2); this.warehousePos = new THREE.Vector3(3, 0, -23); this.ledgerPos = new THREE.Vector3(3, 0, -23); }
@@ -26,7 +26,7 @@ export class City {
     });
     // The authored house model replaces the box visuals once it loads; boxes stay as the fallback.
     this.housesReady = loadHouseTemplate().then((template) => {
-      blocks.forEach((building, index) => placeHouse(this.scene, template, building.data, houseVariant(index)));
+      placeHouses(this.scene, template, blocks.map((building, index) => ({ ...building.data, variant: houseVariant(index) })));
     }).catch((error) => {
       console.warn('House model could not load; using box houses instead.', error);
       blocks.forEach((building) => building.addVisual());
