@@ -180,6 +180,7 @@ export class Game {
       console.warn('Shared character rig could not load; keeping placeholder people:', error);
     });
     this.scrap = this.createScrap();
+    this.caches = this.createCaches();
     this.radarBeacon = null;
     this.radarBeaconTimer = 0;
     this.input = new InputManager({
@@ -271,6 +272,46 @@ export class Game {
     const everyone = [...Object.values(this.npcs || {}), ...(this.enemies || [])];
     everyone.forEach((character) => character.setHeight(markieHeight));
     this.markieCrowdActor?.setHeight(markieHeight);
+  }
+
+  // Salvage caches: sealed crates hidden around the platform. Opening one (E) gives salvage points,
+  // not scrap, so they never change the radio mission's progress.
+  createCaches() {
+    const spots = [[-27, -4], [14, 2], [-12, 18], [24, 30], [-20, -30], [40, -4]];
+    const glows = [];
+    const crates = spots.map(([x, z], index) => {
+      const spot = this.physics.findFree(new THREE.Vector3(x, 0, z), 0.5, 10);
+      const group = new THREE.Group(); group.position.set(spot.x, 0, spot.z);
+      const wood = new THREE.MeshStandardMaterial({ color: 0x7a5a32, roughness: .9 });
+      const body = new THREE.Mesh(new THREE.BoxGeometry(.8, .55, .55), wood);
+      body.position.y = .275; body.castShadow = true; body.receiveShadow = true; group.add(body);
+      const strap = new THREE.Mesh(new THREE.BoxGeometry(.84, .07, .6), new THREE.MeshStandardMaterial({ color: COLORS.teal, roughness: .6, metalness: .4 }));
+      strap.position.y = .3; group.add(strap);
+      // The lid hinges on the back edge and swings up when the cache is opened.
+      const lidPivot = new THREE.Group(); lidPivot.position.set(0, .55, -.275); group.add(lidPivot);
+      const lid = new THREE.Mesh(new THREE.BoxGeometry(.82, .08, .58), wood);
+      lid.position.set(0, .04, .275); lid.castShadow = true; lidPivot.add(lid);
+      this.physics.addBuilding({ x: spot.x, z: spot.z, width: .9, depth: .65 });
+      glows.push({ x: spot.x, y: .9, z: spot.z, color: COLORS.teal });
+      group.userData = { opened: false, lidPivot, glowIndex: index };
+      this.scene.add(group); return group;
+    });
+    this.cacheGlow = addGlowPoints(this.scene, glows, { size: 2.2, opacity: .8 });
+    return crates;
+  }
+
+  openCache(crate) {
+    if (crate.userData.opened) return;
+    crate.userData.opened = true;
+    crate.userData.lidPivot.rotation.x = -1.35;
+    this.cacheGlow.setColor(crate.userData.glowIndex, 0);
+    const reward = 3;
+    this.inventory.addSalvagePoints(reward);
+    const opened = this.caches.filter((cache) => cache.userData.opened).length;
+    this.ui.toast(`SALVAGE CACHE // +${reward} SALVAGE POINTS (${opened}/${this.caches.length})`);
+    if (opened === this.caches.length) this.ui.toast('ALL CACHES OPENED // THE PLATFORM IS YOURS', 3500);
+    this.player.play('interact');
+    if (this.ui.journalOpen) this.ui.renderJournal();
   }
 
   createScrap() {
@@ -404,6 +445,11 @@ export class Game {
       const nextDistance = this.player.position.distanceTo(scrap.position);
       if (nextDistance < distance) { distance = nextDistance; closest = { type: 'scrap', object: scrap, text: 'PICK UP SALVAGED SCRAP' }; }
     }
+    for (const crate of this.caches) {
+      if (crate.userData.opened) continue;
+      const nextDistance = this.player.position.distanceTo(crate.position);
+      if (nextDistance < distance) { distance = nextDistance; closest = { type: 'cache', object: crate, text: 'OPEN SALVAGE CACHE' }; }
+    }
     // Platform missions: priority to current objective
     if (this.missions.canRepair && this.player.position.distanceTo(this.city.generatorPosition) < 2.8) closest = { type: 'radio', text: 'REPAIR KOLLIE’S RADIO' };
     else if (this.missions.is('mentor') && this.npcs.kollie.distanceTo(this.player.position) < 2.8) closest = { type: 'kollie', text: 'ASK KOLLIE ABOUT YOUR PARENTS' };
@@ -436,9 +482,12 @@ export class Game {
     if (!this.running || !this.interaction) return;
     const hit = this.interaction;
     if (hit.type === 'scrap') this.sfx.play('pickup');
+    else if (hit.type === 'cache') this.sfx.play('pickup', 0.7);
     else if (hit.type === 'radio') this.sfx.play('repair');
     else this.sfx.play('interact', 0.8);
-    if (hit.type === 'scrap') {
+    if (hit.type === 'cache') {
+      this.openCache(hit.object);
+    } else if (hit.type === 'scrap') {
       hit.object.userData.collected = true; hit.object.visible = false; this.scrapGlow.setColor(hit.object.userData.glowIndex, 0);
       const total = this.inventory.collectScrap();
       this.ui.toast(`SALVAGE SECURED // ${total} PIECE${total === 1 ? '' : 'S'} (+1 SALVAGE MOD)`);
