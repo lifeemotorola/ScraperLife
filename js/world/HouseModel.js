@@ -44,9 +44,15 @@ export function loadHouseTemplate(url = HOUSE_URL) {
     templatePromise = new Promise((resolve, reject) => {
       const manager = new THREE.LoadingManager();
       manager.setURLModifier(resolveTextureUrl);
+      // The loader starts the texture downloads while parsing the .dae, and onLoad only fires once
+      // all of them are done. Wait for both so the city never appears with blank walls.
+      let scene = null;
+      let texturesDone = false;
+      const finishIfReady = () => { if (scene && texturesDone) resolve(prepareTemplate(scene)); };
+      manager.onLoad = () => { texturesDone = true; finishIfReady(); };
       new ColladaLoader(manager).load(
         url,
-        (collada) => resolve(prepareTemplate(collada.scene)),
+        (collada) => { scene = collada.scene; finishIfReady(); },
         undefined,
         (error) => reject(error),
       );

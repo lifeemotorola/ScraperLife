@@ -37,6 +37,22 @@ export const CAMERA_MODES = [
 ];
 
 export class Game {
+  // Removes the loading screen once the given assets have loaded, or after LOADING_TIMEOUT_MS so a
+  // stalled download cannot trap the player behind it. The first frame is compiled before the reveal
+  // so shader setup does not stutter the first moments of play.
+  revealWhenReady(assets) {
+    const screen = document.getElementById('loading-screen');
+    if (!screen) return;
+    const LOADING_TIMEOUT_MS = 30000;
+    const timeout = new Promise((resolve) => setTimeout(resolve, LOADING_TIMEOUT_MS));
+    const reveal = () => {
+      try { this.renderer.compile(this.scene, this.camera); } catch (error) { console.warn('Shader warm-up failed:', error); }
+      screen.classList.add('done');
+      setTimeout(() => screen.remove(), 500);
+    };
+    Promise.race([Promise.allSettled(assets.filter(Boolean)), timeout]).then(reveal);
+  }
+
   init() {
     this.running = false;
     this.time = 0;
@@ -180,6 +196,8 @@ export class Game {
     this.currentNewsIndex = -1;
     this.trackChangeCounter = 0;
     this.ui.bindStart(() => this.start(), () => location.reload());
+    // Hold the loading screen until the sky, the city houses and the character rig are ready.
+    this.revealWhenReady([this.hdrPromise, this.city.housesReady, this.sharedCharacterPromise, this.characterPalettesPromise]);
     this.ui.bindJournalHandlers({
       inventory: this.inventory,
       missions: this.missions,
