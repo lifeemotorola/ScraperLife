@@ -7,90 +7,59 @@
   "units": "sRGB hex, as read by three.js Color.set()",
   "note": "One rigged body for the whole cast; each palette carries its own colours and wardrobe style. Do not edit by hand - re-run the generator.",
   "materials": [
-    "Backpack2",
-    "Head",
-    "Body2",
-    "Arms",
-    "Body_Arkit:Eye",
-    "Brows_Leashes",
-    "Gloves1",
-    "Hair3",
-    "Jacket1",
-    "Jeans1",
-    "Mouth",
-    "Shoes1"
+    "Body2"
   ],
   "unmatchedMaterials": [],
   "slots": {
     "eyes": {
-      "materials": [
-        "Body_Arkit:Eye"
-      ],
+      "materials": [],
       "roughness": 0.12,
       "tintable": false
     },
     "mouth": {
-      "materials": [
-        "Mouth"
-      ],
+      "materials": [],
       "roughness": 0.55,
       "tintable": false
     },
     "brows": {
-      "materials": [
-        "Brows_Leashes"
-      ],
+      "materials": [],
       "roughness": 0.8,
       "tintable": true
     },
     "hair": {
-      "materials": [
-        "Hair3"
-      ],
+      "materials": [],
       "roughness": 0.45,
       "tintable": true
     },
     "skin": {
       "materials": [
-        "Head",
-        "Body2",
-        "Arms"
+        "Body2"
       ],
       "roughness": 0.62,
       "tintable": true
     },
     "shirt": {
-      "materials": [
-        "Jacket1"
-      ],
+      "materials": [],
       "roughness": 0.78,
       "tintable": true
     },
     "pants": {
-      "materials": [
-        "Jeans1"
-      ],
+      "materials": [],
       "roughness": 0.88,
       "tintable": true
     },
     "shoes": {
-      "materials": [
-        "Shoes1"
-      ],
+      "materials": [],
       "roughness": 0.5,
       "tintable": true
     },
     "gloves": {
-      "materials": [
-        "Gloves1"
-      ],
+      "materials": [],
       "roughness": 0.7,
       "tintable": true
     },
     "pack": {
-      "materials": [
-        "Backpack2"
-      ],
+      "materials": [],
       "roughness": 0.8,
       "tintable": true
     }

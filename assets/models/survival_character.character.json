@@ -1,80 +1,80 @@
 {
-  "generator": "tools/rig_and_animate.py",
+  "generator": "tools/rebuild_character_from_walking.mjs",
   "version": 1,
   "name": "survival_character",
-  "source": "fbx/Survival_Character.fbx",
+  "source": "fbx/Walking.fbx",
   "glb": "survival_character.glb",
   "units": "three.js world units; feet on y=0",
   "height": 2.3,
   "forward": {
     "authored": "-Y in Blender",
     "inThreeJs": "+Z",
-    "extraYaw": 0.0,
-    "appliedYawDeg": 0.0
+    "extraYaw": 0,
+    "appliedYawDeg": 0
   },
   "fps": 30,
   "clips": [
     {
       "name": "idle",
       "loop": true,
-      "seconds": 4.4,
-      "curves": 211,
+      "seconds": 4.433,
+      "curves": 23,
       "note": "standing breathing loop with a slow weight shift",
       "duration": 4.4333
     },
     {
       "name": "walk",
       "loop": true,
-      "seconds": 1.067,
-      "curves": 211,
+      "seconds": 1.033,
+      "curves": 53,
       "note": "in-place foot-contact walk; the game owns translation",
-      "duration": 1.1
+      "duration": 1.0333
     },
     {
       "name": "run",
       "loop": true,
-      "seconds": 0.733,
-      "curves": 211,
+      "seconds": 0.767,
+      "curves": 23,
       "note": "sprint: forward lean, high knees, a real flight phase",
       "duration": 0.7667
     },
     {
       "name": "jump",
       "loop": false,
-      "seconds": 1.067,
-      "curves": 167,
+      "seconds": 1.1,
+      "curves": 23,
       "note": "crouch, take off, tuck, land and settle",
       "duration": 1.1
     },
     {
       "name": "pulse",
       "loop": false,
-      "seconds": 1.133,
-      "curves": 135,
+      "seconds": 1.167,
+      "curves": 23,
       "note": "scrap pulse (Space/PULSE): wind up, sweep out, recover",
       "duration": 1.1667
     },
     {
       "name": "hit",
       "loop": false,
-      "seconds": 0.533,
-      "curves": 159,
+      "seconds": 0.567,
+      "curves": 23,
       "note": "takes pressure from Vardee's crew: recoil and guard",
       "duration": 0.5667
     },
     {
       "name": "grab",
       "loop": false,
-      "seconds": 0.933,
-      "curves": 139,
+      "seconds": 0.967,
+      "curves": 23,
       "note": "reach down and lift a piece of scrap (E / USE)",
       "duration": 0.9667
     },
     {
       "name": "celebrate",
       "loop": false,
-      "seconds": 1.7,
-      "curves": 127,
+      "seconds": 1.733,
+      "curves": 23,
       "note": "chapter closed: both fists up, small hop",
       "duration": 1.7333
     }
@@ -117,77 +117,66 @@
   },
   "stats": {
     "file": "survival_character.glb",
-    "bytes": 5513332,
-    "nodes": 172,
-    "bones": 160,
+    "bytes": 1389296,
+    "nodes": 54,
+    "bones": 52,
     "skins": 1,
-    "skinnedMeshes": 11,
-    "triangles": 120920,
-    "vertices": 84627,
+    "skinnedMeshes": 1,
+    "triangles": 6418,
+    "vertices": 19254,
     "morphTargets": 0,
     "materials": [
-      "Backpack2",
-      "Head",
-      "Body2",
-      "Arms",
-      "Body_Arkit:Eye",
-      "Brows_Leashes",
-      "Gloves1",
-      "Hair3",
-      "Jacket1",
-      "Jeans1",
-      "Mouth",
-      "Shoes1"
+      "Body2"
     ],
-    "images": 1,
+    "images": 0,
     "animations": [
-      {
-        "name": "celebrate",
-        "duration": 1.7333,
-        "bones": 31,
-        "channels": 32
-      },
-      {
-        "name": "grab",
-        "duration": 0.9667,
-        "bones": 34,
-        "channels": 35
-      },
-      {
-        "name": "hit",
-        "duration": 0.5667,
-        "bones": 39,
-        "channels": 40
-      },
       {
         "name": "idle",
         "duration": 4.4333,
+        "bones": 22,
+        "channels": 23
+      },
+      {
+        "name": "walk",
+        "duration": 1.0333,
         "bones": 52,
         "channels": 53
-      },
-      {
-        "name": "jump",
-        "duration": 1.1,
-        "bones": 41,
-        "channels": 42
-      },
-      {
-        "name": "pulse",
-        "duration": 1.1667,
-        "bones": 33,
-        "channels": 34
       },
       {
         "name": "run",
         "duration": 0.7667,
-        "bones": 52,
-        "channels": 53
+        "bones": 22,
+        "channels": 23
       },
       {
-        "name": "walk",
+        "name": "jump",
         "duration": 1.1,
-        "bones": 52,
-        "channels": 53
+        "bones": 22,
+        "channels": 23
+      },
+      {
+        "name": "pulse",
+        "duration": 1.1667,
+        "bones": 22,
+        "channels": 23
+      },
+      {
+        "name": "hit",
+        "duration": 0.5667,
+        "bones": 22,
+        "channels": 23
+      },
+      {
+        "name": "grab",
+        "duration": 0.9667,
+        "bones": 22,
+        "channels": 23
+      },
+      {
+        "name": "celebrate",
+        "duration": 1.7333,
+        "bones": 22,
+        "channels": 23
       }
     ]
   }
