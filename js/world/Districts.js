@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { COLORS } from './Environment.js';
 import { houseVariant, placeHouses } from './HouseModel.js';
+import { SEASON_TINTS, TREE_KINDS } from './Trees.js';
 
 // Endless districts. The world is cut into square chunks. Each chunk is generated from a seed made
 // from its own (x, z) index, so the same chunk always looks the same, and chunks load and unload
@@ -9,6 +10,7 @@ import { houseVariant, placeHouses } from './HouseModel.js';
 // (-1..0, -1..0), and the sea starts at chunk x = 1, so neither is generated.
 
 export const CHUNK = 40;
+const color = new THREE.Color();
 const PLOT = 20;          // four plots per chunk, each PLOT wide
 const ROAD_WIDTH = 6;     // one cross of streets per chunk, along the chunk's centre lines
 const SKIP = 'authored';  // marker for chunks left to the hand-built city
@@ -44,10 +46,11 @@ function markMatrices(...meshes) {
 }
 
 export class Districts {
-  constructor(scene, physics, { template = null, radius = 2 } = {}) {
+  constructor(scene, physics, { template = null, trees = null, radius = 2 } = {}) {
     this.scene = scene;
     this.physics = physics;
     this.template = template;
+    this.trees = trees;
     this.radius = radius;
     this.chunks = new Map();
     this.centre = null;
@@ -154,6 +157,8 @@ export class Districts {
     // Each of the four plots may hold a house, and each plot's outer corner may hold a palm.
     const placements = [];
     const palms = [];
+    // Trees go on lots without a house. Each entry: the tree kind, position, scale and season tint.
+    const trees = TREE_KINDS.map(() => []);
     for (let sx = 0; sx < 2; sx += 1) {
       for (let sz = 0; sz < 2; sz += 1) {
         const x = ox + PLOT / 2 + sx * PLOT;
@@ -165,6 +170,14 @@ export class Districts {
         const height = 7 + random() * 4;
         const variantIndex = Math.floor(random() * 997);
         const hasPalm = random() < .4;
+        const treeRoll = random();
+        const treeKind = Math.floor(random() * TREE_KINDS.length);
+        const treeScale = .85 + random() * .3;
+        const treeSeason = Math.floor(random() * SEASON_TINTS.length);
+        if (!hasHouse && treeRoll < .6 && this.trees) {
+          trees[treeKind].push({ x, z, scale: treeScale, season: treeSeason });
+          this.physics.addBuilding({ x, z, width: .6, depth: .6 }, key);
+        }
         if (hasHouse && this.template) {
           placements.push({ x, z, width, depth, height, variant: houseVariant(variantIndex) });
           this.physics.addBuilding({ x, z, width: width + .3, depth: depth + .3 }, key);
@@ -176,6 +189,23 @@ export class Districts {
     if (placements.length) {
       objects.push(...placeHouses(this.scene, this.template, placements));
     }
+    trees.forEach((list, kind) => {
+      if (!list.length || !this.trees) return;
+      // One InstancedMesh per part (bark, leaves), so each tree kind costs one or two draw calls per chunk.
+      for (const part of Object.values(this.trees[kind])) {
+        const instanced = new THREE.InstancedMesh(part.geometry, part.material, list.length);
+        instanced.castShadow = true;
+        list.forEach((tree, i) => {
+          matrix.makeScale(tree.scale, tree.scale, tree.scale).setPosition(tree.x, 0, tree.z);
+          instanced.setMatrixAt(i, matrix);
+          instanced.setColorAt(i, color.set(SEASON_TINTS[tree.season]));
+        });
+        markMatrices(instanced);
+        instanced.instanceColor.needsUpdate = true;
+        addObject(instanced);
+      }
+    });
+
     if (palms.length) {
       const trunks = new THREE.InstancedMesh(this.shared.trunk, this.shared.trunkMaterial, palms.length);
       const fronds = new THREE.InstancedMesh(this.shared.leaves, this.shared.leafMaterial, palms.length);

@@ -3,6 +3,7 @@ import { COLORS, LampLightPool, addGlowPoints, addGlowSprite, lamp, road } from 
 import { Building, makeSign } from './Building.js';
 import { houseVariant, loadHouseTemplate, placeHouses } from './HouseModel.js';
 import { Districts } from './Districts.js';
+import { loadTreeTemplates } from './Trees.js';
 
 export class City {
   constructor(scene, physics) { this.scene = scene; this.physics = physics; this.generator = null; this.generatorPosition = new THREE.Vector3(-3, 0, -2); this.warehousePos = new THREE.Vector3(3, 0, -23); this.ledgerPos = new THREE.Vector3(3, 0, -23); }
@@ -29,13 +30,18 @@ export class City {
     // The authored house model replaces the box visuals once it loads; boxes stay as the fallback.
     // Endless districts start once the house template is known, so the first chunks around the spawn are ready
     // before the game is revealed.
-    this.housesReady = loadHouseTemplate().then((template) => {
+    // Trees are optional: if they fail to load, districts still build without them.
+    const treesReady = loadTreeTemplates().catch((error) => {
+      console.warn('Tree models could not load; districts will have no trees.', error);
+      return null;
+    });
+    this.housesReady = Promise.all([loadHouseTemplate(), treesReady]).then(([template, trees]) => {
       placeHouses(this.scene, template, blocks.map((building, index) => ({ ...building.data, variant: houseVariant(index) })));
-      this.startDistricts(template);
+      this.startDistricts(template, trees);
     }).catch((error) => {
       console.warn('House model could not load; using box houses instead.', error);
       blocks.forEach((building) => building.addVisual());
-      this.startDistricts(null);
+      this.startDistricts(null, null);
     });
     this.makeWorkshop(-4, -3);
     this.makeWarehouse(3, -23);
@@ -53,8 +59,8 @@ export class City {
     this.addDistrictMarkers();
   }
   updateLamps(playerPosition) { this.lampLights?.update(playerPosition); }
-  startDistricts(template) {
-    this.districts = new Districts(this.scene, this.physics, { template });
+  startDistricts(template, trees = null) {
+    this.districts = new Districts(this.scene, this.physics, { template, trees });
     this.districts.update(this.spawn);
   }
   // Called every frame: streams the endless districts around the player and keeps the grid under them.
