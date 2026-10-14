@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { COLORS } from './Environment.js';
 import { houseVariant, placeHouses } from './HouseModel.js';
+import { SEASON_TINTS, TREE_KINDS } from './Trees.js';
 
 // Endless districts. The world is cut into square chunks. Each chunk is generated from a seed made
 // from its own (x, z) index, so the same chunk always looks the same, and chunks load and unload
@@ -9,6 +10,7 @@ import { houseVariant, placeHouses } from './HouseModel.js';
 // (-1..0, -1..0), and the sea starts at chunk x = 1, so neither is generated.
 
 export const CHUNK = 40;
+const color = new THREE.Color();
 const PLOT = 20;          // four plots per chunk, each PLOT wide
 const ROAD_WIDTH = 6;     // one cross of streets per chunk, along the chunk's centre lines
 const SKIP = 'authored';  // marker for chunks left to the hand-built city
@@ -44,10 +46,11 @@ function markMatrices(...meshes) {
 }
 
 export class Districts {
-  constructor(scene, physics, { template = null, radius = 2 } = {}) {
+  constructor(scene, physics, { template = null, trees = null, radius = 2 } = {}) {
     this.scene = scene;
     this.physics = physics;
     this.template = template;
+    this.trees = trees;
     this.radius = radius;
     this.chunks = new Map();
     this.centre = null;
@@ -56,27 +59,12 @@ export class Districts {
 
   // Geometry and materials that every chunk reuses, so chunks add no new material or geometry cost.
   makeSharedGeometry() {
-    const trunk = new THREE.CylinderGeometry(.13, .24, 3.5, 7);
-    trunk.translate(0, 1.75, 0);
-    const leaves = [];
-    for (let i = 0; i < 7; i += 1) {
-      const leaf = new THREE.PlaneGeometry(2.1, .53);
-      const matrix = new THREE.Matrix4().compose(
-        new THREE.Vector3(0, 3.55, 0),
-        new THREE.Quaternion().setFromEuler(new THREE.Euler(-.35, i * (Math.PI * 2 / 7), .15, 'XYZ')),
-        new THREE.Vector3(1, 1, 1),
-      );
-      leaf.applyMatrix4(matrix);
-      leaves.push(leaf);
-    }
     const stem = new THREE.CylinderGeometry(.055, .07, 4.2, 7);
     stem.translate(0, 2.1, 0);
     const bulb = new THREE.SphereGeometry(.13, 8, 6);
     bulb.translate(0, 4.1, 0);
     return {
-      trunk, leaves: mergeGeometries(leaves), stem, bulb,
-      trunkMaterial: new THREE.MeshStandardMaterial({ color: 0x563d29, roughness: 1 }),
-      leafMaterial: new THREE.MeshStandardMaterial({ color: 0x245d45, side: THREE.DoubleSide, roughness: .9 }),
+      stem, bulb,
       stemMaterial: new THREE.MeshStandardMaterial({ color: 0x22312f, metalness: .5 }),
       bulbMaterial: new THREE.MeshBasicMaterial({ color: 0xffc36c }),
       roadMaterial: new THREE.MeshStandardMaterial({ color: COLORS.road, roughness: 1 }),
@@ -151,9 +139,10 @@ export class Districts {
     markMatrices(lampStems, lampBulbs);
     addObject(lampStems); addObject(lampBulbs);
 
-    // Each of the four plots may hold a house, and each plot's outer corner may hold a palm.
+    // Each of the four plots may hold a house or a tree.
     const placements = [];
-    const palms = [];
+    // Trees go on lots without a house. Each entry: the tree kind, position, scale and season tint.
+    const trees = TREE_KINDS.map(() => []);
     for (let sx = 0; sx < 2; sx += 1) {
       for (let sz = 0; sz < 2; sz += 1) {
         const x = ox + PLOT / 2 + sx * PLOT;
@@ -164,33 +153,41 @@ export class Districts {
         const depth = 6 + random() * 3;
         const height = 7 + random() * 4;
         const variantIndex = Math.floor(random() * 997);
-        const hasPalm = random() < .4;
+        random(); // Former palm roll. The draw is kept so later draws, and every chunk's layout, stay the same.
+        const treeRoll = random();
+        const treeKind = Math.floor(random() * TREE_KINDS.length);
+        const treeScale = .85 + random() * .3;
+        const treeSeason = Math.floor(random() * SEASON_TINTS.length);
+        if (!hasHouse && treeRoll < .6 && this.trees) {
+          trees[treeKind].push({ x, z, scale: treeScale, season: treeSeason });
+          this.physics.addBuilding({ x, z, width: .6, depth: .6 }, key);
+        }
         if (hasHouse && this.template) {
           placements.push({ x, z, width, depth, height, variant: houseVariant(variantIndex) });
           this.physics.addBuilding({ x, z, width: width + .3, depth: depth + .3 }, key);
         }
-        if (hasPalm) palms.push({ x: x + (sx ? 8.5 : -8.5), z: z + (sz ? 8.5 : -8.5) });
       }
     }
 
     if (placements.length) {
       objects.push(...placeHouses(this.scene, this.template, placements));
     }
-    if (palms.length) {
-      const trunks = new THREE.InstancedMesh(this.shared.trunk, this.shared.trunkMaterial, palms.length);
-      const fronds = new THREE.InstancedMesh(this.shared.leaves, this.shared.leafMaterial, palms.length);
-      palms.forEach((palm, i) => {
-        // Same slight lean as the hand-built palms, varied per tree.
-        const lean = Math.sin(palm.x * 12.9898 + palm.z * 78.233) * .12;
-        matrix.makeRotationZ(lean).setPosition(palm.x, 0, palm.z);
-        trunks.setMatrixAt(i, matrix);
-        fronds.setMatrixAt(i, matrix);
-        this.physics.addBuilding({ x: palm.x, z: palm.z, width: .5, depth: .5 }, key);
-      });
-      markMatrices(trunks, fronds);
-      trunks.castShadow = true;
-      addObject(trunks); addObject(fronds);
-    }
+    trees.forEach((list, kind) => {
+      if (!list.length || !this.trees) return;
+      // One InstancedMesh per part (bark, leaves), so each tree kind costs one or two draw calls per chunk.
+      for (const part of Object.values(this.trees[kind])) {
+        const instanced = new THREE.InstancedMesh(part.geometry, part.material, list.length);
+        instanced.castShadow = true;
+        list.forEach((tree, i) => {
+          matrix.makeScale(tree.scale, tree.scale, tree.scale).setPosition(tree.x, 0, tree.z);
+          instanced.setMatrixAt(i, matrix);
+          instanced.setColorAt(i, color.set(SEASON_TINTS[tree.season]));
+        });
+        markMatrices(instanced);
+        instanced.instanceColor.needsUpdate = true;
+        addObject(instanced);
+      }
+    });
 
     return { cx, cz, objects };
   }
