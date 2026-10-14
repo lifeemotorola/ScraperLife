@@ -105,7 +105,7 @@ export class Game {
     this.sfx = new SoundEffectsSystem();
     this.dialogue = new DialogueSystem(this.ui, DIALOGUE, this.voice, this.music);
     this.combat = new CombatSystem();
-    this.physics = new PhysicsEngine({ limit: 48 });
+    this.physics = new PhysicsEngine();
     this.city = new City(this.scene, this.physics); this.city.build({ lampLightCount: this.isMobile ? 3 : 5 });
     // (-16, 0, 10) stands on the open street by Kollie Radio Works; findFree guarantees
     // the spawn never lands inside a building collider again (that reads as Markie
@@ -902,6 +902,7 @@ export class Game {
     if (climate.changed && this.running) this.ui.toast(`CLIMATE SHIFT // ${climate.label}`);
     if (this.running) this.update(delta);
     this.city.updateLamps(this.player.position);
+    this.city.updateStreaming(this.player.position);
     this.updateShadows(delta);
     this.updateCamera(); this.renderer.render(this.scene, this.camera);
   }
