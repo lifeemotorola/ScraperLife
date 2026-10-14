@@ -136,11 +136,34 @@ export function resolveClip(clips, wanted, stateMap = {}) {
     || null;
 }
 
+// The walk clip moves the pelvis about 2.3 m along Z over one loop (root motion). The game already
+// moves Markie, so that travel doubled every step and then snapped back when the clip looped.
+// This keeps the clip's vertical bob and every joint rotation, and holds the pelvis's X and Z at
+// their first-frame values. Each clip is converted once and cached.
+const inPlaceClips = new WeakMap();
+export function inPlaceClip(clip) {
+  if (inPlaceClips.has(clip)) return inPlaceClips.get(clip);
+  const tracks = clip.tracks.map((track) => {
+    if (track.name !== 'pelvis.position') return track;
+    const values = Array.from(track.values);
+    const x0 = values[0];
+    const z0 = values[2];
+    for (let i = 0; i < values.length; i += 3) {
+      values[i] = x0;
+      values[i + 2] = z0;
+    }
+    return new THREE.VectorKeyframeTrack(track.name, Array.from(track.times), values);
+  });
+  const converted = new THREE.AnimationClip(clip.name, clip.duration, tracks);
+  inPlaceClips.set(clip, converted);
+  return converted;
+}
+
 export class CharacterAnimator {
   // Drives one AnimationMixer with an idle/locomotion layer plus one-shot actions.
   constructor(root, clips, { stateMap = {}, speed = 1 } = {}) {
     this.root = root;
-    this.clips = clips;
+    this.clips = clips.map(inPlaceClip);
     this.stateMap = stateMap;
     this.mixer = new THREE.AnimationMixer(root);
     this.actions = new Map();
