@@ -1,0 +1,5 @@
+numpy
+pyaml
+shapely
+topologic_core
+ifcopenshell
