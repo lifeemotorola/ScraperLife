@@ -59,27 +59,12 @@ export class Districts {
 
   // Geometry and materials that every chunk reuses, so chunks add no new material or geometry cost.
   makeSharedGeometry() {
-    const trunk = new THREE.CylinderGeometry(.13, .24, 3.5, 7);
-    trunk.translate(0, 1.75, 0);
-    const leaves = [];
-    for (let i = 0; i < 7; i += 1) {
-      const leaf = new THREE.PlaneGeometry(2.1, .53);
-      const matrix = new THREE.Matrix4().compose(
-        new THREE.Vector3(0, 3.55, 0),
-        new THREE.Quaternion().setFromEuler(new THREE.Euler(-.35, i * (Math.PI * 2 / 7), .15, 'XYZ')),
-        new THREE.Vector3(1, 1, 1),
-      );
-      leaf.applyMatrix4(matrix);
-      leaves.push(leaf);
-    }
     const stem = new THREE.CylinderGeometry(.055, .07, 4.2, 7);
     stem.translate(0, 2.1, 0);
     const bulb = new THREE.SphereGeometry(.13, 8, 6);
     bulb.translate(0, 4.1, 0);
     return {
-      trunk, leaves: mergeGeometries(leaves), stem, bulb,
-      trunkMaterial: new THREE.MeshStandardMaterial({ color: 0x563d29, roughness: 1 }),
-      leafMaterial: new THREE.MeshStandardMaterial({ color: 0x245d45, side: THREE.DoubleSide, roughness: .9 }),
+      stem, bulb,
       stemMaterial: new THREE.MeshStandardMaterial({ color: 0x22312f, metalness: .5 }),
       bulbMaterial: new THREE.MeshBasicMaterial({ color: 0xffc36c }),
       roadMaterial: new THREE.MeshStandardMaterial({ color: COLORS.road, roughness: 1 }),
@@ -154,9 +139,8 @@ export class Districts {
     markMatrices(lampStems, lampBulbs);
     addObject(lampStems); addObject(lampBulbs);
 
-    // Each of the four plots may hold a house, and each plot's outer corner may hold a palm.
+    // Each of the four plots may hold a house or a tree.
     const placements = [];
-    const palms = [];
     // Trees go on lots without a house. Each entry: the tree kind, position, scale and season tint.
     const trees = TREE_KINDS.map(() => []);
     for (let sx = 0; sx < 2; sx += 1) {
@@ -169,7 +153,7 @@ export class Districts {
         const depth = 6 + random() * 3;
         const height = 7 + random() * 4;
         const variantIndex = Math.floor(random() * 997);
-        const hasPalm = random() < .4;
+        random(); // Former palm roll. The draw is kept so later draws, and every chunk's layout, stay the same.
         const treeRoll = random();
         const treeKind = Math.floor(random() * TREE_KINDS.length);
         const treeScale = .85 + random() * .3;
@@ -182,7 +166,6 @@ export class Districts {
           placements.push({ x, z, width, depth, height, variant: houseVariant(variantIndex) });
           this.physics.addBuilding({ x, z, width: width + .3, depth: depth + .3 }, key);
         }
-        if (hasPalm) palms.push({ x: x + (sx ? 8.5 : -8.5), z: z + (sz ? 8.5 : -8.5) });
       }
     }
 
@@ -205,22 +188,6 @@ export class Districts {
         addObject(instanced);
       }
     });
-
-    if (palms.length) {
-      const trunks = new THREE.InstancedMesh(this.shared.trunk, this.shared.trunkMaterial, palms.length);
-      const fronds = new THREE.InstancedMesh(this.shared.leaves, this.shared.leafMaterial, palms.length);
-      palms.forEach((palm, i) => {
-        // Same slight lean as the hand-built palms, varied per tree.
-        const lean = Math.sin(palm.x * 12.9898 + palm.z * 78.233) * .12;
-        matrix.makeRotationZ(lean).setPosition(palm.x, 0, palm.z);
-        trunks.setMatrixAt(i, matrix);
-        fronds.setMatrixAt(i, matrix);
-        this.physics.addBuilding({ x: palm.x, z: palm.z, width: .5, depth: .5 }, key);
-      });
-      markMatrices(trunks, fronds);
-      trunks.castShadow = true;
-      addObject(trunks); addObject(fronds);
-    }
 
     return { cx, cz, objects };
   }

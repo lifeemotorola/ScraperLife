@@ -46,7 +46,6 @@ export class City {
     this.makeWorkshop(-4, -3);
     this.makeWarehouse(3, -23);
     [[21,-10,0xa64e36],[19,-17,0x26555d],[22,12,0x9d613c],[16,8,0x2d6264],[-11,4,0x935b3b],[36,-22,0x8a4a3a],[ -36,-6,0x2f5d5b],[ 30,30,0x9d7a4a]].forEach(([x,z,color]) => this.container(x,z,color));
-    [[-27,-13],[-27,26],[-5,27],[17,25],[-18,-22],[5,13],[23,-25],[ -38,12],[ 38,-10],[ -12,38],[ 34,8]].forEach(([x,z]) => this.palm(x,z));
     for (let i = 0; i < 55; i += 1) this.debris(-36 + (i * 17) % 72, -36 + (i * 29) % 72, i % 2);
     // Street lamps share one glow object instead of 25 PointLights (see addGlowPoints).
     const lampGlows = [];
@@ -125,7 +124,6 @@ export class City {
     setTimeout(() => this.scene.remove(burst), 1200);
   }
   container(x,z,color) { const body = new THREE.Mesh(new THREE.BoxGeometry(4,2.5,2),new THREE.MeshStandardMaterial({color,roughness:.75,metalness:.2}));body.position.set(x,1.25,z);body.castShadow=true;body.receiveShadow=true;this.scene.add(body);this.physics.addBuilding({x,z,width:4,depth:2}); }
-  palm(x,z) { const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.13,.24,3.5,7),new THREE.MeshStandardMaterial({color:0x563d29,roughness:1}));trunk.position.set(x,1.75,z);trunk.rotation.z=Math.sin(x)*.12;trunk.castShadow=true;this.scene.add(trunk);this.physics.addBuilding({x,z,width:.5,depth:.5});const leaves=new THREE.MeshStandardMaterial({color:0x245d45,side:THREE.DoubleSide,roughness:.9});for(let i=0;i<7;i+=1){const leaf=new THREE.Mesh(new THREE.PlaneGeometry(2.1,.53),leaves);leaf.position.set(x,3.55,z);leaf.rotation.y=i*(Math.PI*2/7);leaf.rotation.x=-.35;leaf.rotation.z=.15;this.scene.add(leaf);} }
   debris(x,z,type) { const mesh = new THREE.Mesh(new THREE.DodecahedronGeometry(type?.14:.22,0),new THREE.MeshStandardMaterial({color:type?0x8f693d:0x45514e,roughness:1}));mesh.position.set(x,.15,z);mesh.rotation.set(x,z,1);this.scene.add(mesh); }
   addDistrictMarkers() {
     // Low-cost sprites for expanded platform readability
