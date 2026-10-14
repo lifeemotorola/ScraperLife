@@ -1,0 +1,29 @@
+schema_version = "1.0.0"
+id = "PlaceHelper"
+name = "Place Helper"
+tagline = "Place, align and scatter objects with ease"
+version = "2.0.0"
+type = "add-on"
+maintainer = "AIGODLIKE Community"
+
+blender_version_min = "4.2.0"
+
+website = "https://github.com/AIGODLIKE/PlaceHelper"
+support = "https://github.com/AIGODLIKE/PlaceHelper/issues"
+
+tags = ["3D View", "Object"]
+license = ["SPDX:GPL-3.0-or-later"]
+
+[build]
+paths_exclude_pattern = [
+    "__pycache__/",
+    "/.git/",
+    ".gitignore",
+    ".gitattributes",
+    "/*.zip",
+    "*.blend1",
+    ".vscode/",
+    ".idea/",
+    ".DS_Store",
+    "Thumbs.db",
+]
