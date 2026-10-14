@@ -1,0 +1,37 @@
+schema_version = "1.0.0"
+
+id = "helio"
+version = "1.1.1"
+name = "Helio"
+tagline = "Automatic lighting of the scene based on GPS, date and time"
+maintainer = "Michal Dolanský"
+type = "add-on"
+
+website = "https://extensions.blender.org/add-ons/helio/"
+
+tags = ["Lighting"]
+
+support = "https://github.com/mikydosh/helio/issues"
+
+blender_version_min = "5.0.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
+
+copyright = [
+  "2025 Michal Dolanský",
+]
+
+wheels = [
+  "./wheels/timezonefinderL-4.0.2-py3-none-any.whl",
+  "./wheels/importlib_resources-7.1.0-py3-none-any.whl",
+  "./wheels/tzdata-2026.2-py2.py3-none-any.whl",
+]
+
+[build]
+paths_exclude_pattern = [
+  "__pycache__/",
+  ".git",
+  "*.zip",
+]
