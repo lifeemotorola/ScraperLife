@@ -20,7 +20,7 @@ export class Building {
   // The collider is what the player and NPCs bump into; it is the same whichever model draws the block.
   addCollider() {
     const { x, z, width, depth } = this.data;
-    this.physics.addBuilding({ x, z, width: width + .3, depth: depth + .3 });
+    this.physics.addBuilding({ x, z, width: width + .3, depth: depth + .3 }, null, { passOverStreets: true });
   }
   // Procedural box house, used when the authored house model cannot be loaded.
   add() {

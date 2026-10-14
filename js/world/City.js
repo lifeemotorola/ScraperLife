@@ -11,8 +11,8 @@ export class City {
     this.spawn = spawn;
     this.addTerrain();
     // Platform expanded: 96-unit sector, new ring road and cross streets for larger navigation
-    road(this.scene, -2, 0, 10, 86, 'z'); road(this.scene, 7, -8, 62, 9, 'x'); road(this.scene, -18, 13, 36, 7, 'x');
-    road(this.scene, -2, -22, 72, 8, 'x'); road(this.scene, 28, -6, 8, 48, 'z'); road(this.scene, -28, 6, 8, 44, 'z');
+    this.street(-2, 0, 10, 86, 'z'); this.street(7, -8, 62, 9, 'x'); this.street(-18, 13, 36, 7, 'x');
+    this.street(-2, -22, 72, 8, 'x'); this.street(28, -6, 8, 48, 'z'); this.street(-28, 6, 8, 44, 'z');
     // Meter-scale building footprints and 3–5 storey heights make Waterside feel like a real city around human-scale characters.
     const buildingData = [
       [-21,18,10,8,9,0x5b6b62,'KOLLIE COURT'],[-10,22,9,6,8.5,0x455956,'MOBILE REPAIR'],[0,20,10,8,11,0x6b6554,'MARKET'],
@@ -85,6 +85,11 @@ export class City {
     const grid = new THREE.GridHelper(96, 24, 0x2e4a48, 0x253a3a);
     grid.position.y = 0.015; this.scene.add(grid); this.grid = grid;
   }
+  // A painted street (same geometry as road()). Its ground is registered so blocks crossing it can be walked through there.
+  street(x, z, width, height, axis) {
+    road(this.scene, x, z, width, height, axis);
+    this.physics.addStreet(x, z, axis === 'x' ? width : height, axis === 'x' ? height : width);
+  }
   makeWorkshop(x,z) {
     const group = new THREE.Group(); group.position.set(x,0,z); this.scene.add(group);
     const floor = new THREE.Mesh(new THREE.BoxGeometry(14,.18,10), new THREE.MeshStandardMaterial({ color: 0x202d2d, roughness: .9 })); floor.position.y = .08; floor.receiveShadow = true; group.add(floor);
@@ -98,8 +103,8 @@ export class City {
     const light = new THREE.Mesh(new THREE.SphereGeometry(.12,12,8),new THREE.MeshStandardMaterial({color:0x5c2020,emissive:0x300000,emissiveIntensity:1}));light.position.set(.72,.76,-.25);generator.add(light);
     const cables = new THREE.Mesh(new THREE.TorusGeometry(.48,.04,6,16),new THREE.MeshStandardMaterial({color:0x131b1c,roughness:.9}));cables.rotation.x=Math.PI/2;cables.position.set(-.75,.6,0);generator.add(cables);
     this.generator = { group: generator, light };
-    // The workshop is walk-in: its full 14 × 10 m roof footprint is solid, so characters cannot pass through it.
-    this.physics.addBuilding({ x, z, width: 14, depth: 10 });
+    // The workshop's 14 × 10 m footprint is solid except where it lies on a street.
+    this.physics.addBuilding({ x, z, width: 14, depth: 10 }, null, { passOverStreets: true });
   }
   makeWarehouse(x,z) {
     // Warehouse 6 is now a distinct landmark for the ledger mission
@@ -111,8 +116,8 @@ export class City {
     ledger.position.set(0, 1.42, 0); ledger.castShadow = true; group.add(ledger);
     const sign = makeSign('WAREHOUSE 6 — RESTRICTED', 6); sign.position.set(0, 4.2, -3.8); group.add(sign);
     this.ledger = { group, crate, ledger, light: ledgerGlow };
-    // The crate is solid; the ledger sits on top of it, so the collider matches the crate only.
-    this.physics.addBuilding({ x, z, width: 2.2, depth: 1.1 });
+    // The crate is solid off the street; the ledger sits on top of it, so the collider matches the crate only.
+    this.physics.addBuilding({ x, z, width: 2.2, depth: 1.1 }, null, { passOverStreets: true });
   }
   activateRadio() { this.generator.light.material.color.setHex(0x59d8ba); this.generator.light.material.emissive.setHex(0x0b756c); addGlowSprite(this.scene, new THREE.Vector3(-3, 3, -3), COLORS.teal, 9); }
   collectLedger() {
