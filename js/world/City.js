@@ -70,6 +70,8 @@ export class City {
     const light = new THREE.Mesh(new THREE.SphereGeometry(.12,12,8),new THREE.MeshStandardMaterial({color:0x5c2020,emissive:0x300000,emissiveIntensity:1}));light.position.set(.72,.76,-.25);generator.add(light);
     const cables = new THREE.Mesh(new THREE.TorusGeometry(.48,.04,6,16),new THREE.MeshStandardMaterial({color:0x131b1c,roughness:.9}));cables.rotation.x=Math.PI/2;cables.position.set(-.75,.6,0);generator.add(cables);
     this.generator = { group: generator, light };
+    // The workshop is walk-in: its full 14 × 10 m roof footprint is solid, so characters cannot pass through it.
+    this.physics.addBuilding({ x, z, width: 14, depth: 10 });
   }
   makeWarehouse(x,z) {
     // Warehouse 6 is now a distinct landmark for the ledger mission
@@ -81,6 +83,8 @@ export class City {
     ledger.position.set(0, 1.42, 0); ledger.castShadow = true; group.add(ledger);
     const sign = makeSign('WAREHOUSE 6 — RESTRICTED', 6); sign.position.set(0, 4.2, -3.8); group.add(sign);
     this.ledger = { group, crate, ledger, light: ledgerGlow };
+    // The crate is solid; the ledger sits on top of it, so the collider matches the crate only.
+    this.physics.addBuilding({ x, z, width: 2.2, depth: 1.1 });
   }
   activateRadio() { this.generator.light.material.color.setHex(0x59d8ba); this.generator.light.material.emissive.setHex(0x0b756c); addGlowSprite(this.scene, new THREE.Vector3(-3, 3, -3), COLORS.teal, 9); }
   collectLedger() {
@@ -92,7 +96,7 @@ export class City {
     setTimeout(() => this.scene.remove(burst), 1200);
   }
   container(x,z,color) { const body = new THREE.Mesh(new THREE.BoxGeometry(4,2.5,2),new THREE.MeshStandardMaterial({color,roughness:.75,metalness:.2}));body.position.set(x,1.25,z);body.castShadow=true;body.receiveShadow=true;this.scene.add(body);this.physics.addBuilding({x,z,width:4,depth:2}); }
-  palm(x,z) { const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.13,.24,3.5,7),new THREE.MeshStandardMaterial({color:0x563d29,roughness:1}));trunk.position.set(x,1.75,z);trunk.rotation.z=Math.sin(x)*.12;trunk.castShadow=true;this.scene.add(trunk);const leaves=new THREE.MeshStandardMaterial({color:0x245d45,side:THREE.DoubleSide,roughness:.9});for(let i=0;i<7;i+=1){const leaf=new THREE.Mesh(new THREE.PlaneGeometry(2.1,.53),leaves);leaf.position.set(x,3.55,z);leaf.rotation.y=i*(Math.PI*2/7);leaf.rotation.x=-.35;leaf.rotation.z=.15;this.scene.add(leaf);} }
+  palm(x,z) { const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.13,.24,3.5,7),new THREE.MeshStandardMaterial({color:0x563d29,roughness:1}));trunk.position.set(x,1.75,z);trunk.rotation.z=Math.sin(x)*.12;trunk.castShadow=true;this.scene.add(trunk);this.physics.addBuilding({x,z,width:.5,depth:.5});const leaves=new THREE.MeshStandardMaterial({color:0x245d45,side:THREE.DoubleSide,roughness:.9});for(let i=0;i<7;i+=1){const leaf=new THREE.Mesh(new THREE.PlaneGeometry(2.1,.53),leaves);leaf.position.set(x,3.55,z);leaf.rotation.y=i*(Math.PI*2/7);leaf.rotation.x=-.35;leaf.rotation.z=.15;this.scene.add(leaf);} }
   debris(x,z,type) { const mesh = new THREE.Mesh(new THREE.DodecahedronGeometry(type?.14:.22,0),new THREE.MeshStandardMaterial({color:type?0x8f693d:0x45514e,roughness:1}));mesh.position.set(x,.15,z);mesh.rotation.set(x,z,1);this.scene.add(mesh); }
   addDistrictMarkers() {
     // Low-cost sprites for expanded platform readability
