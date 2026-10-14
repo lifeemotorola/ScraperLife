@@ -27,7 +27,9 @@ export class UIManager {
       salvageCount: $('salvage-points-count'), upgradesList: $('upgrades-list'), dossierList: $('dossier-list'), intelList: $('intel-list'), radioIntelList: $('radio-intel-list'), radioIntelStats: $('radio-intel-stats'), radioNewsList: $('radio-news-list'),
       touchJournal: $('touch-journal'), touchDash: $('touch-dash'),
     };
-    this.worldBounds = 48; // matches PhysicsEngine limit + water offset; platform expanded to 92 units
+    // The minimap is a window of 2 × worldBounds metres, centred on the player (the world has no edge).
+    this.worldBounds = 48;
+    this.mapCentre = { x: 0, z: 0 };
     this.worldMapOpen = false;
     this.settingsOpen = false;
     this.journalOpen = false;
@@ -464,8 +466,8 @@ export class UIManager {
     }
     const B = this.worldBounds;
     const range = B * 2;
-    const left = `${((worldPos.x + B) / range) * 100}%`;
-    const top = `${((worldPos.z + B) / range) * 100}%`;
+    const left = `${((worldPos.x - this.mapCentre.x + B) / range) * 100}%`;
+    const top = `${((worldPos.z - this.mapCentre.z + B) / range) * 100}%`;
     this.radarPingMarker.style.left = left;
     this.radarPingMarker.style.top = top;
     this.radarPingMarker.classList.remove('hidden');
@@ -576,8 +578,8 @@ export class UIManager {
         dots = { mini, world, label };
         this.remoteDots.set(player.id, dots);
       }
-      const left = `${((player.x + B) / range) * 100}%`;
-      const top = `${((player.z + B) / range) * 100}%`;
+      const left = `${((player.x - this.mapCentre.x + B) / range) * 100}%`;
+      const top = `${((player.z - this.mapCentre.z + B) / range) * 100}%`;
       dots.mini.style.left = left; dots.mini.style.top = top;
       dots.world.style.left = left; dots.world.style.top = top;
       dots.label.textContent = `${player.name.toUpperCase()} · ${(player.characterId || '').toUpperCase()}`;
@@ -599,21 +601,22 @@ export class UIManager {
     if (dot) dot.style.background = pulse >= 35 ? 'var(--teal)' : '#61736b';
     const B = this.worldBounds;
     const range = B * 2;
+    this.mapCentre = { x: player.x, z: player.z };
     if (this.el.mapPlayer) {
-      this.el.mapPlayer.style.left = `${((player.x + B) / range) * 100}%`;
-      this.el.mapPlayer.style.top = `${((player.z + B) / range) * 100}%`;
+      this.el.mapPlayer.style.left = `${((player.x - this.mapCentre.x + B) / range) * 100}%`;
+      this.el.mapPlayer.style.top = `${((player.z - this.mapCentre.z + B) / range) * 100}%`;
     }
     if (this.el.objective) {
-      this.el.objective.style.left = `${((target.x + B) / range) * 100}%`;
-      this.el.objective.style.top = `${((target.z + B) / range) * 100}%`;
+      this.el.objective.style.left = `${((target.x - this.mapCentre.x + B) / range) * 100}%`;
+      this.el.objective.style.top = `${((target.z - this.mapCentre.z + B) / range) * 100}%`;
     }
     if (this.el.worldMapPlayer) {
-      this.el.worldMapPlayer.style.left = `${((player.x + B) / range) * 100}%`;
-      this.el.worldMapPlayer.style.top = `${((player.z + B) / range) * 100}%`;
+      this.el.worldMapPlayer.style.left = `${((player.x - this.mapCentre.x + B) / range) * 100}%`;
+      this.el.worldMapPlayer.style.top = `${((player.z - this.mapCentre.z + B) / range) * 100}%`;
     }
     if (this.el.worldMapObjective) {
-      this.el.worldMapObjective.style.left = `${((target.x + B) / range) * 100}%`;
-      this.el.worldMapObjective.style.top = `${((target.z + B) / range) * 100}%`;
+      this.el.worldMapObjective.style.left = `${((target.x - this.mapCentre.x + B) / range) * 100}%`;
+      this.el.worldMapObjective.style.top = `${((target.z - this.mapCentre.z + B) / range) * 100}%`;
       if (this.el.worldMapObjectiveLabel && missionTitle) this.el.worldMapObjectiveLabel.textContent = missionTitle.toUpperCase();
     }
     const npcMap = {
@@ -625,8 +628,8 @@ export class UIManager {
     Object.entries(npcMap).forEach(([id, pos]) => {
       const el = document.getElementById(`map-npc-${id}`);
       if (el) {
-        el.style.left = `${((pos.x + B) / range) * 100}%`;
-        el.style.top = `${((pos.z + B) / range) * 100}%`;
+        el.style.left = `${((pos.x - this.mapCentre.x + B) / range) * 100}%`;
+        el.style.top = `${((pos.z - this.mapCentre.z + B) / range) * 100}%`;
       }
     });
   }

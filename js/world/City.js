@@ -2,10 +2,12 @@ import * as THREE from 'three';
 import { COLORS, LampLightPool, addGlowPoints, addGlowSprite, lamp, road } from './Environment.js';
 import { Building, makeSign } from './Building.js';
 import { houseVariant, loadHouseTemplate, placeHouses } from './HouseModel.js';
+import { Districts } from './Districts.js';
 
 export class City {
   constructor(scene, physics) { this.scene = scene; this.physics = physics; this.generator = null; this.generatorPosition = new THREE.Vector3(-3, 0, -2); this.warehousePos = new THREE.Vector3(3, 0, -23); this.ledgerPos = new THREE.Vector3(3, 0, -23); }
-  build({ lampLightCount = 5 } = {}) {
+  build({ lampLightCount = 5, spawn = new THREE.Vector3(-16, 0, 10) } = {}) {
+    this.spawn = spawn;
     this.addTerrain();
     // Platform expanded: 96-unit sector, new ring road and cross streets for larger navigation
     road(this.scene, -2, 0, 10, 86, 'z'); road(this.scene, 7, -8, 62, 9, 'x'); road(this.scene, -18, 13, 36, 7, 'x');
@@ -25,11 +27,15 @@ export class City {
       return building;
     });
     // The authored house model replaces the box visuals once it loads; boxes stay as the fallback.
+    // Endless districts start once the house template is known, so the first chunks around the spawn are ready
+    // before the game is revealed.
     this.housesReady = loadHouseTemplate().then((template) => {
       placeHouses(this.scene, template, blocks.map((building, index) => ({ ...building.data, variant: houseVariant(index) })));
+      this.startDistricts(template);
     }).catch((error) => {
       console.warn('House model could not load; using box houses instead.', error);
       blocks.forEach((building) => building.addVisual());
+      this.startDistricts(null);
     });
     this.makeWorkshop(-4, -3);
     this.makeWarehouse(3, -23);
@@ -47,15 +53,32 @@ export class City {
     this.addDistrictMarkers();
   }
   updateLamps(playerPosition) { this.lampLights?.update(playerPosition); }
+  startDistricts(template) {
+    this.districts = new Districts(this.scene, this.physics, { template });
+    this.districts.update(this.spawn);
+  }
+  // Called every frame: streams the endless districts around the player and keeps the grid under them.
+  updateStreaming(playerPosition) {
+    this.districts?.update(playerPosition);
+    if (this.grid) {
+      this.grid.position.x = Math.round(playerPosition.x / 4) * 4;
+      this.grid.position.z = Math.round(playerPosition.z / 4) * 4;
+    }
+  }
   addTerrain() {
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(96,96), new THREE.MeshStandardMaterial({ color: COLORS.ground, roughness: 1 }));
-    ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; this.scene.add(ground);
-    const water = new THREE.Mesh(new THREE.PlaneGeometry(20,96), new THREE.MeshStandardMaterial({ color: COLORS.water, roughness: .3, metalness: .1, transparent: true, opacity: .88 }));
-    water.rotation.x = -Math.PI / 2; water.position.set(43,-.07,0); this.scene.add(water);
+    // The land runs west, north and south without an edge; the sea runs east without one.
+    // The land stops at x = 48 (under the water) and the water starts at x = 33, as before.
+    const LAND_EDGE = 48;
+    const FAR = 4000;
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(FAR, FAR), new THREE.MeshStandardMaterial({ color: COLORS.ground, roughness: 1 }));
+    ground.rotation.x = -Math.PI / 2; ground.position.set(LAND_EDGE - FAR / 2, 0, 0); ground.receiveShadow = true; this.scene.add(ground);
+    const water = new THREE.Mesh(new THREE.PlaneGeometry(FAR, FAR), new THREE.MeshStandardMaterial({ color: COLORS.water, roughness: .3, metalness: .1, transparent: true, opacity: .88 }));
+    water.rotation.x = -Math.PI / 2; water.position.set(33 + FAR / 2, -.07, 0); this.scene.add(water);
     for (let z = -38; z <= 38; z += 7) { const foam = new THREE.Mesh(new THREE.PlaneGeometry(12,.14), new THREE.MeshBasicMaterial({ color: 0xa4d5cc, transparent: true, opacity: .4 })); foam.rotation.x = -Math.PI / 2; foam.position.set(35.5,.01,z); this.scene.add(foam); }
     // faint grid for expanded platform readability
+    // The grid is only a 96 m patch that follows the player (see updateStreaming).
     const grid = new THREE.GridHelper(96, 24, 0x2e4a48, 0x253a3a);
-    grid.position.y = 0.015; this.scene.add(grid);
+    grid.position.y = 0.015; this.scene.add(grid); this.grid = grid;
   }
   makeWorkshop(x,z) {
     const group = new THREE.Group(); group.position.set(x,0,z); this.scene.add(group);

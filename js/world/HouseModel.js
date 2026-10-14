@@ -57,8 +57,10 @@ export function houseVariant(index) {
 // Places every house in one go. Each model part becomes a single InstancedMesh, so all houses
 // cost one draw call per part (and one per part in the shadow pass) instead of one per house.
 // Each house still fills its footprint and reaches its storey height, keeping its X/Z proportions.
+// Returns every object it added to the scene, so a caller can remove them again later.
 export function placeHouses(scene, template, placements) {
   const size = template.userData.size;
+  const created = [];
   template.updateMatrixWorld(true);
 
   const houseMatrices = placements.map(({ x, z, width, depth, height, variant }) => {
@@ -87,6 +89,7 @@ export function placeHouses(scene, template, placements) {
     instanced.instanceMatrix.needsUpdate = true;
     if (instanced.instanceColor) instanced.instanceColor.needsUpdate = true;
     scene.add(instanced);
+    created.push(instanced);
   }
 
   // The model has no sign of its own, so each street name goes over its house's front (-Z) face.
@@ -97,5 +100,7 @@ export function placeHouses(scene, template, placements) {
     // A plane faces +Z by default; turn it so its text reads from the street side (-Z).
     sign.rotation.y = Math.PI;
     scene.add(sign);
+    created.push(sign);
   });
+  return created;
 }
