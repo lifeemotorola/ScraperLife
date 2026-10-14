@@ -32,7 +32,7 @@ export const HDR = {
   // Environment intensity is driven by the day cycle (see ClimateController.update).
   day: 1.0,
   dawn: 0.45,
-  night: 0.12,
+  night: 0.4,
   backgroundBlur: 0.0,
 };
 
@@ -168,20 +168,40 @@ export function loadHDREnvironment(scene, renderer, { url = HDR.url, onReady = n
   });
 }
 
+// One in-game day takes 15 real minutes. Night is only the last 2 of them, centred on midnight;
+// the other 13 minutes are daylight from 06:00 to 18:00 in-game.
+export const DAY_LENGTH_SECONDS = 15 * 60;
+export const NIGHT_SHARE = 2 / 15;
+
+// Maps a progress through the cycle (0..1, starting at sunrise) to the sun's angle and the in-game
+// hour. The sun angle is 0 at sunrise, PI/2 at noon and PI at sunset, so the sun is above the
+// horizon exactly during the day, and below it for the 2-minute night.
+export function clockAt(progress) {
+  const half = NIGHT_SHARE / 2;
+  if (progress >= half && progress <= 1 - half) {
+    const d = (progress - half) / (1 - NIGHT_SHARE);
+    return { solarAngle: Math.PI * d, hours: 6 + 12 * d };
+  }
+  let into = progress - (1 - half);
+  if (into < 0) into += 1;
+  const k = into / NIGHT_SHARE;
+  return { solarAngle: Math.PI + Math.PI * k, hours: (18 + 12 * k) % 24 };
+}
+
 /** Drives a compressed day/night cycle and recurring coastal weather. */
 export class ClimateController {
   constructor(scene, lights, { mobile = false } = {}) {
     this.scene = scene; this.lights = lights; this.mobile = mobile;
     this.elapsed = 0;
-    // One 24-hour in-game cycle takes 15 real minutes. Start at sunrise: the first 7.5 minutes
-    // carry 06:00 through 18:00 daylight, then 7.5 minutes of night lead into the next sunrise.
-    this.dayProgress = .25;
+    // One 24-hour in-game cycle takes 15 real minutes: 13 of daylight (06:00-18:00) and 2 of night.
+    // Start at sunrise.
+    this.dayProgress = NIGHT_SHARE / 2;
     this.dayNumber = 1;
-    this.dayDuration = 15 * 60;
+    this.dayDuration = DAY_LENGTH_SECONDS;
     this.weatherIndex = -1;
     this.weather = { id: 'clear', label: 'COASTAL CLEAR', rain: 0, fog: FOG.clear, tint: new THREE.Color(0x6da9a2) };
     this.rain = this.createRain();
-    this.night = new THREE.Color(0x07141f);
+    this.night = new THREE.Color(0x1c3442);
     this.day = new THREE.Color(0x72aea7);
     this.dawn = new THREE.Color(0xeb8159);
     this.workingColor = new THREE.Color();
@@ -230,7 +250,7 @@ export class ClimateController {
     if (changed) this.setWeather(weatherIndex);
 
     // At 06:00 the sun rises; at 12:00 it reaches its highest point.
-    const solarAngle = this.dayProgress * Math.PI * 2 - Math.PI / 2;
+    const { solarAngle } = clockAt(this.dayProgress);
     const daylight = Math.max(0, Math.sin(solarAngle));
     const horizon = Math.max(0, 1 - Math.abs(Math.sin(solarAngle) * 2.4));
     const radius = 42;
@@ -243,9 +263,9 @@ export class ClimateController {
     // The HDR environment is the ambient term now, so the direct lights are much smaller than
     // they used to be. Pushing them back up on top of the sky is what washed the city out.
     this.lights.sun.intensity = .04 + daylight * 2.6;
-    this.lights.moon.intensity = .05 + (1 - daylight) * .35;
+    this.lights.moon.intensity = .05 + (1 - daylight) * .8;
     this.lights.moon.position.set(-Math.cos(solarAngle) * radius, -Math.sin(solarAngle) * radius, -18);
-    this.lights.sky.intensity = .10 + daylight * .30;
+    this.lights.sky.intensity = .25 + daylight * .30;
 
     this.workingColor.copy(this.night).lerp(this.day, daylight);
     if (horizon > .05) this.workingColor.lerp(this.dawn, horizon * .46);
@@ -291,7 +311,7 @@ export class ClimateController {
   }
 
   formatTime() {
-    const totalMinutes = Math.floor(this.dayProgress * 24 * 60);
+    const totalMinutes = Math.floor(clockAt(this.dayProgress).hours * 60);
     const hours = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
     const minutes = (totalMinutes % 60).toString().padStart(2, '0');
     return `DAY ${this.dayNumber.toString().padStart(2, '0')} // ${hours}:${minutes}`;

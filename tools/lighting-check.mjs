@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import * as THREE from 'three';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-import { ClimateController, FOG, HDR, setupEnvironment } from '../js/world/Environment.js';
+import { ClimateController, FOG, HDR, NIGHT_SHARE, setupEnvironment } from '../js/world/Environment.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const hdrPath = join(root, 'assets/textures/waterside_sky.hdr');
@@ -61,7 +61,9 @@ check('clear weather has the longest sight line', FOG.clear.far > FOG.rain.far &
   `clear ${FOG.clear.far}, rain ${FOG.rain.far}, harmattan ${FOG.haze.far}`);
 
 const climate = new ClimateController(scene, lights, { mobile: true });
-climate.dayProgress = 0.61;
+// The baked sky was authored for the sun at the old 0.61 progress, which was solar angle 2.2617 rad.
+// Progress maps to the sun angle through the daytime segment now, so find the progress for that angle.
+climate.dayProgress = NIGHT_SHARE / 2 + (2.2617 / Math.PI) * (1 - NIGHT_SHARE);
 const startWeather = climate.update(0, new THREE.Vector3());
 const lightDirection = lights.sun.position.clone().normalize();
 const skyDirection = climate.hdrReferenceSun.clone();
@@ -87,18 +89,23 @@ const cycle = new ClimateController(cycleScene, cycleLights, { mobile: true });
 const sunrise = cycle.update(0, new THREE.Vector3());
 check('one in-game day takes exactly 15 real minutes', cycle.dayDuration === 15 * 60,
   `${cycle.dayDuration / 60} minutes per 24-hour cycle`);
-check('the first half starts at sunrise (06:00)', sunrise.time === 'DAY 01 // 06:00'
-  && Math.abs(cycle.dayProgress - 0.25) < 1e-9, sunrise.time);
-cycle.update(225, new THREE.Vector3());
-check('the first half reaches full daylight at noon', cycle.formatTime() === 'DAY 01 // 12:00'
+check('the cycle starts at sunrise (06:00)', sunrise.time === 'DAY 01 // 06:00'
+  && Math.abs(cycle.dayProgress - NIGHT_SHARE / 2) < 1e-9, sunrise.time);
+cycle.update(390, new THREE.Vector3());
+check('6.5 minutes reach full daylight at noon', cycle.formatTime() === 'DAY 01 // 12:00'
   && cycleLights.sun.intensity > 2.5, `${cycle.formatTime()}, sun ${cycleLights.sun.intensity.toFixed(2)}`);
-cycle.update(225, new THREE.Vector3());
-check('7.5 minutes reaches sunset and night lighting', cycle.formatTime() === 'DAY 01 // 18:00'
-  && cycleLights.sun.intensity < 0.1 && cycleLights.moon.intensity > 0.35,
-  `${cycle.formatTime()}, sun ${cycleLights.sun.intensity.toFixed(2)}, moon ${cycleLights.moon.intensity.toFixed(2)}`);
-cycle.update(450, new THREE.Vector3());
-check('the next sunrise arrives at 15 minutes and advances the day', cycle.formatTime() === 'DAY 02 // 06:00'
-  && Math.abs(cycle.dayProgress - 0.25) < 1e-9, cycle.formatTime());
+cycle.update(390, new THREE.Vector3());
+check('13 minutes reach sunset (18:00)', cycle.formatTime() === 'DAY 01 // 18:00',
+  `${cycle.formatTime()}, sun ${cycleLights.sun.intensity.toFixed(2)}`);
+cycle.update(60, new THREE.Vector3());
+check('the night is lit: at 14 minutes the sun is down and the moon and sky carry the light',
+  cycleLights.sun.intensity < 0.1 && cycleLights.moon.intensity > 0.7 && cycleLights.sky.intensity > 0.2
+  && cycle.scene.environmentIntensity > HDR.night * 0.99,
+  `${cycle.formatTime()}, sun ${cycleLights.sun.intensity.toFixed(2)}, moon ${cycleLights.moon.intensity.toFixed(2)}, env ${cycle.scene.environmentIntensity.toFixed(2)}`);
+cycle.update(60, new THREE.Vector3());
+check('the night lasts only 2 minutes: the next sunrise arrives at 15 minutes and advances the day',
+  cycle.formatTime() === 'DAY 02 // 06:00' && Math.abs(cycle.dayProgress - NIGHT_SHARE / 2) < 1e-6,
+  cycle.formatTime());
 
 console.log();
 if (failures.length) {
