@@ -1,0 +1,851 @@
+import bpy
+from .. import hb_utils
+from .. import hb_project
+
+# =============================================================================
+# ROOM MANAGEMENT OPERATORS
+# =============================================================================
+
+class home_builder_OT_create_room(bpy.types.Operator):
+    bl_idname = "home_builder.create_room"
+    bl_label = "Create Room"
+    bl_description = "Create a new room scene"
+    bl_options = {'UNDO'}
+    
+    room_name: bpy.props.StringProperty(
+        name="Room Name",
+        description="Name for the new room",
+        default="Room"
+    )  # type: ignore
+    
+    def invoke(self, context, event):
+        # Generate default name based on existing rooms
+        existing_rooms = [s for s in bpy.data.scenes if s.get('IS_ROOM_SCENE')]
+        self.room_name = f"Room {len(existing_rooms) + 1}"
+        return context.window_manager.invoke_props_dialog(self)
+    
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "room_name")
+    
+    def execute(self, context):
+        # Store original scene settings
+        original_scene = context.scene
+        
+        # Store unit settings
+        unit_system = original_scene.unit_settings.system
+        unit_scale = original_scene.unit_settings.scale_length
+        unit_length = original_scene.unit_settings.length_unit
+        
+        # Store tool settings (snapping)
+        tool_settings = context.tool_settings
+        snap_elements = set(tool_settings.snap_elements)
+        use_snap = tool_settings.use_snap
+        snap_target = tool_settings.snap_target
+        use_snap_grid_absolute = tool_settings.use_snap_grid_absolute
+        use_snap_align_rotation = tool_settings.use_snap_align_rotation
+        use_snap_backface_culling = tool_settings.use_snap_backface_culling
+        
+        # Store the active product library so the new room keeps it
+        product_tab = original_scene.home_builder.product_tab
+
+        # Create new scene
+        new_scene = bpy.data.scenes.new(self.room_name)
+        new_scene['IS_ROOM_SCENE'] = True
+        new_scene.home_builder.product_tab = product_tab
+
+        # Carry the project-wide drawer standard into the new room: the
+        # face-frame Top Drawer Opening Height is kept uniform across
+        # rooms (its update callback syncs edits between existing
+        # scenes), so a room created AFTER the dealer changed it must
+        # seed from the live value rather than the property default.
+        try:
+            new_scene.hb_face_frame.top_drawer_opening_height = (
+                original_scene.hb_face_frame.top_drawer_opening_height)
+        except Exception:
+            pass
+        
+        # Save view state of original scene if it's a room
+        if hb_utils.is_room_scene(original_scene):
+            hb_utils.save_view_state(original_scene)
+        
+        # Switch to new scene
+        context.window.scene = new_scene
+        
+        # Copy unit settings
+        new_scene.unit_settings.system = unit_system
+        new_scene.unit_settings.scale_length = unit_scale
+        new_scene.unit_settings.length_unit = unit_length
+        
+        # Copy snap settings
+        new_tool_settings = context.tool_settings
+        new_tool_settings.snap_elements = snap_elements
+        new_tool_settings.use_snap = use_snap
+        new_tool_settings.snap_target = snap_target
+        new_tool_settings.use_snap_grid_absolute = use_snap_grid_absolute
+        new_tool_settings.use_snap_align_rotation = use_snap_align_rotation
+        new_tool_settings.use_snap_backface_culling = use_snap_backface_culling
+        
+        # A new room opens looking straight down. The plan is the first
+        # thing drawn in it and the empty scene has nothing to frame, so
+        # carrying over the previous room's angle and zoom is never
+        # useful. Save it as the room's view state so leaving and coming
+        # back lands on the plan again.
+        hb_utils.set_plan_view()
+        hb_utils.save_view_state(new_scene)
+
+        # Mark original scene as room if not already marked and not a layout
+        if not original_scene.get('IS_LAYOUT_VIEW') and not original_scene.get('IS_ROOM_SCENE'):
+            original_scene['IS_ROOM_SCENE'] = True
+        
+        self.report({'INFO'}, f"Created room: {self.room_name}")
+        return {'FINISHED'}
+
+
+class home_builder_OT_switch_room(bpy.types.Operator):
+    bl_idname = "home_builder.switch_room"
+    bl_label = "Switch Room"
+    bl_description = "Switch to a different room scene"
+    bl_options = {'UNDO'}
+    
+    scene_name: bpy.props.StringProperty(name="Scene Name")  # type: ignore
+    
+    def execute(self, context):
+        if self.scene_name in bpy.data.scenes:
+            # Save current view state if in a room scene
+            current_scene = context.scene
+            if hb_utils.is_room_scene(current_scene):
+                hb_utils.save_view_state(current_scene)
+            
+            # Switch to target scene
+            target_scene = bpy.data.scenes[self.scene_name]
+            context.window.scene = target_scene
+            
+            # Restore view state for the target room
+            if hb_utils.is_room_scene(target_scene):
+                hb_utils.restore_view_state(target_scene)
+            
+            self.report({'INFO'}, f"Switched to: {self.scene_name}")
+        else:
+            self.report({'WARNING'}, f"Scene not found: {self.scene_name}")
+        return {'FINISHED'}
+
+
+class home_builder_OT_delete_room(bpy.types.Operator):
+    bl_idname = "home_builder.delete_room"
+    bl_label = "Delete Room"
+    bl_description = "Delete a room scene"
+    bl_options = {'UNDO'}
+    
+    scene_name: bpy.props.StringProperty(name="Scene Name")  # type: ignore
+    
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+    
+    def execute(self, context):
+        if self.scene_name not in bpy.data.scenes:
+            self.report({'WARNING'}, f"Scene not found: {self.scene_name}")
+            return {'CANCELLED'}
+        
+        scene_to_delete = bpy.data.scenes[self.scene_name]
+        
+        # Don't allow deleting the last room
+        room_scenes = [s for s in bpy.data.scenes if s.get('IS_ROOM_SCENE') or (not s.get('IS_LAYOUT_VIEW'))]
+        if len(room_scenes) <= 1:
+            self.report({'WARNING'}, "Cannot delete the last room")
+            return {'CANCELLED'}
+        
+        # If deleting current scene, switch to another first
+        if context.scene == scene_to_delete:
+            for scene in bpy.data.scenes:
+                if scene != scene_to_delete and not scene.get('IS_LAYOUT_VIEW'):
+                    context.window.scene = scene
+                    break
+        
+        was_main = scene_to_delete.get('IS_MAIN_SCENE', False)
+        scene_name = scene_to_delete.name
+
+        # Project-level data lives on the main scene. Hand it off to the
+        # scene taking over as main BEFORE deleting, or it is lost with
+        # the scene.
+        if was_main:
+            candidates = [s for s in hb_project.get_room_scenes()
+                          if s != scene_to_delete]
+            if not candidates:
+                candidates = [s for s in bpy.data.scenes if s != scene_to_delete]
+            if candidates:
+                hb_project.migrate_project_data(scene_to_delete, candidates[0])
+                hb_project.set_main_scene(candidates[0])
+
+        bpy.data.scenes.remove(scene_to_delete)
+
+        # Re-tag a main scene if we just deleted it
+        if was_main:
+            hb_project.ensure_main_scene(context)
+        
+        self.report({'INFO'}, f"Deleted room: {scene_name}")
+        return {'FINISHED'}
+
+
+class home_builder_OT_rename_room(bpy.types.Operator):
+    bl_idname = "home_builder.rename_room"
+    bl_label = "Rename Room"
+    bl_description = "Rename a room"
+    bl_options = {'UNDO'}
+
+    scene_name: bpy.props.StringProperty(
+        name="Scene Name",
+        description="Room scene to rename; empty means the current scene",
+        default=""
+    )  # type: ignore
+
+    new_name: bpy.props.StringProperty(
+        name="New Name",
+        description="New name for the room"
+    )  # type: ignore
+
+    @classmethod
+    def poll(cls, context):
+        return not context.scene.get('IS_LAYOUT_VIEW')
+
+    def _target(self, context):
+        return bpy.data.scenes.get(self.scene_name) or context.scene
+
+    def invoke(self, context, event):
+        self.new_name = self._target(context).name
+        return context.window_manager.invoke_props_dialog(self)
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "new_name")
+
+    def execute(self, context):
+        target = self._target(context)
+        if target is None:
+            self.report({'WARNING'}, "Room scene not found")
+            return {'CANCELLED'}
+        if target.get('IS_LAYOUT_VIEW') or target.get('IS_DETAIL_VIEW'):
+            self.report({'WARNING'}, "Cannot rename a layout or detail view")
+            return {'CANCELLED'}
+        old_name = target.name
+        target.name = self.new_name
+        self.report({'INFO'}, f"Renamed '{old_name}' to '{self.new_name}'")
+        return {'FINISHED'}
+
+
+class home_builder_OT_duplicate_room(bpy.types.Operator):
+    bl_idname = "home_builder.duplicate_room"
+    bl_label = "Duplicate Room"
+    bl_description = "Duplicate the current room scene"
+    bl_options = {'UNDO'}
+    
+    new_name: bpy.props.StringProperty(
+        name="New Name",
+        description="Name for the duplicated room"
+    )  # type: ignore
+    
+    @classmethod
+    def poll(cls, context):
+        return not context.scene.get('IS_LAYOUT_VIEW')
+    
+    def invoke(self, context, event):
+        self.new_name = context.scene.name + " Copy"
+        return context.window_manager.invoke_props_dialog(self)
+    
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "new_name")
+    
+    def execute(self, context):
+        original_scene = context.scene
+        
+        # FULL_COPY makes a deep, single-user copy of every object and its
+        # data. A plain Scene.copy() only *links* the objects, so edits in the
+        # duplicate would silently mutate the source room.
+        if hb_utils.is_room_scene(original_scene):
+            hb_utils.save_view_state(original_scene)
+
+        before = set(bpy.data.scenes)
+        bpy.ops.scene.new(type='FULL_COPY')
+        new_scene = context.window.scene
+        if new_scene in before:
+            created = [s for s in bpy.data.scenes if s not in before]
+            if created:
+                new_scene = created[0]
+                context.window.scene = new_scene
+
+        new_scene.name = self.new_name
+
+        # Force the copy to be a plain room; never inherit source scene roles.
+        new_scene['IS_ROOM_SCENE'] = True
+        for flag in ('IS_MAIN_SCENE', 'IS_LAYOUT_VIEW',
+                     'IS_DETAIL_VIEW', 'IS_CROWN_DETAIL'):
+            if new_scene.get(flag) is not None:
+                del new_scene[flag]
+
+        # Fall back to the new scene name downstream instead of showing the
+        # source room's label.
+        new_scene.home_builder.room_name = ""
+
+        # Drop the duplicate at the end of the room list.
+        other_rooms = [s for s in bpy.data.scenes
+                       if s is not new_scene
+                       and not s.get('IS_LAYOUT_VIEW')
+                       and not s.get('IS_DETAIL_VIEW')]
+        orders = [s.home_builder.sort_order for s in other_rooms]
+        new_scene.home_builder.sort_order = (max(orders) + 1) if orders else 0
+
+        self.report({'INFO'}, f"Duplicated room as: {new_scene.name}")
+        return {'FINISHED'}
+
+
+class home_builder_OT_move_room_scene(bpy.types.Operator):
+    """Move room scene up or down in the list"""
+    bl_idname = "home_builder.move_room_scene"
+    bl_label = "Move Room Scene"
+    bl_description = "Move room scene up or down in the list"
+    bl_options = {'UNDO'}
+    
+    move_up: bpy.props.BoolProperty(name="Move Up") # type: ignore
+
+    def ensure_sort_orders_initialized(self, room_scenes):
+        """Make sure all scenes have unique sort_order values."""
+        orders = [s.home_builder.sort_order for s in room_scenes]
+        if len(set(orders)) != len(orders):
+            # Any duplicate makes a neighbor swap invisible (two equal
+            # values swap to the same list). Re-sequence in the currently
+            # displayed order (sort_order, then name -- matching the UI's
+            # stable sort) so normalizing never reshuffles the list.
+            displayed = sorted(room_scenes,
+                               key=lambda s: (s.home_builder.sort_order, s.name))
+            for i, scene in enumerate(displayed):
+                scene.home_builder.sort_order = i
+
+    def execute(self, context):
+        # Get room scenes (not layout or detail views)
+        room_scenes = [s for s in bpy.data.scenes 
+                      if not s.get('IS_LAYOUT_VIEW') and not s.get('IS_DETAIL_VIEW')]
+        
+        if len(room_scenes) < 2:
+            return {'CANCELLED'}
+        
+        # Ensure sort orders are initialized
+        self.ensure_sort_orders_initialized(room_scenes)
+        
+        # Sort by sort_order
+        room_scenes = sorted(room_scenes, key=lambda s: s.home_builder.sort_order)
+        
+        scene = context.scene
+        
+        # Check if current scene is a room scene
+        if scene not in room_scenes:
+            return {'CANCELLED'}
+        
+        idx = room_scenes.index(scene)
+        
+        # Check boundaries
+        if idx == 0 and self.move_up:
+            return {'CANCELLED'}
+        if idx == len(room_scenes) - 1 and not self.move_up:
+            return {'CANCELLED'}
+        
+        # Get neighbor scene
+        if self.move_up:
+            neighbor = room_scenes[idx - 1]
+        else:
+            neighbor = room_scenes[idx + 1]
+        
+        # Swap sort_order values
+        scene.home_builder.sort_order, neighbor.home_builder.sort_order = \
+            neighbor.home_builder.sort_order, scene.home_builder.sort_order
+        
+        return {'FINISHED'}
+
+
+
+
+# =============================================================================
+# ROOM LINKING
+# =============================================================================
+
+# Beyond the shared product roots, these also stand in a room in their
+# own right rather than as part of a wall or a cabinet.
+_EXTRA_PRODUCT_TAGS = (
+    'IS_FRAMELESS_PRODUCT_CAGE',
+    'IS_FACE_FRAME_PRODUCT_CAGE',
+    'IS_OBSTACLE',
+)
+
+
+def is_2d_annotation(obj):
+    """True for 2D drawing furniture -- dimensions, labels, elevation
+    fills.
+
+    These are created in the room scene and parented to the wall or the
+    cabinet they annotate, so they ride along with any walk of a room's
+    geometry. They belong to the drawings, not to the room, and a room
+    borrowing this one must never receive them: the borrower would draw
+    the source room's dimension lines and labels floating in 3D.
+    """
+    return bool(obj.get('IS_2D_ANNOTATION'))
+
+
+def _under_2d_annotation(obj):
+    """True for an annotation or anything hanging off one.
+
+    The walk that sorts a room skips an annotation's whole subtree, so
+    this is the matching test for objects already sorted into a
+    collection -- a leader line under a dimension carries no tag of its
+    own, and evicting the dimension while leaving its parts behind would
+    keep half the annotation in the room.
+    """
+    while obj is not None:
+        if is_2d_annotation(obj):
+            return True
+        obj = obj.parent
+    return False
+
+
+def organize_room_collections(scene):
+    """
+    Organize a room scene's objects into sub-collections by type.
+    Creates: '{SceneName} - Walls', '{SceneName} - Lights', '{SceneName} - Products'
+    Returns dict with keys 'walls', 'lights', 'products' mapping to collections.
+    """
+    name = scene.name
+    
+    # Collection names
+    col_names = {
+        'walls': f"{name} - Walls",
+        'lights': f"{name} - Lights",
+        'products': f"{name} - Products",
+    }
+    
+    # Create or get sub-collections
+    collections = {}
+    for key, col_name in col_names.items():
+        if col_name in bpy.data.collections:
+            collections[key] = bpy.data.collections[col_name]
+        else:
+            col = bpy.data.collections.new(col_name)
+            scene.collection.children.link(col)
+            collections[key] = col
+    
+    # Gather top-level objects by category
+    # We identify "root" objects and move them + all children
+    
+    wall_roots = set()
+    light_objects = set()
+    product_roots = set()
+    floor_objects = set()
+    
+    for obj in scene.objects:
+        if is_2d_annotation(obj):
+            continue
+        if obj.get('IS_WALL_BP'):
+            wall_roots.add(obj)
+        elif obj.get('IS_ROOM_LIGHT'):
+            light_objects.add(obj)
+        elif hb_utils.is_product_root(obj, _EXTRA_PRODUCT_TAGS):
+            product_roots.add(obj)
+        elif obj.get('IS_FLOOR_BP'):
+            floor_objects.add(obj)
+        elif obj.get('IS_ENTRY_DOOR_BP') or obj.get('IS_WINDOW_BP'):
+            # Doors/windows on walls - treat as wall category
+            wall_roots.add(obj)
+    
+    def get_all_children(obj, stop_at_products=False):
+        """Recursively get all children of an object.
+
+        ``stop_at_products`` cuts the walk where a placed product begins.
+        A cabinet is PARENTED to the wall it stands against, so a plain
+        walk of a wall's children swallows every cabinet on it -- which
+        is why switching a linked room's walls off used to take its
+        cabinets with them."""
+        children = set()
+        for child in obj.children:
+            if stop_at_products and hb_utils.is_product_root(
+                    child, _EXTRA_PRODUCT_TAGS):
+                continue
+            # A dimension hangs off the cabinet it measures, so the walk
+            # reaches it the same way it reaches a door. Skip the whole
+            # subtree: anything under an annotation is its own scaffolding
+            # (leader lines, elevation fills), not room geometry.
+            if is_2d_annotation(child):
+                continue
+            children.add(child)
+            children.update(get_all_children(child, stop_at_products))
+        return children
+    
+    def move_to_collection(objects, target_col):
+        """Move objects to target collection, removing from the others.
+
+        An object left linked in a category it no longer belongs to keeps
+        showing when that category is switched off; unlinking here also
+        repairs rooms organised before products were sorted correctly."""
+        managed = [c for c in collections.values() if c is not target_col]
+        for obj in objects:
+            for col in managed:
+                if obj.name in col.objects:
+                    col.objects.unlink(obj)
+            # Skip if already in target
+            if obj.name in target_col.objects:
+                continue
+            # Link to target
+            target_col.objects.link(obj)
+            # Unlink from scene collection (but not from other sub-collections)
+            if obj.name in scene.collection.objects:
+                scene.collection.objects.unlink(obj)
+    
+    # Move walls + their children (exclude GeoNodeCage objects)
+    # The walk stops at any product standing on the wall; those are
+    # gathered below into their own category.
+    wall_objects = set()
+    for root in wall_roots:
+        wall_objects.add(root)
+        wall_objects.update(get_all_children(root, stop_at_products=True))
+    wall_objects = {obj for obj in wall_objects if not obj.get('IS_GEONODE_CAGE')}
+    move_to_collection(wall_objects, collections['walls'])
+    
+    # Move lights
+    move_to_collection(light_objects, collections['lights'])
+    # Migrate lights from old-style "Room Lights" collection if it exists
+    for old_col_name in ["Room Lights", f"{name} - Lights"]:
+        if old_col_name in bpy.data.collections and old_col_name != col_names['lights']:
+            old_light_col = bpy.data.collections[old_col_name]
+            for obj in list(old_light_col.objects):
+                if obj not in light_objects:
+                    light_objects.add(obj)
+                    if obj.name not in collections['lights'].objects:
+                        collections['lights'].objects.link(obj)
+                if obj.name in old_light_col.objects:
+                    old_light_col.objects.unlink(obj)
+            # Remove old collection if empty
+            if len(old_light_col.objects) == 0:
+                if old_light_col.name in scene.collection.children:
+                    scene.collection.children.unlink(old_light_col)
+                bpy.data.collections.remove(old_light_col)
+    
+    # Move products + their children (cabinets, obstacles, floors)
+    # Exclude GeoNodeCage objects (invisible parametric control objects)
+    product_objects = set()
+    for root in product_roots:
+        product_objects.add(root)
+        product_objects.update(get_all_children(root))
+    for obj in floor_objects:
+        product_objects.add(obj)
+        product_objects.update(get_all_children(obj))
+    product_objects = {obj for obj in product_objects if not obj.get('IS_GEONODE_CAGE')}
+    move_to_collection(product_objects, collections['products'])
+
+    # Evict annotations sorted in by earlier versions. move_to_collection
+    # only unlinks what it is moving, so a room organised before the walk
+    # skipped them keeps its dimensions inside Products -- and a room
+    # borrowing that category still gets them. Relink to the scene BEFORE
+    # unlinking: a category collection is often an object's only link,
+    # and unlinking it first would drop the object out of the file.
+    for col in collections.values():
+        for obj in list(col.objects):
+            if not _under_2d_annotation(obj):
+                continue
+            if obj.name not in scene.collection.objects:
+                scene.collection.objects.link(obj)
+            col.objects.unlink(obj)
+
+    return collections
+
+
+LINKED_CATEGORY_MAP = {
+    'walls': ('LINKED_INCLUDE_WALLS', "Walls"),
+    'lights': ('LINKED_INCLUDE_LIGHTS', "Lights"),
+    'products': ('LINKED_INCLUDE_PRODUCTS', "Products"),
+}
+
+
+def _hide_link_collection(source_scene, link_col):
+    """A link collection is scaffolding for the rooms borrowing this one;
+    it should not draw a second copy of the room in the room itself."""
+    for view_layer in source_scene.view_layers:
+        for layer_col in view_layer.layer_collection.children:
+            if layer_col.name == link_col.name:
+                layer_col.exclude = True
+
+
+def refresh_linked_room(linked_obj):
+    """Re-sort the source room and bring the instance back in step.
+
+    Every object a product builds is linked to the scene's own root
+    collection (see hb_types), so a cabinet rebuilt after the room was
+    linked drops its new parts outside '<Room> - Products' -- the
+    borrowing room then shows the cabinet with pieces missing. Sorting
+    the room again picks up those parts, along with any product placed
+    since, and re-linking each category the instance is set to include
+    covers a sub-collection that went missing in between.
+
+    Returns (True, message) or (False, message).
+    """
+    room_name = linked_obj.get('LINKED_ROOM_SOURCE', '')
+    source_scene = bpy.data.scenes.get(room_name)
+    if source_scene is None:
+        return False, f"Source room '{room_name}' no longer exists"
+
+    sub_collections = organize_room_collections(source_scene)
+
+    link_col = linked_obj.instance_collection
+    if link_col is None:
+        link_col_name = f"{room_name} - Link"
+        link_col = bpy.data.collections.get(link_col_name)
+        if link_col is None:
+            link_col = bpy.data.collections.new(link_col_name)
+        linked_obj.instance_collection = link_col
+
+    if link_col.name not in source_scene.collection.children:
+        source_scene.collection.children.link(link_col)
+    _hide_link_collection(source_scene, link_col)
+
+    for cat_key, (prop_key, _label) in LINKED_CATEGORY_MAP.items():
+        sub_col = sub_collections[cat_key]
+        included = linked_obj.get(prop_key, True)
+        if included and sub_col.name not in link_col.children:
+            link_col.children.link(sub_col)
+        elif not included and sub_col.name in link_col.children:
+            link_col.children.unlink(sub_col)
+
+    return True, f"Refreshed '{room_name}'"
+
+
+class home_builder_OT_refresh_linked_rooms(bpy.types.Operator):
+    bl_idname = "home_builder.refresh_linked_rooms"
+    bl_label = "Refresh Linked Rooms"
+    bl_description = ("Bring the linked rooms up to date with any cabinets "
+                      "added or changed since they were linked")
+    bl_options = {'UNDO'}
+
+    object_name: bpy.props.StringProperty(
+        name="Object Name",
+        description="Linked room to refresh; empty refreshes every linked "
+                    "room in this scene",
+        default=""
+    )  # type: ignore
+
+    def execute(self, context):
+        if self.object_name:
+            obj = context.scene.objects.get(self.object_name)
+            targets = [obj] if obj and obj.get('IS_LINKED_ROOM') else []
+        else:
+            targets = [obj for obj in context.scene.objects
+                       if obj.get('IS_LINKED_ROOM')]
+
+        if not targets:
+            self.report({'WARNING'}, "No linked rooms in this room")
+            return {'CANCELLED'}
+
+        refreshed = 0
+        problems = []
+        for obj in targets:
+            ok, message = refresh_linked_room(obj)
+            if ok:
+                refreshed += 1
+            else:
+                problems.append(message)
+
+        context.view_layer.update()
+
+        for message in problems:
+            self.report({'WARNING'}, message)
+        if refreshed:
+            self.report({'INFO'}, f"Refreshed {refreshed} linked room(s)")
+        elif not problems:
+            self.report({'INFO'}, "Nothing to refresh")
+        return {'FINISHED'}
+
+
+class home_builder_OT_toggle_link_room(bpy.types.Operator):
+    bl_idname = "home_builder.toggle_link_room"
+    bl_label = "Toggle Link Room"
+    bl_description = "Link or unlink a room in the current scene"
+    bl_options = {'UNDO'}
+    
+    scene_name: bpy.props.StringProperty(name="Scene Name")  # type: ignore
+    
+    def execute(self, context):
+        source_scene = bpy.data.scenes.get(self.scene_name)
+        if not source_scene:
+            self.report({'WARNING'}, f"Scene '{self.scene_name}' not found")
+            return {'CANCELLED'}
+        
+        target_scene = context.scene
+        room_name = source_scene.name
+        
+        # Check if already linked — if so, unlink
+        for obj in target_scene.objects:
+            if obj.get('IS_LINKED_ROOM') and obj.get('LINKED_ROOM_SOURCE') == room_name:
+                bpy.ops.home_builder.unlink_room(object_name=obj.name)
+                return {'FINISHED'}
+        
+        # Not linked yet — link it
+        # Step 1: Organize source scene into sub-collections
+        sub_collections = organize_room_collections(source_scene)
+        
+        # Step 2: Create a link collection with all categories
+        link_col_name = f"{room_name} - Link"
+        
+        # Remove old link collection if it exists
+        if link_col_name in bpy.data.collections:
+            old_col = bpy.data.collections[link_col_name]
+            for child in list(old_col.children):
+                old_col.children.unlink(child)
+            bpy.data.collections.remove(old_col)
+        
+        link_col = bpy.data.collections.new(link_col_name)
+        
+        # Link all sub-collections by default
+        link_col.children.link(sub_collections['walls'])
+        link_col.children.link(sub_collections['lights'])
+        link_col.children.link(sub_collections['products'])
+        
+        # Link the link collection into the source scene
+        if link_col.name not in source_scene.collection.children:
+            source_scene.collection.children.link(link_col)
+        
+        # Hide the link collection in the source scene viewport
+        for layer_col in source_scene.view_layers[0].layer_collection.children:
+            if layer_col.name == link_col_name:
+                layer_col.exclude = True
+                break
+        
+        # Step 3: Create collection instance empty in the target scene
+        empty = bpy.data.objects.new(f"Linked: {room_name}", None)
+        empty.instance_type = 'COLLECTION'
+        empty.instance_collection = link_col
+        empty.empty_display_size = 0.5
+        empty.empty_display_type = 'PLAIN_AXES'
+        
+        # Mark with custom properties
+        empty['IS_LINKED_ROOM'] = True
+        empty['LINKED_ROOM_SOURCE'] = room_name
+        empty['LINKED_INCLUDE_WALLS'] = True
+        empty['LINKED_INCLUDE_LIGHTS'] = True
+        empty['LINKED_INCLUDE_PRODUCTS'] = True
+        
+        # Default display color (light gray with transparency)
+        empty.color = (0.5, 0.5, 0.5, 0.6)
+        
+        target_scene.collection.objects.link(empty)
+        
+        self.report({'INFO'}, f"Linked '{room_name}' into '{target_scene.name}'")
+        return {'FINISHED'}
+
+
+class home_builder_OT_toggle_linked_room_category(bpy.types.Operator):
+    bl_idname = "home_builder.toggle_linked_room_category"
+    bl_label = "Toggle Linked Category"
+    bl_description = "Toggle whether a category is included in the linked room"
+    bl_options = {'UNDO'}
+    
+    object_name: bpy.props.StringProperty(name="Object Name")  # type: ignore
+    category: bpy.props.StringProperty(name="Category")  # type: ignore
+    
+    def execute(self, context):
+        obj = context.scene.objects.get(self.object_name)
+        if not obj or not obj.get('IS_LINKED_ROOM'):
+            self.report({'WARNING'}, "Linked room not found")
+            return {'CANCELLED'}
+        
+        room_name = obj.get('LINKED_ROOM_SOURCE')
+        link_col = obj.instance_collection
+        if not link_col:
+            self.report({'WARNING'}, "Link collection not found")
+            return {'CANCELLED'}
+        
+        if self.category not in LINKED_CATEGORY_MAP:
+            return {'CANCELLED'}
+
+        prop_key, label = LINKED_CATEGORY_MAP[self.category]
+        col_name = f"{room_name} - {label}"
+        sub_col = bpy.data.collections.get(col_name)
+        if not sub_col:
+            self.report({'WARNING'}, f"Collection '{col_name}' not found")
+            return {'CANCELLED'}
+        
+        # Toggle
+        currently_included = obj.get(prop_key, True)
+        
+        if currently_included:
+            # Remove from link collection
+            if sub_col.name in link_col.children:
+                link_col.children.unlink(sub_col)
+            obj[prop_key] = False
+        else:
+            # Add to link collection
+            if sub_col.name not in link_col.children:
+                link_col.children.link(sub_col)
+            obj[prop_key] = True
+        
+        # Force viewport update
+        context.view_layer.update()
+        
+        return {'FINISHED'}
+
+
+class home_builder_OT_unlink_room(bpy.types.Operator):
+    bl_idname = "home_builder.unlink_room"
+    bl_label = "Unlink Room"
+    bl_description = "Remove a linked room from the current scene"
+    bl_options = {'UNDO'}
+    
+    object_name: bpy.props.StringProperty(name="Object Name")  # type: ignore
+    
+    def execute(self, context):
+        obj = context.scene.objects.get(self.object_name)
+        if not obj or not obj.get('IS_LINKED_ROOM'):
+            self.report({'WARNING'}, "Linked room not found")
+            return {'CANCELLED'}
+        
+        room_name = obj.get('LINKED_ROOM_SOURCE', 'Unknown')
+        
+        # Clean up the link collection
+        link_col = obj.instance_collection
+        if link_col:
+            # Unlink children (don't delete the sub-collections)
+            for child in list(link_col.children):
+                link_col.children.unlink(child)
+            
+            # Remove from source scene if linked there
+            source_scene = bpy.data.scenes.get(room_name)
+            if source_scene and link_col.name in source_scene.collection.children:
+                source_scene.collection.children.unlink(link_col)
+            
+            bpy.data.collections.remove(link_col)
+        
+        # Remove the empty
+        bpy.data.objects.remove(obj, do_unlink=True)
+        
+        self.report({'INFO'}, f"Unlinked '{room_name}'")
+        return {'FINISHED'}
+
+
+# =============================================================================
+# REGISTRATION
+# =============================================================================
+
+classes = (
+    home_builder_OT_create_room,
+    home_builder_OT_switch_room,
+    home_builder_OT_delete_room,
+    home_builder_OT_rename_room,
+    home_builder_OT_duplicate_room,
+    home_builder_OT_move_room_scene,
+    home_builder_OT_toggle_link_room,
+    home_builder_OT_toggle_linked_room_category,
+    home_builder_OT_refresh_linked_rooms,
+    home_builder_OT_unlink_room,
+)
+
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
+def unregister():
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)

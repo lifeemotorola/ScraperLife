@@ -1,0 +1,455 @@
+"""General-purpose operators for the addon (cross-library utilities)."""
+
+import bpy
+
+# The claim marker the hide / isolate commands stamp is shared with
+# the wall ones, so either Show All restores what the other hid.
+from .walls import ISOLATE_HIDDEN_TAG
+
+
+class HB_MT_call_menu_wrapper(bpy.types.Menu):
+    """Wrapper menu that forces INVOKE_DEFAULT on its contents.
+
+    Blender popup menus invoked via wm.call_menu run their items under an
+    EXEC_* operator context by default. Operators that rely on invoke()
+    (props dialogs, modal placement, search popups) silently no-op in that
+    context - execute() returns {'FINISHED'} without ever popping the UI.
+
+    Inlining the target menu via layout.menu_contents() lets us set the
+    layout's operator_context once on the wrapper. The inner menu's draw()
+    runs against our layout, so every layout.operator(...) call inside
+    inherits INVOKE_DEFAULT - no per-menu patching required.
+    """
+    bl_idname = "HB_MT_call_menu_wrapper"
+    bl_label = "HB Menu"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator_context = 'INVOKE_DEFAULT'
+        obj = context.object
+        if (obj and "MENU_ID" in obj and obj["MENU_ID"]
+                and hasattr(bpy.types, obj["MENU_ID"])):
+            layout.menu_contents(obj["MENU_ID"])
+
+
+class HB_GENERAL_OT_menu(bpy.types.Operator):
+    """Pops the context menu for the active HB5 asset.
+
+    Reads the ``MENU_ID`` custom property off the active object and pops a
+    wrapper menu that inlines that target. The wrapper exists to force an
+    INVOKE_DEFAULT operator context on the inner menu's items.
+
+    Falls back to Blender's default object context menu when no HB5 asset
+    is active so right-click is never dead.
+
+    Intended to be bound to RIGHTMOUSE (3D View > Object Mode) in the
+    user's keymap preferences.
+    """
+    bl_idname = "hb_general.menu"
+    bl_label = "HB Menu"
+    bl_description = "Open the context menu for the selected HB5 asset"
+    bl_options = {'UNDO'}
+
+    def invoke(self, context, event):
+        obj = context.object
+        menu_id = ""
+        if obj and "MENU_ID" in obj and obj["MENU_ID"]:
+            menu_id = obj["MENU_ID"]
+
+        if menu_id and hasattr(bpy.types, menu_id):
+            bpy.ops.wm.call_menu('INVOKE_DEFAULT',
+                                 name="HB_MT_call_menu_wrapper")
+        else:
+            # No HB5 menu on the active object - fall through to the
+            # native context menu so RMB still works on stock Blender
+            # objects, empties, etc.
+            bpy.ops.wm.call_menu('INVOKE_DEFAULT',
+                                 name="VIEW3D_MT_object_context_menu")
+
+        return {'FINISHED'}
+
+
+def _delete_selection(context):
+    """The objects a plain delete acts on: the selection, falling back to
+    the active object (a right-click makes an object active without
+    necessarily selecting it)."""
+    objs = list(context.selected_objects)
+    if not objs and context.object is not None:
+        objs = [context.object]
+    return objs
+
+
+def _remove_objects(objs):
+    """Delete objects outright rather than out of the current scene only.
+
+    ``bpy.ops.object.delete`` unlinks an object from the collections of the
+    ACTIVE SCENE and frees the datablock only when nothing else still
+    references it. A layout view links the real part objects into its own
+    content collections, and those hang off a collection instance rather
+    than sitting in a scene's tree, so that sweep never reaches them: the
+    part leaves the model, survives in bpy.data, and keeps drawing on the
+    sheet. It also keeps its parent, so the next content rebuild walks
+    ``children``, finds it, and links it straight back.
+
+    Removing the datablock takes it out of every collection at once --
+    what the cabinet, wall and sub-assembly deletes already do.
+    """
+    removed = 0
+    for obj in objs:
+        try:
+            bpy.data.objects.remove(obj, do_unlink=True)
+            removed += 1
+        except ReferenceError:
+            pass
+    return removed
+
+
+def _delete_object_subtree(obj):
+    """Remove ``obj`` and every descendant from bpy.data.
+
+    Used when deleting a face frame sub-assembly cage that has no dedicated
+    delete operator (an opening cage). Stock ``object.delete`` removes only the
+    selected objects, which orphans the cage's parts; removing the whole subtree
+    takes them with it.
+    """
+    for descendant in list(obj.children_recursive):
+        bpy.data.objects.remove(descendant, do_unlink=True)
+    bpy.data.objects.remove(obj, do_unlink=True)
+
+
+class HB_GENERAL_OT_delete(bpy.types.Operator):
+    """HB5-aware delete: routes to the correct delete operator for the
+    selected asset, falling back to Blender's object delete otherwise.
+
+    Stock ``object.delete`` removes only the selected objects, which leaves
+    orphaned children behind when the selection is an HB5 cage or part, and
+    never runs the cleanup an HB5 asset needs (wall miter recompute,
+    neighbor constraint removal, etc.). This operator classifies the active
+    object and dispatches:
+
+    - face frame cabinet  -> hb_face_frame.delete_cabinet
+    - closet starter      -> hb_closets.delete_starter
+    - closet bay cage     -> hb_closets.delete_bay
+    - closet opening cage -> hb_closets.clear_opening (openings are
+      structural in closets; the reconciler owns their lifecycle)
+    - closet part         -> hb_closets.delete_part (config-aware)
+    - frameless cabinet   -> hb_frameless.delete_cabinet
+    - frameless appliance -> hb_frameless.delete_appliance
+    - door / window       -> home_builder_doors_windows.delete_door_window
+    - wall                -> home_builder_walls.delete_wall
+    - anything else       -> object.delete
+
+    Each HB5 delete operator already sweeps ``selected_objects`` for its own
+    kind, so multi-select delete (several cabinets, several walls) works
+    without extra handling here - the active object only decides which kind
+    is targeted. Mixed selections delete the active object's kind only.
+
+    The cabinet, appliance, and door/window checks all run before the wall
+    check on purpose: those assets sit in the wall's parent chain (a door
+    or window BP is a direct child of the wall BP), so the wall test would
+    otherwise misfire and delete the whole wall instead of the asset on it.
+
+    Intended to be bound to the DEL key (3D View > Object Mode) in the
+    user's keymap preferences.
+    """
+    bl_idname = "hb_general.delete"
+    bl_label = "HB Delete"
+    bl_description = "Delete the selected HB5 asset and all of its parts"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        # Deferred imports: ops_general is imported before the product
+        # libraries during addon registration, so importing these at module
+        # scope would risk an early/circular import.
+        from .. import hb_utils
+        from ..product_libraries.face_frame import types_face_frame
+
+        obj = context.active_object
+
+        # A dimension / label (IS_2D_ANNOTATION) or an individual cabinet part
+        # (CABINET_PART / hb_part_role) is a SUB-object of a product, not the
+        # product itself. Deleting one must remove ONLY that object, never the
+        # cabinet it annotates or belongs to: find_cabinet_root() below walks
+        # up to the cage and would otherwise take the whole product down. The
+        # cabinet CAGE must be the active object to delete the entire product.
+        if obj is not None and (obj.get('IS_2D_ANNOTATION')
+                                or obj.get('CABINET_PART')
+                                or obj.get('hb_part_role')):
+            # Closet parts route through their config-aware delete
+            # (drawer/door/cubby counts decrement; rods take their
+            # hangers along). Parts it doesn't cover remove their
+            # subtree so children never orphan.
+            from ..product_libraries.closets import types_closets
+            if (obj.get('hb_part_role')
+                    and types_closets.find_starter_root(obj) is not None):
+                if bpy.ops.hb_closets.delete_part.poll():
+                    bpy.ops.hb_closets.delete_part()
+                else:
+                    _delete_object_subtree(obj)
+                return {'FINISHED'}
+            # Only the part-like objects in the selection: a cage caught
+            # up in a multi-select must not come down with them, which is
+            # the "mixed selections delete the active object's kind only"
+            # contract above -- and removing a cage object on its own
+            # would orphan its parts.
+            _remove_objects([o for o in _delete_selection(context)
+                             if (o.get('IS_2D_ANNOTATION')
+                                 or o.get('CABINET_PART')
+                                 or o.get('hb_part_role'))])
+            return {'FINISHED'}
+
+        # Face frame cabinet: ONLY the cage (the cabinet root) deletes the
+        # whole product. A descendant that resolves to a cabinet root but is not
+        # the root itself (an opening cage, a bay, ...) deletes only the selected
+        # object -- the cage must be the active object to take the product down.
+        ff_root = types_face_frame.find_cabinet_root(obj)
+        if ff_root is not None and ff_root is obj:
+            bpy.ops.hb_face_frame.delete_cabinet()
+            return {'FINISHED'}
+        if ff_root is not None:
+            # A sub-assembly of the cabinet (not the cage). Delete it AND its
+            # parts: a bare object.delete would orphan the children.
+            if obj.get('IS_FACE_FRAME_BAY_CAGE'):
+                # Proper bay removal: wipes the bay subtree (openings, fronts,
+                # pulls, interior) plus its mid-stile / mid-div pair and
+                # reindexes the rest. Refuses on the last remaining bay.
+                bpy.ops.hb_face_frame.delete_bay(
+                    bay_index=obj.get('hb_bay_index', 0))
+            else:
+                # Opening cage (or other sub-cage): no dedicated operator, so
+                # remove the cage and everything under it.
+                _delete_object_subtree(obj)
+            return {'FINISHED'}
+
+        # Closet hierarchy: the starter CAGE deletes the whole product;
+        # a bay cage deletes the bay; an opening cage clears its
+        # contents (opening cages are structural - the reconciler owns
+        # them); any other closet sub-object (hangers, molding) removes
+        # its own subtree. Must run BEFORE the wall check: a starter is
+        # a direct child of its wall, so the wall test would otherwise
+        # delete the whole wall.
+        from ..product_libraries.closets import types_closets
+        cl_root = types_closets.find_starter_root(obj)
+        if cl_root is not None:
+            if cl_root is obj:
+                bpy.ops.hb_closets.delete_starter()
+            elif obj.get(types_closets.TAG_BAY_CAGE):
+                bpy.ops.hb_closets.delete_bay()
+            elif obj.get(types_closets.TAG_OPENING_CAGE):
+                bpy.ops.hb_closets.clear_opening()
+            else:
+                _delete_object_subtree(obj)
+            return {'FINISHED'}
+
+        if hb_utils.get_cabinet_bp(obj) is not None:
+            bpy.ops.hb_frameless.delete_cabinet()
+        elif hb_utils.get_appliance_bp(obj) is not None:
+            bpy.ops.hb_frameless.delete_appliance()
+        elif obj and obj.get('IS_WINDOW_BP'):
+            bpy.ops.home_builder_doors_windows.delete_door_window(
+                object_type='WINDOW')
+        elif obj and obj.get('IS_ENTRY_DOOR_BP'):
+            bpy.ops.home_builder_doors_windows.delete_door_window(
+                object_type='DOOR')
+        elif obj and (obj.get('IS_WALL_BP')
+                      or (obj.parent and obj.parent.get('IS_WALL_BP'))):
+            bpy.ops.home_builder_walls.delete_wall()
+        else:
+            # Not an HB5 asset - delete with no confirm popup, matching
+            # DEL's default behavior (X keeps its own stock confirm binding).
+            _remove_objects(_delete_selection(context))
+
+        return {'FINISHED'}
+
+
+def _product_root(obj):
+    """The whole product the object belongs to, or the object itself.
+
+    Every library hangs its parts off a root, so hiding "the cabinet"
+    has to start there: a part's own hide leaves its siblings on screen,
+    which is what makes a half-hidden product look broken. Deliberately
+    generous -- an object that belongs to no library comes back
+    unchanged, so the caller can treat everything the same way.
+    """
+    if obj is None:
+        return None
+    from .. import hb_utils
+    from ..product_libraries.face_frame import types_face_frame
+    from ..product_libraries.closets import types_closets
+
+    # An applied / standalone panel is its own root, and find_cabinet_root
+    # already stops there rather than climbing into its host cabinet.
+    root = types_face_frame.find_cabinet_root(obj)
+    if root is not None:
+        return root
+    root = types_closets.find_starter_root(obj)
+    if root is not None:
+        return root
+    root = hb_utils.get_cabinet_bp(obj) or hb_utils.get_appliance_bp(obj)
+    if root is not None:
+        return root
+    cur = obj
+    while cur is not None:
+        if cur.get('IS_APPLIANCE') or cur.get('IS_WALL_BP'):
+            return cur
+        cur = cur.parent
+    return obj
+
+
+def _hide_object(obj):
+    """Hide one object and claim it, unless something already hid it.
+
+    Anything already out of sight is left alone and unclaimed: the
+    product logic keeps cutters, disabled partitions and construction
+    helpers hidden, and the user may have hidden things by hand. Show
+    All Hidden only restores what carries the claim.
+    """
+    try:
+        if obj.hide_get():
+            return False
+    except RuntimeError:
+        pass  # excluded from the view layer: the monitor flag decides
+    if obj.hide_viewport:
+        return False
+    _set_hidden(obj, True)
+    obj[ISOLATE_HIDDEN_TAG] = True
+    return True
+
+
+def _set_hidden(obj, hide):
+    obj.hide_viewport = hide
+    try:
+        obj.hide_set(hide)
+    except RuntimeError:
+        pass  # not in the active view layer
+
+
+class HB_GENERAL_OT_hide(bpy.types.Operator):
+    """Hide a whole product, or a single part of one, with Show All
+    Hidden to bring it back.
+
+    Blender's own hide takes the selected objects and nothing else,
+    which on an asset built from dozens of parented objects hides the
+    cage and leaves the doors, drawers and carcass standing. ``scope``
+    picks what a hide means:
+
+    - PRODUCT -> the product root each selection resolves to, plus
+      every object under it.
+    - OBJECT  -> exactly the selected objects, for studying one part.
+
+    With ``isolate`` the sense is inverted: everything else in the room
+    is hidden instead, leaving the chosen product or part on its own.
+    """
+    bl_idname = "hb_general.hide"
+    bl_label = "Hide"
+    bl_options = {'UNDO'}
+
+    scope: bpy.props.EnumProperty(
+        name="Scope",
+        items=[('PRODUCT', "Product",
+                "The whole product and all of its parts"),
+               ('OBJECT', "Object", "Only the selected objects")],
+        default='PRODUCT')  # type: ignore
+
+    isolate: bpy.props.BoolProperty(
+        name="Isolate",
+        description="Hide everything else instead",
+        default=False)  # type: ignore
+
+    @classmethod
+    def description(cls, context, properties):
+        noun = "product" if properties.scope == 'PRODUCT' else "part"
+        if properties.isolate:
+            return f"Hide everything except the selected {noun}"
+        if properties.scope == 'PRODUCT':
+            return "Hide the selected product and all of its parts"
+        return "Hide the selected part"
+
+    def _targets(self, context):
+        """The objects this run is about: the selection itself, or every
+        object under the products it belongs to."""
+        selected = list(context.selected_objects)
+        if not selected and context.active_object is not None:
+            selected = [context.active_object]
+        if self.scope == 'OBJECT':
+            return selected
+        roots = []
+        for obj in selected:
+            root = _product_root(obj)
+            if root is not None and root not in roots:
+                roots.append(root)
+        targets = []
+        for root in roots:
+            for obj in [root] + list(root.children_recursive):
+                if obj not in targets:
+                    targets.append(obj)
+        return targets
+
+    def execute(self, context):
+        targets = self._targets(context)
+        if not targets:
+            self.report({'WARNING'}, "Nothing selected")
+            return {'CANCELLED'}
+
+        count = 0
+        if self.isolate:
+            keep = set(targets)
+            for obj in context.scene.objects:
+                # Cameras and lights are not room content, and hiding
+                # them would blank the viewport.
+                if obj in keep or obj.type in {'CAMERA', 'LIGHT'}:
+                    continue
+                count += bool(_hide_object(obj))
+            self.report({'INFO'}, f"Isolated, hid {count} object(s)")
+            return {'FINISHED'}
+
+        for obj in targets:
+            count += bool(_hide_object(obj))
+        self.report({'INFO'}, f"{count} object(s) hidden")
+        return {'FINISHED'}
+
+
+class HB_GENERAL_OT_show_all_hidden(bpy.types.Operator):
+    """Show everything the hide and isolate commands hid.
+
+    Only claimed objects come back, so the parts the product logic keeps
+    hidden stay hidden and no rebuild is needed afterwards.
+    """
+    bl_idname = "hb_general.show_all_hidden"
+    bl_label = "Show All Hidden"
+    bl_description = ("Unhide everything hidden by the hide and isolate "
+                      "commands")
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        count = 0
+        for obj in context.scene.objects:
+            if not obj.get(ISOLATE_HIDDEN_TAG):
+                continue
+            _set_hidden(obj, False)
+            del obj[ISOLATE_HIDDEN_TAG]
+            count += 1
+        if count:
+            self.report({'INFO'}, f"Restored {count} hidden object(s)")
+        else:
+            self.report({'INFO'}, "No hidden objects found")
+        return {'FINISHED'}
+
+
+classes = (
+    HB_MT_call_menu_wrapper,
+    HB_GENERAL_OT_menu,
+    HB_GENERAL_OT_delete,
+    HB_GENERAL_OT_hide,
+    HB_GENERAL_OT_show_all_hidden,
+)
+
+
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
+
+def unregister():
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)

@@ -1,0 +1,3154 @@
+import bpy
+import math
+from mathutils import Vector, Matrix, Euler
+from . import hb_types
+from . import units
+
+# =============================================================================
+# PAPER SIZE DEFINITIONS
+# =============================================================================
+
+# Paper sizes in inches (width, height) - portrait orientation
+PAPER_SIZES = {
+    'LETTER': (8.5, 11.0),
+    'LEGAL': (8.5, 14.0),
+    'TABLOID': (11.0, 17.0),
+    'A4': (8.27, 11.69),
+    'A3': (11.69, 16.54),
+}
+
+# Default DPI for rendering
+DEFAULT_DPI = 150
+
+def get_paper_resolution(paper_size: str, landscape: bool = True, dpi: int = DEFAULT_DPI) -> tuple:
+    """Get pixel resolution for a paper size.
+    
+    Args:
+        paper_size: Paper size name (LETTER, LEGAL, TABLOID, A4, A3)
+        landscape: If True, swap width and height
+        dpi: Dots per inch for rendering
+    
+    Returns:
+        Tuple of (width_px, height_px)
+    """
+    if paper_size not in PAPER_SIZES:
+        paper_size = 'LETTER'
+    
+    width_in, height_in = PAPER_SIZES[paper_size]
+    
+    if landscape:
+        width_in, height_in = height_in, width_in
+    
+    return (int(width_in * dpi), int(height_in * dpi))
+
+def get_font(font_name='Calibri Regular'):
+    for font in bpy.data.fonts:
+        if font.name == font_name:
+            return font
+    return None
+
+
+# =============================================================================
+# LINE ENGINE (Freestyle vs Grease Pencil Line Art)
+# =============================================================================
+
+# Values for the addon preference and the per-scene stamp. Layout views are
+# stamped at creation so export code can tell how an existing scene draws its
+# lines regardless of what the preference currently says.
+LINE_ENGINE_FREESTYLE = 'FREESTYLE'
+LINE_ENGINE_LINEART = 'LINEART'
+# Semantic vector engine: the scene is set up exactly like a FREESTYLE
+# view (linesets, routing collections, render toggles), and only the
+# stamp differs so an export-time consumer can generate vector line work
+# from the model edges instead of using the Freestyle raster pass.
+LINE_ENGINE_SEMANTIC = 'SEMANTIC'
+LINE_ENGINE_PROP = 'HB_LINE_ENGINE'
+
+# Tag on the per-scene Grease Pencil object that carries the Line Art
+# modifiers, so lookups survive object renames.
+LINEART_OBJECT_TAG = 'IS_HB_LINEART'
+
+# Tag on the per-scene tilted camera the Line Art modifiers evaluate from.
+LINEART_CAMERA_TAG = 'IS_HB_LINEART_CAMERA'
+
+# A perfectly axis-aligned ortho camera makes many cabinet edges degenerate
+# for Line Art: adjacent faces sit exactly edge-on to the view and flush
+# parts project onto coincident image-space lines, so their feature edges
+# are dropped (e.g. door top rails losing their top line). Evaluating from
+# a camera tilted by a fraction of a degree breaks every such degeneracy;
+# strokes still lie on the real geometry, so the drawing is unaffected.
+LINEART_CAMERA_JITTER_DEG = 0.05
+
+# Freestyle rates every edge by quantitative invisibility (QI): the number
+# of surfaces between it and the camera, so QI 0 means nothing is in front
+# of it. The default visibility test demands QI 0 exactly, but coplanar or
+# zero-gap parts (a door, its stile and an applied panel sharing a plane;
+# two cabinet sides butted flush) make that count tie, and an edge that is
+# plainly visible comes back QI 1 and is dropped. Views whose depth
+# complexity is low enough to absorb the extra level accept a range
+# instead -- see LayoutView.solid_qi_end. Freestyle's own upper bound for
+# a QI range, used as the open end of the dashed pass.
+FREESTYLE_QI_MAX = 100
+
+# Paper-space line sizes in inches, converted to world units per drawing
+# scale by update_line_art_sizes. Chosen to match the Freestyle look
+# (solid 1.5px / dashed 1.0px at the 150dpi base).
+LINEART_SOLID_WIDTH_PAPER = 0.010
+LINEART_DASHED_WIDTH_PAPER = 0.0067
+# The dashed layer is resampled to this fixed point spacing because the
+# DASH modifier counts points, not distance -- Line Art emits straight
+# edges as 2-point strokes, which can never dash on their own.
+LINEART_SAMPLE_PAPER = 0.025
+LINEART_DASH_POINTS = 3
+LINEART_GAP_POINTS = 2
+
+# --- Marked-parts channel ------------------------------------------------
+# Face frame and front parts sit flush against their neighbours, which
+# leaves their feature edges in occlusion-tie territory: the level-0 solid
+# pass can lose them entirely (e.g. a tall cabinet's face frame top rail).
+# A third Line Art pass re-traces just these parts with a small occlusion
+# tolerance so their lines always survive, without turning the whole
+# drawing into an x-ray.
+LINEART_MARKED_TAG = 'IS_HB_LINEART_MARKED'
+LINEART_MARKED_SUFFIX = ' LA-Marked'
+# Substring match against part object names within each instanced content
+# collection. Doubling the fronts also pushes genuinely-hidden geometry
+# behind them past the marked occlusion range, keeping openings clean.
+LINEART_MARKED_PART_KEYWORDS = (
+    'Rail', 'Stile', 'Door (', 'Blind Panel', 'Drawer Front')
+# 0-2 covers flush-tie casualties (level 1) plus rails that sit behind two
+# coincident planes (level 2) while leaving anything behind a closed front
+# (level 4+ once the front is doubled) hidden.
+LINEART_MARKED_LEVEL_END = 2
+# Cell instance names that mark isometric views: 'Isometric*' (multi-view
+# corners) and 'Iso *' (island nine-view corners). The trailing space in
+# 'Iso ' keeps 'Island*' instances out.
+ISO_CELL_PREFIXES = ('Isometric', 'Iso ')
+# The isometric cells read badly with every GP pass (protruding door back
+# edges draw, flush joints produce grazing ties); they are drawn by the
+# Freestyle iso pass instead (setup_iso_freestyle), so the marked channel
+# applies to flat cells only.
+LINEART_MARKED_SKIP_PREFIXES = ISO_CELL_PREFIXES
+# The marked duplicates are lifted this far toward the camera. Coplanar
+# duplicates create occlusion ties that can stack past the marked range
+# (drawer front + door + frame + their copies share one plane at the
+# boundary lines); lifting breaks every tie while displacing the drawn
+# lines by exactly zero pixels in an orthographic view.
+LINEART_MARKED_LIFT = 0.001
+
+# Set on the GP object when its generated strokes have been baked into
+# editable strokes (bake_line_art_editable). Baked views keep their
+# modifiers disabled; regenerating the view returns to automatic tracing.
+LINEART_BAKED_PROP = 'HB_LINEART_BAKED'
+# Zero-opacity layer whose strokes mask (inverted) every other layer,
+# so line art can't draw through annotation text.
+LINEART_HOLDOUT_LAYER = 'Holdout'
+
+
+def get_default_line_engine():
+    """Line engine used for NEW layout views, from addon preferences."""
+    addon = bpy.context.preferences.addons.get(__package__)
+    if addon and hasattr(addon.preferences, 'line_engine'):
+        return addon.preferences.line_engine
+    return LINE_ENGINE_FREESTYLE
+
+
+def get_scene_line_engine(scene):
+    """Line engine an EXISTING layout scene was generated with."""
+    return scene.get(LINE_ENGINE_PROP, LINE_ENGINE_FREESTYLE)
+
+
+def get_line_art_object(scene):
+    """Return the scene's Line Art GP object, or None."""
+    for obj in scene.collection.all_objects:
+        if obj.get(LINEART_OBJECT_TAG):
+            return obj
+    return None
+
+
+def remove_line_art_from_scene(scene):
+    """Delete the scene's Line Art GP object (style pages, engine switch)."""
+    obj = get_line_art_object(scene)
+    if obj is None:
+        return
+    data = obj.data
+    bpy.data.objects.remove(obj)
+    if data is not None and data.users == 0:
+        bpy.data.grease_pencils.remove(data)
+
+
+def _ensure_lineart_camera(scene):
+    """Return the tilted camera Line Art evaluates from (see
+    LINEART_CAMERA_JITTER_DEG), creating or repairing it as needed.
+
+    The jitter camera shares the scene camera's data block (so ortho
+    scale and clipping always match) and is parented to it (so it
+    follows framing changes). Returns None until the scene camera
+    exists -- update_line_art_sizes retries on every scale/paper
+    recalculation, which runs after view cameras are created.
+    """
+    cam = scene.camera
+    if cam is None:
+        return None
+    for obj in scene.collection.all_objects:
+        if obj.get(LINEART_CAMERA_TAG):
+            if obj.parent == cam and obj.data == cam.data:
+                return obj
+            # Scene camera was rebuilt since this was created; replace it.
+            bpy.data.objects.remove(obj)
+            break
+    jitter = bpy.data.objects.new(f"{scene.name}_LineArt Camera", cam.data)
+    jitter[LINEART_CAMERA_TAG] = True
+    scene.collection.objects.link(jitter)
+    jitter.parent = cam
+    tilt = math.radians(LINEART_CAMERA_JITTER_DEG)
+    # Local X = pitch, local Y = yaw. (Local Z would be roll around the
+    # view axis, which changes nothing for degeneracy.)
+    jitter.rotation_euler = (tilt, tilt, 0.0)
+    # Never drawn or rendered; Line Art only reads its transform + data.
+    jitter.hide_render = True
+    jitter.hide_viewport = True
+    return jitter
+
+
+def set_line_art_visible(scene, visible):
+    """Show or hide a view's line art by toggling its modifiers' viewport
+    flag. Hiding skips the whole line art evaluation -- the lever when
+    tracing large views makes sheet annotating feel sluggish. Render
+    visibility (show_render) is left on, and the export path re-enables
+    the viewport flag around its OpenGL render, so hidden lines still
+    print. Baked (editable) views toggle their layers instead -- their
+    generating modifiers must stay off. No-op for Freestyle views.
+    """
+    gp_obj = get_line_art_object(scene)
+    if gp_obj is None:
+        return
+    baked = bool(gp_obj.get(LINEART_BAKED_PROP))
+    for mod in gp_obj.modifiers:
+        mod.show_viewport = visible and not baked
+    for layer in gp_obj.data.layers:
+        layer.hide = not visible
+
+
+def refresh_line_art(scene):
+    """Force the scene's Line Art strokes to recompute on next evaluation.
+
+    Line Art computes once and caches; a view scene that was built or
+    heavily edited programmatically can be left displaying strokes from a
+    mid-build state (missing edges, stub segments). A plain update tag is
+    not always enough to invalidate the cached result, so bounce the line
+    art modifiers' viewport flag -- a real property change that reliably
+    rebuilds both the strokes and their draw batches. Cheap no-op when
+    the scene has no line art object.
+    """
+    gp_obj = get_line_art_object(scene)
+    if gp_obj is None:
+        return
+    for mod in gp_obj.modifiers:
+        if mod.type == 'LINEART' and mod.show_viewport:
+            mod.show_viewport = False
+            mod.show_viewport = True
+    gp_obj.update_tag()
+
+
+def is_line_art_baked(scene):
+    """True when the view's line art was baked into editable strokes."""
+    gp_obj = get_line_art_object(scene)
+    return bool(gp_obj is not None and gp_obj.get(LINEART_BAKED_PROP))
+
+
+def _reset_layer_frame(layer, scene):
+    """Replace a layer's frames with one empty keyframe; return its drawing."""
+    for f in list(layer.frames):
+        try:
+            layer.frames.remove(f.frame_number)
+        except TypeError:
+            layer.frames.remove(f)
+    frame = layer.frames.new(scene.frame_current)
+    return frame.drawing
+
+
+def bake_line_art_editable(scene):
+    """Convert the view's generated line art into editable strokes.
+
+    Copies the fully evaluated strokes (occlusion, dash pattern --
+    everything) into the layers as real strokes and disables the
+    generating modifiers, so the lines can be edited, deleted, or added
+    to with the standard Grease Pencil edit tools. The trade: baked
+    lines no longer follow cabinet changes -- unbake_line_art (or
+    regenerating the view) returns to automatic tracing. Returns True
+    when strokes were baked.
+    """
+    gp_obj = get_line_art_object(scene)
+    if gp_obj is None:
+        return False
+
+    # The evaluated depsgraph belongs to the active window scene; make
+    # sure we snapshot THIS scene's evaluation even when called for a
+    # background scene.
+    window = getattr(bpy.context, "window", None)
+    original_scene = window.scene if window else None
+    if window and window.scene is not scene:
+        window.scene = scene
+    try:
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        depsgraph.update()
+        ob_eval = gp_obj.evaluated_get(depsgraph)
+
+        # Snapshot the evaluated strokes before touching the modifiers.
+        snapshot = {}
+        for layer in ob_eval.data.layers:
+            frame = layer.current_frame()
+            if frame is None:
+                continue
+            rows = []
+            for s in frame.drawing.strokes:
+                rows.append((
+                    [tuple(p.position) for p in s.points],
+                    [p.radius for p in s.points],
+                    [p.opacity for p in s.points],
+                    s.material_index,
+                    s.cyclic,
+                ))
+            snapshot[layer.name] = rows
+    finally:
+        if window and original_scene is not None and window.scene is not original_scene:
+            window.scene = original_scene
+    if not any(snapshot.values()):
+        return False
+
+    # Disable the whole generating stack. The resample + dash modifiers
+    # must go too: their effect is already in the snapshot, and leaving
+    # them live would re-dash the baked dashes.
+    for mod in gp_obj.modifiers:
+        mod.show_viewport = False
+        mod.show_render = False
+
+    for layer_name, rows in snapshot.items():
+        layer = gp_obj.data.layers.get(layer_name)
+        if layer is None:
+            continue
+        drawing = _reset_layer_frame(layer, scene)
+        if not rows:
+            continue
+        drawing.add_strokes([len(r[0]) for r in rows])
+        for si, (positions, radii, opacities, mat_idx, cyclic) in enumerate(rows):
+            stroke = drawing.strokes[si]
+            stroke.material_index = mat_idx
+            stroke.cyclic = cyclic
+            for pi, point in enumerate(stroke.points):
+                point.position = positions[pi]
+                point.radius = radii[pi]
+                point.opacity = opacities[pi]
+
+    gp_obj[LINEART_BAKED_PROP] = True
+    gp_obj.data.update_tag()
+    return True
+
+
+def unbake_line_art(scene):
+    """Discard baked/edited strokes and return to automatic tracing."""
+    gp_obj = get_line_art_object(scene)
+    if gp_obj is None:
+        return
+    for layer in gp_obj.data.layers:
+        _reset_layer_frame(layer, scene)
+        layer.hide = False
+    if LINEART_BAKED_PROP in gp_obj:
+        del gp_obj[LINEART_BAKED_PROP]
+    for mod in gp_obj.modifiers:
+        mod.show_viewport = True
+        mod.show_render = True
+    refresh_line_art(scene)
+
+
+def _ensure_lineart_layer(gp_data, scene, name):
+    """Get or create a keyframed GP layer for one line art pass.
+
+    Every pass gets its OWN target layer: multiple Line Art modifiers
+    writing into a shared layer can draw mis-batched strokes in the
+    viewport (lines appearing far from where the evaluated data puts
+    them) even though the underlying stroke data is correct.
+    """
+    layer = gp_data.layers.get(name)
+    if layer is None:
+        layer = gp_data.layers.new(name)
+        layer.use_lights = False
+    if not layer.frames:
+        layer.frames.new(scene.frame_current)
+    return layer
+
+
+def _get_lineart_material(name):
+    """Black stroke-only GP material, shared across layout scenes."""
+    mat = bpy.data.materials.get(name)
+    if mat is None:
+        mat = bpy.data.materials.new(name)
+    if not mat.grease_pencil:
+        bpy.data.materials.create_gpencil_data(mat)
+    gpm = mat.grease_pencil
+    gpm.show_stroke = True   # create_gpencil_data() defaults this OFF
+    gpm.show_fill = False
+    gpm.color = (0.0, 0.0, 0.0, 1.0)
+    return mat
+
+
+def setup_line_art_for_scene(scene, solid_collection, dashed_collection,
+                             ignore_collection):
+    """Create (or rebuild) the Grease Pencil Line Art object for a layout scene.
+
+    Mirrors the two Freestyle linesets: a Solid layer with the visible
+    edges of the SOLID collection and a Dashed layer with the hidden
+    (occlusion >= 1) edges of the DASHED collection. A collection-sourced
+    Line Art modifier still occludes against the whole scene, so the
+    lineset semantics carry over unchanged.
+    """
+    remove_line_art_from_scene(scene)
+
+    # Annotations (dims, text, title block) must neither emit nor occlude
+    # line art strokes.
+    if ignore_collection is not None:
+        ignore_collection.lineart_usage = 'EXCLUDE'
+
+    gp_data = bpy.data.grease_pencils.new(f"{scene.name}_LineArt")
+    gp_obj = bpy.data.objects.new(f"{scene.name}_LineArt", gp_data)
+    gp_obj[LINEART_OBJECT_TAG] = True
+    scene.collection.objects.link(gp_obj)
+
+    # Workbench solid shading in OBJECT color mode tints GP strokes by the
+    # object color, not the GP material, so the object itself must be black.
+    gp_obj.color = (0.0, 0.0, 0.0, 1.0)
+    # Hidden lines sit behind the geometry that hides them; draw the whole
+    # object in front so they aren't depth-culled in the viewport or the
+    # OpenGL export render.
+    gp_obj.show_in_front = True
+    # Generated output, not user content: keep it out of click/box selection
+    # so annotating a sheet can't grab it by accident. The layout sidebar
+    # exposes the toggle for the rare case where selecting it is useful.
+    gp_obj.hide_select = True
+
+    mat_solid = _get_lineart_material("HB_LineArt_Solid")
+    mat_dashed = _get_lineart_material("HB_LineArt_Dashed")
+    gp_data.materials.append(mat_solid)
+    gp_data.materials.append(mat_dashed)
+
+    # Line art writes into the layer's frame at the current frame; a layer
+    # with no keyframe silently produces nothing.
+    for layer_name in ("Solid", "Dashed"):
+        layer = gp_data.layers.new(layer_name)
+        layer.frames.new(scene.frame_current)
+        layer.use_lights = False
+
+    mod = gp_obj.modifiers.new("Lineart Solid", 'LINEART')
+    mod.source_type = 'COLLECTION'
+    mod.source_collection = solid_collection
+    mod.use_contour = True
+    mod.use_crease = True
+    mod.use_edge_mark = True
+    mod.use_intersection = False
+    mod.use_loose = False
+    mod.use_material = False
+    mod.use_object_instances = True
+    mod.use_multiple_levels = False
+    mod.level_start = 0
+    mod.target_layer = "Solid"
+    mod.target_material = mat_solid
+
+    mod = gp_obj.modifiers.new("Lineart Dashed", 'LINEART')
+    mod.source_type = 'COLLECTION'
+    mod.source_collection = dashed_collection
+    mod.use_contour = True
+    mod.use_crease = True
+    mod.use_edge_mark = True
+    mod.use_intersection = False
+    mod.use_loose = False
+    mod.use_material = False
+    mod.use_object_instances = True
+    # Occlusion >= 1: only edges hidden behind other geometry, the Line
+    # Art equivalent of the Freestyle lineset's visibility = 'HIDDEN'.
+    mod.use_multiple_levels = True
+    mod.level_start = 1
+    mod.level_end = 128
+    mod.target_layer = "Dashed"
+    mod.target_material = mat_dashed
+
+    mod = gp_obj.modifiers.new("Resample Dashed", 'GREASE_PENCIL_SIMPLIFY')
+    mod.mode = 'SAMPLE'
+    mod.material_filter = mat_dashed
+
+    mod = gp_obj.modifiers.new("Dash Hidden", 'GREASE_PENCIL_DASH')
+    mod.material_filter = mat_dashed
+    seg = mod.segments[0]  # a new DASH modifier ships with one segment
+    seg.dash = LINEART_DASH_POINTS
+    seg.gap = LINEART_GAP_POINTS
+
+    # Sizes + jitter camera. The camera usually doesn't exist yet at this
+    # point (views create it after create_scene); update_line_art_sizes
+    # runs again from every scale/paper recalculation and attaches it then.
+    update_line_art_sizes(scene)
+    return gp_obj
+
+
+def update_line_art_sizes(scene):
+    """Recompute world-space stroke sizes from the scene's drawing scale.
+
+    GP stroke radius is in world units (unlike Freestyle's pixel
+    thickness), so the paper-space constants are converted through
+    paper_to_world to keep printed line weight scale- and DPI-independent.
+    The per-scene hb_lineart_*_scale factors multiply the base sizes so
+    user tweaks survive drawing-scale changes.
+    """
+    gp_obj = get_line_art_object(scene)
+    if gp_obj is None:
+        return
+    scale_str = getattr(scene, 'hb_layout_scale', '') or '1/4"=1\''
+    solid_factor = getattr(scene, 'hb_lineart_solid_scale', 1.0)
+    dashed_factor = getattr(scene, 'hb_lineart_dashed_scale', 1.0)
+    dash_factor = getattr(scene, 'hb_lineart_dash_scale', 1.0)
+    # Deferred import: operators.layouts imports this module at load time.
+    from .operators.layouts import paper_to_world
+    try:
+        # The modifier's radius value ends up as the stroke's half-width
+        # (point radius = modifier radius / 2), so the paper-space WIDTH
+        # constants convert 1:1 -- do NOT halve them here. Under-width
+        # strokes fall below a pixel at the 150dpi base and whole lines
+        # wash out wherever they land across a pixel boundary.
+        solid_radius = paper_to_world(LINEART_SOLID_WIDTH_PAPER, scale_str) * solid_factor
+        dashed_radius = paper_to_world(LINEART_DASHED_WIDTH_PAPER, scale_str) * dashed_factor
+        sample_length = paper_to_world(LINEART_SAMPLE_PAPER, scale_str) * dash_factor
+    except Exception:
+        return
+    jitter = _ensure_lineart_camera(scene)
+    for mod in gp_obj.modifiers:
+        if mod.name in ("Lineart Solid", "Lineart Marked"):
+            mod.radius = solid_radius
+        elif mod.name == "Lineart Dashed":
+            mod.radius = dashed_radius
+        elif mod.name == "Resample Dashed":
+            mod.length = sample_length
+        if mod.type == 'LINEART' and jitter is not None:
+            mod.use_custom_camera = True
+            mod.source_camera = jitter
+
+
+_EMISSION_COPY_SUFFIX = " LAEmit"
+
+
+def _emission_copy(obj):
+    """Object-level copy of a part for a line art emission subset.
+
+    Line Art's collection filter matches by OBJECT: linking the original
+    part into a subset would make every instance of that part anywhere
+    in the scene emit for the subset's pass (e.g. marked-channel strokes
+    appearing in the iso cells). A copy has its own identity, so only
+    the subset's own instances emit. Mesh data and modifiers are shared.
+    """
+    copy = obj.copy()
+    copy.name = obj.name + _EMISSION_COPY_SUFFIX
+    copy.hide_select = True
+    return copy
+
+
+def _clear_emission_subset(subset):
+    """Empty an emission subset collection.
+
+    Our copies (marked by _EMISSION_COPY_SUFFIX) are owned by the subset
+    and get deleted; anything else (originals linked by older builds) is
+    only unlinked -- deleting those would destroy the view content.
+    """
+    for obj in list(subset.objects):
+        if obj.name.split('.')[0].endswith(_EMISSION_COPY_SUFFIX) or \
+                _EMISSION_COPY_SUFFIX in obj.name:
+            bpy.data.objects.remove(obj)
+        else:
+            subset.objects.unlink(obj)
+
+
+def _authored_world(obj):
+    """World matrix composed purely from authored channels (matrix_basis +
+    matrix_parent_inverse up the parent chain). Unlike matrix_world this is
+    never depsgraph-stale, so instances created earlier in the same operator
+    run read their real transform."""
+    m = obj.matrix_basis.copy()
+    o = obj
+    while o.parent is not None:
+        m = o.parent.matrix_basis @ o.matrix_parent_inverse @ m
+        o = o.parent
+    return m
+
+
+def build_line_art_marked_channel(scene):
+    """Create or rebuild the marked-parts Line Art channel for a layout view.
+
+    Links the face-frame / front parts of every instanced content
+    collection (matched by LINEART_MARKED_PART_KEYWORDS) into per-content
+    subset collections, instances those at each flat cell's transform,
+    and traces them with a third Line Art pass at occlusion
+    0..LINEART_MARKED_LEVEL_END so flush-joint edges can't be lost.
+
+    Call after the view's content instances exist (end of view
+    generation). Idempotent: clears and rebuilds the marked instances
+    every time. No-op for Freestyle views and scenes without a solid
+    collection.
+    """
+    gp_obj = get_line_art_object(scene)
+    if gp_obj is None:
+        return
+    solid_coll = bpy.data.collections.get(f"{scene.name}_Freestyle_Solid")
+    if solid_coll is None:
+        return
+
+    marked_coll = bpy.data.collections.get(f"{scene.name}_LineArt_Marked")
+    if marked_coll is None:
+        marked_coll = bpy.data.collections.new(f"{scene.name}_LineArt_Marked")
+    if marked_coll.name not in scene.collection.children:
+        scene.collection.children.link(marked_coll)
+
+    # Clear the previous build; only marked instance empties live here.
+    for obj in list(marked_coll.objects):
+        bpy.data.objects.remove(obj)
+
+    # Lift toward the camera (see LINEART_MARKED_LIFT). The camera looks
+    # along its local -Z, so toward-camera is its world +Z axis.
+    lift = Vector((0.0, 0.0, 0.0))
+    if scene.camera is not None:
+        toward_cam = scene.camera.matrix_world.to_quaternion() @ Vector((0.0, 0.0, 1.0))
+        lift = toward_cam.normalized() * LINEART_MARKED_LIFT
+
+    for inst in list(solid_coll.objects):
+        if inst.type != 'EMPTY' or inst.instance_type != 'COLLECTION':
+            continue
+        src = inst.instance_collection
+        if src is None or src.name.endswith(LINEART_MARKED_SUFFIX):
+            continue
+        if any(inst.name.startswith(p) for p in LINEART_MARKED_SKIP_PREFIXES):
+            continue
+
+        subset_name = src.name + LINEART_MARKED_SUFFIX
+        subset = bpy.data.collections.get(subset_name)
+        if subset is None:
+            subset = bpy.data.collections.new(subset_name)
+        _clear_emission_subset(subset)
+        for obj in list(src.all_objects):
+            if (obj.type == 'MESH'
+                    and any(k in obj.name for k in LINEART_MARKED_PART_KEYWORDS)):
+                subset.objects.link(_emission_copy(obj))
+        if len(subset.objects) == 0:
+            continue
+
+        empty = bpy.data.objects.new(inst.name + LINEART_MARKED_SUFFIX, None)
+        empty[LINEART_MARKED_TAG] = True
+        empty.instance_type = 'COLLECTION'
+        empty.instance_collection = subset
+        # Parent to the source instance so repositioning a cell carries its
+        # marked twin along. The local matrix bakes in the world-space lift;
+        # it is composed from authored channels (_authored_world) because
+        # inst.matrix_world is depsgraph-evaluated and still reads as the
+        # identity for instances created earlier in this same operator run
+        # (e.g. fresh per-cabinet split siblings).
+        src_world = _authored_world(inst)
+        empty.parent = inst
+        try:
+            empty.matrix_basis = (src_world.inverted()
+                                  @ Matrix.Translation(lift) @ src_world)
+        except ValueError:
+            pass  # degenerate (zero-scale) source: leave at identity
+        # Mirror the source instance's display colour: the marked twin is
+        # lifted toward the camera, so in OBJECT colour mode a default
+        # (white) twin would paint over any tint on the source instance.
+        empty.color = inst.color
+        empty.hide_select = True
+        marked_coll.objects.link(empty)
+
+    mod = gp_obj.modifiers.get("Lineart Marked")
+    if mod is None:
+        mod = gp_obj.modifiers.new("Lineart Marked", 'LINEART')
+        # Keep the dashed post-processing (resample + dash) at the end of
+        # the stack; line art modifier order among themselves is free.
+        names = [m.name for m in gp_obj.modifiers]
+        if "Resample Dashed" in names:
+            gp_obj.modifiers.move(names.index("Lineart Marked"),
+                                  names.index("Resample Dashed"))
+    mod.source_type = 'COLLECTION'
+    mod.source_collection = marked_coll
+    mod.use_contour = True
+    mod.use_crease = True
+    mod.use_edge_mark = True
+    mod.use_intersection = False
+    mod.use_loose = False
+    mod.use_material = False
+    mod.use_object_instances = True
+    mod.use_multiple_levels = True
+    mod.level_start = 0
+    mod.level_end = LINEART_MARKED_LEVEL_END
+    _ensure_lineart_layer(gp_obj.data, scene, "Marked")
+    mod.target_layer = "Marked"
+    mod.target_material = _get_lineart_material("HB_LineArt_Solid")
+    # A fresh Marked layer misses any text-holdout mask applied earlier.
+    _apply_holdout_masks(gp_obj)
+
+    # Radius + jitter camera for the (possibly new) modifier.
+    update_line_art_sizes(scene)
+
+
+def _apply_holdout_masks(gp_obj):
+    """Add the holdout layer as an inverted mask on every other layer.
+
+    GreasePencil v3 exposes no data API for creating layer masks, so this
+    goes through the layer_mask_add operator with a context override.
+    No-op until the holdout layer exists; safe to call repeatedly.
+    """
+    gp_data = gp_obj.data
+    if gp_data.layers.get(LINEART_HOLDOUT_LAYER) is None:
+        return
+    prev_active = gp_data.layers.active
+    for layer in gp_data.layers:
+        if layer.name == LINEART_HOLDOUT_LAYER:
+            continue
+        if layer.mask_layers.get(LINEART_HOLDOUT_LAYER) is None:
+            gp_data.layers.active = layer
+            try:
+                with bpy.context.temp_override(active_object=gp_obj,
+                                               object=gp_obj):
+                    bpy.ops.grease_pencil.layer_mask_add(
+                        name=LINEART_HOLDOUT_LAYER)
+            except Exception:
+                continue
+        mask = layer.mask_layers.get(LINEART_HOLDOUT_LAYER)
+        if mask is not None:
+            mask.invert = True
+            layer.use_masks = True
+    gp_data.layers.active = prev_active
+
+
+def build_line_art_text_holdouts(scene, rects):
+    """Keep line art strokes from drawing through annotation text.
+
+    rects: iterable of (center, x_dir, half_width, half_height) in world
+    space -- one per text label, x_dir a unit vector along the text's
+    reading direction. Each rect becomes a fat 2-point stroke on a
+    zero-opacity holdout layer, and every other layer masks against it
+    INVERTED, clipping strokes wherever text sits. The stroke endpoints
+    are inset by the radius so the round caps END at the rect's edges
+    rather than overshooting them -- coverage matches the rect along the
+    centerline, with rounded corners. The layer must be zero-opacity,
+    NOT hidden: a hidden layer stops masking. Idempotent -- rebuilds the
+    holdout strokes each call; an empty rects list clears them.
+    """
+    gp_obj = get_line_art_object(scene)
+    if gp_obj is None:
+        return
+    gp_data = gp_obj.data
+    layer = gp_data.layers.get(LINEART_HOLDOUT_LAYER)
+    if layer is None:
+        layer = gp_data.layers.new(LINEART_HOLDOUT_LAYER)
+        layer.use_lights = False
+    layer.opacity = 0.0
+    layer.hide = False
+    drawing = _reset_layer_frame(layer, scene)
+    specs = []
+    for center, x_dir, half_w, half_h in rects:
+        if half_w <= 0.0 or half_h <= 0.0:
+            continue
+        reach = max(half_w - half_h, 0.0)
+        specs.append((center - x_dir * reach,
+                      center + x_dir * reach, half_h))
+    if specs:
+        drawing.add_strokes([2] * len(specs))
+        for i, (p1, p2, radius) in enumerate(specs):
+            stroke = drawing.strokes[i]
+            stroke.material_index = 0
+            stroke.points[0].position = p1
+            stroke.points[1].position = p2
+            stroke.points[0].radius = radius
+            stroke.points[1].radius = radius
+        drawing.tag_positions_changed()
+    _apply_holdout_masks(gp_obj)
+
+
+def get_iso_freestyle_collections(scene):
+    """The iso-only routing collections the Freestyle iso pass selects by.
+
+    Returns (solid, dashed); entries are None until setup_iso_freestyle
+    has run on the scene.
+    """
+    return (bpy.data.collections.get(f"{scene.name}_Iso_Solid"),
+            bpy.data.collections.get(f"{scene.name}_Iso_Dashed"))
+
+
+def scene_uses_iso_freestyle(scene):
+    """True when this view draws its iso cells with a Freestyle pass.
+
+    The exporter's cue that the view is hybrid: the OpenGL render only
+    covers the GP flat-cell lines, so an F12 Freestyle render of the iso
+    cells has to be merged in.
+    """
+    if not scene.view_layers or not scene.view_layers[0].use_freestyle:
+        return False
+    solid, dashed = get_iso_freestyle_collections(scene)
+    return bool((solid is not None and len(solid.objects))
+                or (dashed is not None and len(dashed.objects)))
+
+
+def _remove_gp_iso_channel(scene, gp_obj):
+    """Strip the retired GP iso channel (plate / carcass emission passes)
+    from a view built before iso cells moved to the Freestyle pass.
+
+    Removes the two iso Line Art modifiers and their target layers, this
+    scene's plate / carcass instance collections, and any per-content
+    emission subsets no other view still instances. No-op on views that
+    never had the channel.
+    """
+    for name in ("Lineart Iso", "Lineart Iso Fronts"):
+        mod = gp_obj.modifiers.get(name)
+        if mod is not None:
+            gp_obj.modifiers.remove(mod)
+    for layer_name in ("Iso", "IsoFronts"):
+        layer = gp_obj.data.layers.get(layer_name)
+        if layer is not None:
+            gp_obj.data.layers.remove(layer)
+
+    subsets = set()
+    for suffix in ("_LineArt_IsoPlates", "_LineArt_IsoCarcass"):
+        coll = bpy.data.collections.get(scene.name + suffix)
+        if coll is None:
+            continue
+        for obj in list(coll.objects):
+            if obj.instance_collection is not None:
+                subsets.add(obj.instance_collection)
+            bpy.data.objects.remove(obj)
+        bpy.data.collections.remove(coll)
+
+    # Per-content subsets are shared between views of the same room;
+    # only dismantle the ones nothing else instances anymore.
+    for subset in subsets:
+        if any(o.instance_collection is subset for o in bpy.data.objects):
+            continue
+        for obj in list(subset.objects):
+            # Plates and emission copies are generated artifacts owned by
+            # the subset; anything else linked here is real view content.
+            if (" LA-IsoPlate" in obj.name
+                    or _EMISSION_COPY_SUFFIX in obj.name):
+                data = obj.data
+                bpy.data.objects.remove(obj)
+                if data is not None and data.users == 0:
+                    bpy.data.meshes.remove(data)
+            else:
+                subset.objects.unlink(obj)
+        bpy.data.collections.remove(subset)
+
+
+def setup_iso_freestyle(scene):
+    """Route a Line Art view's isometric cells through a Freestyle pass.
+
+    The GP channels read badly at the 3/4 angle: protruding fronts draw
+    their thickness edges and every flush joint contributes grazing-tie
+    lines that no modifier setting culls -- exactly the cases Freestyle's
+    view map resolves correctly. Views with iso cells therefore render
+    hybrid: Grease Pencil keeps drawing the flat cells (live in the
+    viewport), and the exporter merges in an F12 Freestyle render
+    restricted to the iso cells.
+
+    Scene-side setup, idempotent, call after view generation:
+
+    - Iso cell instances (ISO_CELL_PREFIXES) move from the SOLID /
+      DASHED routing collections into iso-only twins ({scene}_Iso_Solid
+      / {scene}_Iso_Dashed). The GP modifiers stop tracing them; they
+      keep rendering and occluding (Line Art occludes against the whole
+      scene regardless of its source collection).
+    - The view layer gets Freestyle linesets selecting by the iso
+      collections, styled like _setup_freestyle_linesets. The scene
+      master toggle (render.use_freestyle) stays off so a stray F12
+      costs nothing; the exporter flips it on around its iso pass.
+    - Replaces the retired GP iso channel; its leftovers are removed
+      when an older view is rebuilt.
+
+    No-op for pure Freestyle views (their linesets already cover the
+    whole page). Views without iso cells get their view-layer Freestyle
+    switched off, which is what marks them single-pass for the exporter.
+    """
+    gp_obj = get_line_art_object(scene)
+    if gp_obj is None:
+        return
+    solid_coll = bpy.data.collections.get(f"{scene.name}_Freestyle_Solid")
+    if solid_coll is None:
+        return
+
+    _remove_gp_iso_channel(scene, gp_obj)
+
+    def scene_child(name):
+        c = bpy.data.collections.get(name)
+        if c is None:
+            c = bpy.data.collections.new(name)
+        if c.name not in scene.collection.children:
+            scene.collection.children.link(c)
+        return c
+
+    iso_solid = scene_child(f"{scene.name}_Iso_Solid")
+    iso_dashed = scene_child(f"{scene.name}_Iso_Dashed")
+
+    dashed_coll = bpy.data.collections.get(f"{scene.name}_Freestyle_Dashed")
+    for coll, iso_coll in ((solid_coll, iso_solid),
+                           (dashed_coll, iso_dashed)):
+        if coll is None:
+            continue
+        for o in list(coll.objects):
+            if (o.type == 'EMPTY' and o.instance_type == 'COLLECTION'
+                    and any(o.name.startswith(p)
+                            for p in ISO_CELL_PREFIXES)):
+                if o.name not in iso_coll.objects:
+                    iso_coll.objects.link(o)
+                coll.objects.unlink(o)
+
+    # Views built with the retired GP iso channel parked their iso
+    # instances in a render-only collection; adopt those into the solid
+    # routing (the old channel had already merged solid and dashed).
+    old_home = bpy.data.collections.get(f"{scene.name}_LineArt_Iso")
+    if old_home is not None:
+        for o in list(old_home.objects):
+            if o.name not in iso_solid.objects:
+                iso_solid.objects.link(o)
+            old_home.objects.unlink(o)
+        bpy.data.collections.remove(old_home)
+
+    if not len(iso_solid.objects) and not len(iso_dashed.objects):
+        # No iso cells: single-pass view, no Freestyle needed.
+        for view_layer in scene.view_layers:
+            view_layer.use_freestyle = False
+        return
+
+    view_layer = scene.view_layers[0]
+    view_layer.use_freestyle = True
+    freestyle = view_layer.freestyle_settings
+    while len(freestyle.linesets) > 0:
+        freestyle.linesets.remove(freestyle.linesets[0])
+
+    solid_lineset = freestyle.linesets.new('Iso Solid')
+    solid_lineset.select_silhouette = True
+    solid_lineset.select_border = True
+    solid_lineset.select_crease = True
+    solid_lineset.select_edge_mark = True
+    solid_lineset.select_by_collection = True
+    solid_lineset.collection = iso_solid
+    solid_lineset.collection_negation = 'INCLUSIVE'
+    if solid_lineset.linestyle:
+        solid_lineset.linestyle.color = (0, 0, 0)
+        solid_lineset.linestyle.thickness = 1.5
+
+    dashed_lineset = freestyle.linesets.new('Iso Dashed')
+    dashed_lineset.select_silhouette = True
+    dashed_lineset.select_border = True
+    dashed_lineset.select_crease = True
+    dashed_lineset.select_edge_mark = True
+    dashed_lineset.select_by_collection = True
+    dashed_lineset.collection = iso_dashed
+    dashed_lineset.collection_negation = 'INCLUSIVE'
+    dashed_lineset.select_by_visibility = True
+    dashed_lineset.visibility = 'HIDDEN'
+    if dashed_lineset.linestyle:
+        dashed_lineset.linestyle.color = (0, 0, 0)
+        dashed_lineset.linestyle.thickness = 1.0
+        dashed_lineset.linestyle.use_dashed_line = True
+        dashed_lineset.linestyle.dash1 = 10
+        dashed_lineset.linestyle.gap1 = 5
+
+
+# =============================================================================
+# OBJECT CLASSIFICATION
+# =============================================================================
+
+# Cage containers and helper empties are organizational, not visible geometry,
+# and must be excluded from 2D layout views. Cages from every product library
+# carry IS_GEONODE_CAGE (set by the GeoNodeCage base in hb_types). Face frame
+# interior split nodes are plain empties with no geo modifier, so they are
+# matched separately.
+
+def is_cage_object(obj) -> bool:
+    """True if obj is a cage container that should be excluded from layout views."""
+    return bool(
+        obj.get('IS_GEONODE_CAGE') or
+        obj.get('IS_FACE_FRAME_SPLIT_NODE')
+    )
+
+
+def is_helper_object(obj) -> bool:
+    """True if obj should be left out of a layout view: a helper empty
+    (prompt / anchor object), geometry marked render-only, or a part
+    that has been deleted out of the model.
+
+    Render-only covers scene dressing that belongs in a rendering and
+    not on a drawing -- it is real geometry, so nothing else skips it,
+    but every view walk goes through here and this is the one place
+    that decides what a drawing is made of.
+
+    The deleted-part clause is what keeps a stale part off a drawing.
+    bpy.ops.object.delete only unlinks an object from the active scene's
+    collections, and leaves the datablock alive whenever something else
+    still holds a reference -- a view's content collections do, because
+    they link the real part objects and hang off a collection instance
+    rather than a scene. The part also keeps its parent, so a content
+    rebuild walking children finds it and links it back on every sync.
+    A live part always belongs to the scene it was built in; one that
+    belongs to no scene at all has been deleted, so drop it. Scoped to
+    tagged parts on purpose: annotations legitimately live outside the
+    model scene, in their own page's collections.
+    """
+    if obj.get('obj_x') or obj.get('IS_RENDER_ONLY'):
+        return True
+    if 'Overlay Prompt Obj' in obj.name:
+        return True
+    if ((obj.get('CABINET_PART') or obj.get('hb_part_role'))
+            and not obj.users_scene):
+        return True
+    return False
+
+
+# Product dropped on the FAR face of a wall is parented with a 180 degree Z
+# rotation (see the front/back hysteresis in the placement operators), so a
+# layout built from the wall's own frame ends up looking at the blank side of
+# the wall. These two helpers give layout code the frame to draw FROM.
+
+WALL_PRODUCT_CAGE_KEYS = (
+    'IS_FRAMELESS_CABINET_CAGE',
+    'IS_FACE_FRAME_CABINET_CAGE',
+    'IS_FRAMELESS_PRODUCT_CAGE',
+    'IS_FACE_FRAME_PRODUCT_CAGE',
+    'IS_CLOSET_STARTER_CAGE',
+)
+
+
+def wall_content_is_back_side(wall_obj) -> bool:
+    """True when every product on wall_obj sits on the wall's back face.
+
+    Reported only when the wall agrees with itself: a wall carrying product
+    on both faces keeps its own frame, since one view cannot face both.
+    """
+    front = back = 0
+    for child in wall_obj.children:
+        if not any(child.get(key) for key in WALL_PRODUCT_CAGE_KEYS):
+            continue
+        if abs(abs(child.rotation_euler.z) - math.pi) < 0.1:
+            back += 1
+        else:
+            front += 1
+    return back > 0 and front == 0
+
+
+def wall_view_frame(wall_obj, wall_length: float, wall_thickness: float):
+    """Matrix of the frame a wall's 2D views should be built in.
+
+    Normally the wall's own matrix_world. For a wall whose product is all on
+    the back face the frame is spun end-for-end, so that x still runs
+    0..length left-to-right as the camera sees it, y = 0 is the face the
+    product hangs on and -y is the viewing side. That is the same contract
+    front-facing walls already satisfy, so callers need no other change.
+    """
+    frame = wall_obj.matrix_world.copy()
+    if wall_content_is_back_side(wall_obj):
+        frame = frame @ (
+            Matrix.Translation(Vector((wall_length, wall_thickness, 0.0)))
+            @ Matrix.Rotation(math.pi, 4, 'Z'))
+    return frame
+
+
+# =============================================================================
+# TITLE BLOCK
+# =============================================================================
+
+class TitleBlock:
+    """Title block for layout views - vertical strip on left edge.
+    
+    Camera-parented coordinate system:
+    - X = left/right
+    - Y = up/down
+    - Z = distance from camera (use -1)
+    """
+    
+    obj: bpy.types.Object = None
+    text_objects: list = None
+    
+    def __init__(self, obj=None):
+        self.obj = obj
+        self.text_objects = []
+    
+    def create(self, scene: bpy.types.Scene, camera: bpy.types.Object):
+        """Create a title block on the left edge of the view."""
+        
+        # Get camera ortho scale
+        ortho_scale = camera.data.ortho_scale
+        
+        # Set camera scale to match ortho_scale - this allows using normalized 
+        # coordinates (-0.5 to 0.5) for objects parented to the camera
+        camera.scale = (ortho_scale, ortho_scale, ortho_scale)
+        
+        # Use render resolution to get correct aspect ratio
+        res_x = scene.render.resolution_x
+        res_y = scene.render.resolution_y
+        aspect_ratio = res_x / res_y
+        
+        # Get the Freestyle Ignore collection for this scene
+        ignore_collection = bpy.data.collections.get(f"{scene.name}_Freestyle_Ignore")
+        
+        # Create title block border that fits the bounds of the camera.
+        # All text and other title block elements will be parented to this object.
+        #
+        # With camera.scale = ortho_scale, we use normalized coordinates:
+        # - Width (X): -0.5 to 0.5 (total = 1.0)        
+        # - Height (Y): -aspect_ratio/2 to aspect_ratio/2 (total = aspect_ratio)
+        #
+        # GeoNodeRectangle draws from bottom-left corner, so:
+        # - Location = bottom-left corner of camera view
+        # - Dim X = full width = aspect_ratio
+        # - Dim Y = full height = 1.0
+        
+        border = hb_types.GeoNodeRectangle()
+        border.create(f"{scene.name}_TitleBlock_Boarder")
+        border.obj['IS_TITLE_BLOCK_BOARDER'] = True
+        border.obj.parent = camera
+        border.obj.location = (-.5, -.5/aspect_ratio, -0.1)
+        border.obj.scale = (1, 1, 1)
+        border.obj.rotation_euler = (0, 0, 0)
+        border.set_input("Dim X", 1.0)
+        border.set_input("Dim Y", 1.0 / aspect_ratio)
+        self.obj = border.obj
+
+        # This object stays as the title-block PARENT ANCHOR: its
+        # normalized local frame positions the host add-on's view-name field,
+        # legend blocks, detail stacks and style columns. But the visible
+        # rectangle is unwanted on shop drawings (and was mis-positioning
+        # on some views), so hide it from render + viewport. Children are
+        # unaffected -- hide_render/hide_viewport do not propagate to them.
+        border.obj.hide_render = True
+        border.obj.hide_viewport = True
+        
+        # Add to Freestyle Ignore collection
+        if ignore_collection and border.obj.name not in ignore_collection.objects:
+            ignore_collection.objects.link(border.obj)
+
+        dim_x = border.var_input("Dim X", "dim_x")
+        dim_y = border.var_input("Dim Y", "dim_y")
+
+        # left_rect = hb_types.GeoNodeRectangle()
+        # left_rect.create(f"{scene.name}_TitleBlock_Rectangle")
+        # left_rect.obj.parent = border.obj
+        # left_rect.obj.location = (.005, .005, 0)
+        # left_rect.obj.scale = (1, 1, 1)
+        # left_rect.obj.rotation_euler = (0, 0, 0)
+        # left_rect.set_input("Dim X", units.inch(2.75))
+        # left_rect.driver_input("Dim Y", "dim_y-.01", [dim_y])
+        
+        # Add to Freestyle Ignore collection
+        # if ignore_collection and left_rect.obj.name not in ignore_collection.objects:
+        #     ignore_collection.objects.link(left_rect.obj)
+
+        text_x = units.inch(.25)
+
+        text_objs = []
+        text_objs.append(self._add_text_field(scene, self.obj, "Project Name", "PROJECT NAME: <Project Name>", (text_x, units.inch(1.5), 0)))
+        text_objs.append(self._add_text_field(scene, self.obj, "Designer Name", "DESIGNER NAME: <Designer Name>", (text_x, units.inch(1), 0)))
+        text_objs.append(self._add_text_field(scene, self.obj, "Scale", "SCALE: <Scale>", (text_x, units.inch(.5), 0)))
+        text_objs.append(self._add_text_field(scene, self.obj, "Page Number", "PAGE 1 OF 12", (text_x, units.inch(0), 0)))
+        
+        # Add text to Freestyle Ignore collection
+        for text_obj in text_objs:
+            if ignore_collection and text_obj and text_obj.name not in ignore_collection.objects:
+                ignore_collection.objects.link(text_obj)
+
+        return self.obj
+    
+    def _add_text_field(self, scene, parent, field_name, text, location, size=0.015):
+        """Add a text object to the title block, rotated 90 degrees for vertical reading."""
+        text_curve = bpy.data.curves.new(f"{scene.name}_{field_name}", 'FONT')
+        text_curve.body = text
+        
+        text_curve.size = size
+        text_curve.align_x = 'CENTER'
+        text_curve.align_y = 'TOP'
+        
+        text_obj = bpy.data.objects.new(f"{scene.name}_{field_name}", text_curve)
+        
+        # Parent to camera
+        text_obj.parent = parent
+        text_obj.location = location
+        text_obj.color = (0,0,0,1)
+        # Rotate 90 degrees CCW around Z so text reads bottom-to-top
+        text_obj.rotation_euler = (0, 0, 0)
+        text_obj.data.font = get_font()
+        text_obj.data.align_x = 'LEFT'
+        text_obj.data.align_y = 'BOTTOM'
+        
+        # Black material
+        mat = bpy.data.materials.new(f"{scene.name}_{field_name}_Mat")
+        mat.use_nodes = True
+        bsdf = mat.node_tree.nodes.get("Principled BSDF")
+        if bsdf:
+            bsdf.inputs["Base Color"].default_value = (0, 0, 0, 1)
+        text_obj.data.materials.append(mat)
+
+        self.text_objects.append(text_obj)
+        return text_obj
+    
+    def update(self, scene: bpy.types.Scene):
+        """Update title block text from scene properties."""
+        for obj in self.text_objects:
+            if 'view_name' in obj.name:
+                obj.data.body = scene.name
+            elif 'scale' in obj.name:
+                scale_text = scene.hb_layout_scale if hasattr(scene, 'hb_layout_scale') else '1/4"=1\''
+                obj.data.body = f"Scale: {scale_text}"
+
+
+class LayoutView:
+    """Base class for 2D layout views."""
+    
+    scene: bpy.types.Scene = None
+    camera: bpy.types.Object = None
+    paper_size: str = 'LETTER'
+    landscape: bool = True
+    dpi: int = DEFAULT_DPI
+    # Highest QI level the Solid pass still draws (see FREESTYLE_QI_MAX).
+    # None keeps Freestyle's strict "visible only" test. Subclasses widen
+    # this only where a deeper level cannot mean "genuinely behind
+    # something": on an elevation or a 3D view a QI of 1 is usually an
+    # interior part reading through its own front, so those stay strict.
+    solid_qi_end: int = None
+
+    def __init__(self, scene=None):
+        if scene:
+            self.scene = scene
+            # Find camera in scene
+            for obj in scene.objects:
+                if obj.type == 'CAMERA':
+                    self.camera = obj
+                    break
+            # Restore paper settings from scene
+            self.paper_size = scene.get('PAPER_SIZE', 'LETTER')
+            self.landscape = scene.get('PAPER_LANDSCAPE', True)
+            self.dpi = scene.get('PAPER_DPI', DEFAULT_DPI)
+    
+    @staticmethod
+    def get_all_layout_views():
+        """Return all scenes tagged as layout views."""
+        views = []
+        for scene in bpy.data.scenes:
+            if scene.get('IS_LAYOUT_VIEW'):
+                views.append(scene)
+        return views
+    
+    def create_scene(self, name: str) -> bpy.types.Scene:
+        """Create a new scene for the layout view."""
+        # Store original scene's units and tool settings before creating new scene
+        original_scene = bpy.context.scene
+        
+        # Store unit settings
+        unit_system = original_scene.unit_settings.system
+        unit_scale = original_scene.unit_settings.scale_length
+        unit_length = original_scene.unit_settings.length_unit
+        
+        # Store tool settings (snapping)
+        tool_settings = bpy.context.tool_settings
+        snap_elements = set(tool_settings.snap_elements)  # Copy as set
+        use_snap = tool_settings.use_snap
+        snap_target = tool_settings.snap_target
+        use_snap_grid_absolute = tool_settings.use_snap_grid_absolute
+        use_snap_align_rotation = tool_settings.use_snap_align_rotation
+        use_snap_backface_culling = tool_settings.use_snap_backface_culling
+        snap_elements_individual = set(tool_settings.snap_elements_individual) if hasattr(tool_settings, 'snap_elements_individual') else set()
+        
+        # Create new scene
+        self.scene = bpy.data.scenes.new(name)
+        self.scene['IS_LAYOUT_VIEW'] = True
+        bpy.context.window.scene = self.scene
+        
+        # Copy unit settings to new scene
+        self.scene.unit_settings.system = unit_system
+        self.scene.unit_settings.scale_length = unit_scale
+        self.scene.unit_settings.length_unit = unit_length
+
+        # Inherit the active product library (Face Frame / Frameless /
+        # Closet) from the source scene. 
+        _src_hb = getattr(original_scene, "home_builder", None)
+        _new_hb = getattr(self.scene, "home_builder", None)
+        if _src_hb is not None and _new_hb is not None:
+            _new_hb.product_tab = _src_hb.product_tab
+        
+        # Copy snap settings (these are per-context tool settings)
+        new_tool_settings = bpy.context.tool_settings
+        new_tool_settings.snap_elements = snap_elements
+        new_tool_settings.use_snap = use_snap
+        new_tool_settings.snap_target = snap_target
+        new_tool_settings.use_snap_grid_absolute = use_snap_grid_absolute
+        new_tool_settings.use_snap_align_rotation = use_snap_align_rotation
+        new_tool_settings.use_snap_backface_culling = use_snap_backface_culling
+        if hasattr(new_tool_settings, 'snap_elements_individual'):
+            new_tool_settings.snap_elements_individual = snap_elements_individual
+        
+        # Set up render settings for layout views
+        self._setup_render_settings()
+        
+        return self.scene
+    
+    def _setup_render_settings(self):
+        """Configure render settings for 2D layout output."""
+        if not self.scene:
+            return
+        
+        # Use Workbench render engine
+        self.scene.render.engine = 'BLENDER_WORKBENCH'
+        
+        # Set render samples to 32
+        self.scene.display.render_aa = '32'
+        
+        # Set shading color type to Object
+        self.scene.display.shading.color_type = 'OBJECT'
+        self.scene.display.shading.light = 'FLAT'
+        
+        # Set shading to solid
+        self.scene.display.shading.type = 'SOLID'
+
+        # Create the SOLID / DASHED / IGNORE routing collections. Both line
+        # engines share them: Freestyle selects linesets by collection and
+        # Line Art sources its modifiers from the same collections.
+        self._create_freestyle_collections()
+
+        if get_default_line_engine() == LINE_ENGINE_LINEART:
+            # Grease Pencil Line Art draws the lines. Freestyle starts
+            # fully off; setup_iso_freestyle re-enables the view layer
+            # (never the scene master) for views with iso cells, whose
+            # lines come from an export-time Freestyle pass instead.
+            self.scene.render.use_freestyle = False
+            for view_layer in self.scene.view_layers:
+                view_layer.use_freestyle = False
+            self._setup_lineart()
+            self.scene[LINE_ENGINE_PROP] = LINE_ENGINE_LINEART
+        else:
+            # Enable Freestyle
+            self.scene.render.use_freestyle = True
+
+            # Set up Freestyle line sets
+            self._setup_freestyle_linesets()
+            # SEMANTIC views keep the full Freestyle setup and differ only
+            # by their stamp, which exporters read to branch to vector
+            # line generation once a consumer supports the view type.
+            if get_default_line_engine() == LINE_ENGINE_SEMANTIC:
+                self.scene[LINE_ENGINE_PROP] = LINE_ENGINE_SEMANTIC
+            else:
+                self.scene[LINE_ENGINE_PROP] = LINE_ENGINE_FREESTYLE
+    
+    def _create_freestyle_collections(self):
+        """Create the three Freestyle control collections for this layout."""
+        if not self.scene:
+            return
+        
+        scene_name = self.scene.name
+        
+        # Create Freestyle Ignore collection (text, dimensions, details, title block)
+        ignore_name = f"{scene_name}_Freestyle_Ignore"
+        if ignore_name not in bpy.data.collections:
+            self.freestyle_ignore = bpy.data.collections.new(ignore_name)
+            self.freestyle_ignore['IS_FREESTYLE_IGNORE'] = True
+        else:
+            self.freestyle_ignore = bpy.data.collections[ignore_name]
+        
+        # Create Freestyle Dashed collection
+        dashed_name = f"{scene_name}_Freestyle_Dashed"
+        if dashed_name not in bpy.data.collections:
+            self.freestyle_dashed = bpy.data.collections.new(dashed_name)
+            self.freestyle_dashed['IS_FREESTYLE_DASHED'] = True
+        else:
+            self.freestyle_dashed = bpy.data.collections[dashed_name]
+        
+        # Create Freestyle Solid collection (cabinet and room geometry)
+        solid_name = f"{scene_name}_Freestyle_Solid"
+        if solid_name not in bpy.data.collections:
+            self.freestyle_solid = bpy.data.collections.new(solid_name)
+            self.freestyle_solid['IS_FREESTYLE_SOLID'] = True
+        else:
+            self.freestyle_solid = bpy.data.collections[solid_name]
+        
+        # Link collections to scene
+        if self.freestyle_ignore.name not in self.scene.collection.children:
+            self.scene.collection.children.link(self.freestyle_ignore)
+        if self.freestyle_dashed.name not in self.scene.collection.children:
+            self.scene.collection.children.link(self.freestyle_dashed)
+        if self.freestyle_solid.name not in self.scene.collection.children:
+            self.scene.collection.children.link(self.freestyle_solid)
+    
+    def _setup_freestyle_linesets(self):
+        """Configure Freestyle line sets for the three collection types."""
+        if not self.scene or not self.scene.view_layers:
+            return
+        
+        view_layer = self.scene.view_layers[0]
+        view_layer.use_freestyle = True
+        freestyle = view_layer.freestyle_settings
+        
+        # Clear existing linesets
+        while len(freestyle.linesets) > 0:
+            freestyle.linesets.remove(freestyle.linesets[0])
+        
+        # Create Solid lineset (for geometry)
+        solid_lineset = freestyle.linesets.new('Solid')
+        solid_lineset.select_silhouette = True
+        solid_lineset.select_border = True
+        solid_lineset.select_crease = True
+        solid_lineset.select_edge_mark = True
+        solid_lineset.select_by_collection = True
+        solid_lineset.collection = self.freestyle_solid
+        solid_lineset.collection_negation = 'INCLUSIVE'
+        solid_lineset.select_by_visibility = True
+        if self.solid_qi_end is None:
+            solid_lineset.visibility = 'VISIBLE'
+        else:
+            solid_lineset.visibility = 'RANGE'
+            solid_lineset.qi_start = 0
+            solid_lineset.qi_end = self.solid_qi_end
+
+        # Configure solid line style
+        if solid_lineset.linestyle:
+            solid_lineset.linestyle.color = (0, 0, 0)  # Black
+            solid_lineset.linestyle.thickness = 1.5
+        
+        # Create Dashed lineset (for hidden/interior parts behind doors)
+        dashed_lineset = freestyle.linesets.new('Dashed')
+        dashed_lineset.select_silhouette = True
+        dashed_lineset.select_border = True
+        dashed_lineset.select_crease = True
+        dashed_lineset.select_edge_mark = True
+        dashed_lineset.select_by_collection = True
+        dashed_lineset.collection = self.freestyle_dashed
+        dashed_lineset.collection_negation = 'INCLUSIVE'
+        dashed_lineset.select_by_visibility = True
+        if self.solid_qi_end is None:
+            dashed_lineset.visibility = 'HIDDEN'
+        else:
+            # Start one level above whatever the solid pass took, or the
+            # same edge draws solid and dashed on top of each other.
+            dashed_lineset.visibility = 'RANGE'
+            dashed_lineset.qi_start = self.solid_qi_end + 1
+            dashed_lineset.qi_end = FREESTYLE_QI_MAX
+
+        # Configure dashed line style
+        if dashed_lineset.linestyle:
+            dashed_lineset.linestyle.color = (0, 0, 0)  # Black
+            dashed_lineset.linestyle.thickness = 1.0
+            dashed_lineset.linestyle.use_dashed_line = True
+            # Set dash pattern
+            dashed_lineset.linestyle.dash1 = 10
+            dashed_lineset.linestyle.gap1 = 5
+    
+    def _setup_lineart(self):
+        """Line Art counterpart of _setup_freestyle_linesets."""
+        if not self.scene:
+            return
+        setup_line_art_for_scene(
+            self.scene,
+            self.get_freestyle_collection('SOLID'),
+            self.get_freestyle_collection('DASHED'),
+            self.get_freestyle_collection('IGNORE'))
+
+    def get_freestyle_collection(self, collection_type: str):
+        """Get the Freestyle collection by type: 'IGNORE', 'DASHED', or 'SOLID'."""
+        if not self.scene:
+            return None
+        
+        scene_name = self.scene.name
+        
+        if collection_type == 'IGNORE':
+            name = f"{scene_name}_Freestyle_Ignore"
+        elif collection_type == 'DASHED':
+            name = f"{scene_name}_Freestyle_Dashed"
+        elif collection_type == 'SOLID':
+            name = f"{scene_name}_Freestyle_Solid"
+        else:
+            return None
+        
+        return bpy.data.collections.get(name)
+    
+    def add_to_freestyle_collection(self, obj, collection_type: str):
+        """Add an object to the specified Freestyle collection."""
+        collection = self.get_freestyle_collection(collection_type)
+        if collection and obj.name not in collection.objects:
+            collection.objects.link(obj)
+    
+    def create_camera(self, name: str, location: Vector, rotation: tuple) -> bpy.types.Object:
+        """Create an orthographic camera for the view."""
+        cam_data = bpy.data.cameras.new(name)
+        cam_data.type = 'ORTHO'
+        
+        self.camera = bpy.data.objects.new(name, cam_data)
+        self.scene.collection.objects.link(self.camera)
+        
+        self.camera.location = location
+        self.camera.rotation_euler = rotation
+
+        # Page cameras are positioned by code only; keep them from being
+        # selected or transformed interactively
+        self.camera.lock_location = (True, True, True)
+        self.camera.lock_rotation = (True, True, True)
+        self.camera.hide_select = True
+
+        # Set as active camera for scene
+        self.scene.camera = self.camera
+
+        return self.camera
+    
+    def set_camera_ortho_scale(self, scale: float):
+        """Set the orthographic scale of the camera."""
+        if self.camera and self.camera.data:
+            self.camera.data.ortho_scale = scale
+    
+    def set_paper_size(self, paper_size: str = 'LETTER', landscape: bool = True, dpi: int = None):
+        """Set the paper size for this layout view.
+        
+        Args:
+            paper_size: Paper size name (LETTER, LEGAL, TABLOID, A4, A3)
+            landscape: If True, use landscape orientation
+            dpi: Dots per inch (uses default if None)
+        """
+        if dpi is None:
+            dpi = self.dpi
+        
+        self.paper_size = paper_size
+        self.landscape = landscape
+        self.dpi = dpi
+        
+        # Store in scene for persistence
+        if self.scene:
+            self.scene['PAPER_SIZE'] = paper_size
+            self.scene['PAPER_LANDSCAPE'] = landscape
+            self.scene['PAPER_DPI'] = dpi
+        
+        # Set render resolution
+        width_px, height_px = get_paper_resolution(paper_size, landscape, dpi)
+        if self.scene:
+            self.scene.render.resolution_x = width_px
+            self.scene.render.resolution_y = height_px
+            self.scene.render.resolution_percentage = 100
+    
+    def get_paper_aspect_ratio(self) -> float:
+        """Get the aspect ratio (width/height) of the current paper size."""
+        width_px, height_px = get_paper_resolution(self.paper_size, self.landscape, self.dpi)
+        return width_px / height_px
+    
+    def delete(self):
+        """Delete this layout view and its scene."""
+        if self.scene:
+            bpy.data.scenes.remove(self.scene)
+            self.scene = None
+            self.camera = None
+
+
+class ElevationView(LayoutView):
+    """Elevation view of a wall - front orthographic projection."""
+    
+    wall_obj: bpy.types.Object = None
+    content_collections: list = None  # List of (solid_collection, dashed_collection) tuples per cabinet
+    collection_instances: list = None  # List of collection instance objects
+    
+    def __init__(self, scene=None):
+        super().__init__(scene)
+        self.content_collections = []
+        self.collection_instances = []
+        if scene:
+            # Find all collection instances in the scene
+            for obj in scene.objects:
+                if obj.type == 'EMPTY' and obj.instance_type == 'COLLECTION':
+                    self.collection_instances.append(obj)
+            
+            # Find the source wall from scene custom property
+            wall_name = scene.get('SOURCE_WALL')
+            if wall_name and wall_name in bpy.data.objects:
+                self.wall_obj = bpy.data.objects[wall_name]
+    
+    def create(self, wall_obj: bpy.types.Object, name: str = None, 
+               paper_size: str = 'LETTER', landscape: bool = True) -> bpy.types.Scene:
+        """
+        Create an elevation view for a wall.
+        
+        Args:
+            wall_obj: The wall object to create elevation for
+            name: Optional name for the view (defaults to wall name + " Elevation")
+            paper_size: Paper size (LETTER, LEGAL, TABLOID, A4, A3)
+            landscape: If True, use landscape orientation
+        
+        Returns:
+            The created scene
+        """
+        self.wall_obj = wall_obj
+        wall = hb_types.GeoNodeWall(wall_obj)
+        
+        # Get wall properties
+        wall_length = wall.get_input('Length')
+        wall_height = wall.get_input('Height')
+        wall_thickness = wall.get_input('Thickness')
+        
+        # Create scene
+        view_name = name or f"{wall_obj.name} Elevation"
+        self.create_scene(view_name)
+        self.scene['IS_ELEVATION_VIEW'] = True
+        self.scene['SOURCE_WALL'] = wall_obj.name
+        
+        # Camera rotation to face the wall (pointing in +Y direction in wall's local space)
+        wall_rotation_z = wall_obj.rotation_euler.z
+        camera_rotation = (math.radians(90), 0, wall_rotation_z)
+        
+        # Initial camera position (will be adjusted after calculating bounds)
+        wall_center_local = Vector((wall_length / 2, -2, wall_height / 2))
+        wall_center_world = wall_obj.matrix_world @ wall_center_local
+        
+        # Create camera
+        self.create_camera(f"{view_name} Camera", wall_center_world, camera_rotation)
+        
+        # Set paper size for proper aspect ratio
+        self.set_paper_size(paper_size, landscape)
+        
+        # Add cabinet dimensions (before fitting camera so they're included)
+        self.add_cabinet_dimensions()
+        
+        # Calculate bounds of all objects to fit camera properly (includes dimensions)
+        self._fit_camera_to_content(wall_obj)
+        
+        # Create per-cabinet collections with solid/dashed split for Freestyle
+        self._create_content_collections(wall_obj, view_name)
+        
+        # Add title block
+        self.title_block = TitleBlock()
+        self.title_block.create(self.scene, self.camera)
+        
+        return self.scene
+    
+    def _fit_camera_to_content(self, wall_obj):
+        """Adjust camera position and ortho scale to fit all wall content including dimensions."""
+
+        wall = hb_types.GeoNodeWall(wall_obj)
+        wall_length = wall.get_input('Length')
+        wall_height = wall.get_input('Height')
+        
+        # Get wall's local coordinate system
+        wall_matrix = wall_obj.matrix_world
+        wall_matrix_inv = wall_matrix.inverted()
+        
+        # Start with wall bounds in wall's local space
+        min_x, max_x = 0, wall_length
+        min_z, max_z = 0, wall_height
+        
+        # Check all children for their bounds in wall's local space
+        for child in wall_obj.children_recursive:
+            # Skip cages and helper objects
+            is_cage = is_cage_object(child)
+            is_helper = is_helper_object(child)
+            
+            if is_cage or is_helper:
+                continue
+            
+            # Use bounding box for mesh objects
+            if hasattr(child, 'bound_box') and child.type == 'MESH':
+                bbox_corners = [child.matrix_world @ Vector(corner) for corner in child.bound_box]
+                bbox_local = [wall_matrix_inv @ corner for corner in bbox_corners]
+                
+                child_min_x = min(c.x for c in bbox_local)
+                child_max_x = max(c.x for c in bbox_local)
+                child_min_z = min(c.z for c in bbox_local)
+                child_max_z = max(c.z for c in bbox_local)
+                
+                min_x = min(min_x, child_min_x)
+                max_x = max(max_x, child_max_x)
+                min_z = min(min_z, child_min_z)
+                max_z = max(max_z, child_max_z)
+        
+        # Also check dimension objects in the scene
+        for obj in self.scene.collection.objects:
+            if obj.get('IS_2D_ANNOTATION') and obj.type == 'CURVE':
+                # Get dimension position in wall local space
+                dim_local_pos = wall_matrix_inv @ obj.location
+                
+                # Get the dimension length from the curve endpoint
+                if obj.data.splines and len(obj.data.splines[0].points) > 1:
+                    dim_length = obj.data.splines[0].points[1].co.x
+                    
+                    # Update bounds - add generous margin for arrows and text
+                    min_x = min(min_x, dim_local_pos.x - 0.1)
+                    max_x = max(max_x, dim_local_pos.x + dim_length + 0.1)
+                    min_z = min(min_z, dim_local_pos.z - 0.25)
+                    max_z = max(max_z, dim_local_pos.z + 0.25)
+        
+        # Calculate center and size
+        center_x = (min_x + max_x) / 2
+        center_z = (min_z + max_z) / 2
+        
+        width = max_x - min_x
+        height = max_z - min_z
+        
+        # Add margin (10% of the larger dimension)
+        margin = max(width, height) * 0.1
+        width += margin * 2
+        height += margin * 2
+        
+        # Update camera position (center on content, 3m in front)
+        camera_local_pos = Vector((center_x, -3, center_z))
+        camera_world_pos = wall_matrix @ camera_local_pos
+        self.camera.location = camera_world_pos
+        
+        # Set ortho scale to fit content
+        max_dimension = max(width, height)
+        self.set_camera_ortho_scale(max_dimension)
+
+    def add_cabinet_dimensions(self):
+        """Add width dimensions for all cabinets on the wall."""
+
+        if not self.wall_obj:
+            return
+        
+        wall = hb_types.GeoNodeWall(self.wall_obj)
+        wall_matrix = self.wall_obj.matrix_world
+        wall_matrix_inv = wall_matrix.inverted()
+        
+        # Collect cabinets by type (base/tall vs upper)
+        base_tall_cabinets = []
+        upper_cabinets = []
+        
+        for child in self.wall_obj.children:
+            if child.get('IS_FRAMELESS_CABINET_CAGE') or child.get('IS_FACE_FRAME_CABINET_CAGE'):
+                # Get cabinet position in wall local space
+                cabinet_local_pos = wall_matrix_inv @ child.matrix_world.translation
+                
+                # Get cabinet dimensions from the cage
+                cage = hb_types.GeoNodeCage(child)
+                cabinet_width = cage.get_input('Dim X')
+                cabinet_height = cage.get_input('Dim Z')
+                cabinet_z = cabinet_local_pos.z
+                
+                cabinet_info = {
+                    'obj': child,
+                    'x': cabinet_local_pos.x,
+                    'z': cabinet_z,
+                    'width': cabinet_width,
+                    'height': cabinet_height,
+                }
+                
+                # Upper cabinets typically start above 1.2m (48")
+                if cabinet_z > 1.2:
+                    upper_cabinets.append(cabinet_info)
+                else:
+                    base_tall_cabinets.append(cabinet_info)
+        
+        # Sort by x position
+        base_tall_cabinets.sort(key=lambda c: c['x'])
+        upper_cabinets.sort(key=lambda c: c['x'])
+        
+        # Create dimensions for base/tall cabinets (at bottom)
+        dim_z_bottom = -units.inch(4)  # Below the cabinets
+        for cab in base_tall_cabinets:
+            self._create_cabinet_dimension(cab, dim_z_bottom, wall_matrix, flip_text=True)
+        
+        # Create dimensions for upper cabinets (at top)
+        if upper_cabinets:
+            # Find the top of upper cabinets
+            max_top = max(c['z'] + c['height'] for c in upper_cabinets)
+            dim_z_top = max_top + units.inch(4)
+            for cab in upper_cabinets:
+                self._create_cabinet_dimension(cab, dim_z_top, wall_matrix, flip_text=False)
+    
+    def _create_cabinet_dimension(self, cabinet_info, dim_z, wall_matrix, flip_text=False):
+        """Create a single cabinet width dimension."""
+
+        dim = hb_types.GeoNodeDimension()
+        dim.create(f"Dim_{cabinet_info['obj'].name}")
+        # GeoNodeObject.create_curve ignores the name argument and hardcodes
+        # "Dimension"; rename explicitly so downstream by-name passes can
+        # recognize these auto width dims (vs. user-placed dimensions).
+        dim.obj.name = f"Dim_{cabinet_info['obj'].name}"
+        dim.obj.data.name = dim.obj.name
+        dim.obj['IS_2D_ANNOTATION'] = True
+        
+        # The create method links to bpy.context.scene, but we need it in self.scene
+        # Unlink from whatever scene it was added to
+        for scene in bpy.data.scenes:
+            if dim.obj.name in scene.collection.objects:
+                scene.collection.objects.unlink(dim.obj)
+        
+        # Link to our elevation scene
+        self.scene.collection.objects.link(dim.obj)
+        
+        # Add to Freestyle Ignore collection
+        ignore_collection = self.get_freestyle_collection('IGNORE')
+        if ignore_collection and dim.obj.name not in ignore_collection.objects:
+            ignore_collection.objects.link(dim.obj)
+        
+        # Position in wall local space, then convert to world
+        local_pos = Vector((cabinet_info['x'], -units.inch(2), dim_z))
+        dim.obj.location = wall_matrix @ local_pos
+        
+        # Rotation to face camera (90 degrees on X to stand up, match wall rotation on Z)
+        wall_rotation_z = self.wall_obj.rotation_euler.z
+        dim.obj.rotation_euler = (math.radians(90), 0, wall_rotation_z)
+        
+        # Set the dimension length via the curve endpoint
+        dim.obj.data.splines[0].points[1].co = (cabinet_info['width'], 0, 0, 1)
+        
+        # Flip text if needed (for upper cabinets)
+        if flip_text:
+            dim.set_input('Leader Length', units.inch(-4))
+        else:
+            dim.set_input('Leader Length', units.inch(4))
+        
+        return dim
+
+    def _create_content_collections(self, wall_obj: bpy.types.Object, view_name: str):
+        """Create per-cabinet collections with solid/dashed split for Freestyle rendering.
+        
+        Each cabinet gets its own solid collection (and dashed collection if it has interior parts).
+        The wall mesh itself gets a separate solid collection.
+        Each collection gets a collection instance in the elevation scene, enabling
+        independent selection, color changes, and duplication of individual cabinets.
+        """
+        solid_freestyle = self.get_freestyle_collection('SOLID')
+        dashed_freestyle = self.get_freestyle_collection('DASHED')
+        
+        # Create a solid collection for the wall mesh itself
+        wall_solid = bpy.data.collections.new(f"{view_name}_{wall_obj.name}_Solid")
+        if wall_obj.name not in wall_solid.objects:
+            wall_solid.objects.link(wall_obj)
+        self._create_collection_instance(wall_solid, f"{view_name}_{wall_obj.name}", solid_freestyle)
+        
+        # Process each direct child of the wall
+        for child in wall_obj.children:
+            # Skip helper empties
+            if child.get('obj_x') or 'Overlay Prompt Obj' in child.name:
+                continue
+            
+            # Product root cages that get their own per-product content
+            # collections. Closet starters join the cabinet branch here --
+            # their root is a cage, so without this they fall to the else
+            # branch, which links only the (invisible) cage object and
+            # never walks the subtree: no geometry in elevation views.
+            # PRODUCT_CAGE roots (Support Frame, Half Wall, ...) share the
+            # same shape -- a cage root over part children -- and were
+            # dropped the same way, so they join this branch too.
+            if (child.get('IS_FRAMELESS_CABINET_CAGE')
+                    or child.get('IS_FACE_FRAME_CABINET_CAGE')
+                    or child.get('IS_CLOSET_STARTER_CAGE')
+                    or child.get('IS_FRAMELESS_PRODUCT_CAGE')
+                    or child.get('IS_FACE_FRAME_PRODUCT_CAGE')):
+                # Cabinet: create solid and dashed collections
+                cabinet_name = child.name
+                cab_solid = bpy.data.collections.new(f"{view_name}_{cabinet_name}_Solid")
+                cab_dashed = bpy.data.collections.new(f"{view_name}_{cabinet_name}_Dashed")
+                
+                # Recursively sort cabinet parts into solid vs dashed
+                self._collect_objects_split(child, cab_solid, cab_dashed)
+                
+                # Always create solid instance
+                self._create_collection_instance(cab_solid, f"{view_name}_{cabinet_name}_Solid", solid_freestyle)
+                
+                # Only create dashed instance if there are dashed objects
+                if len(cab_dashed.objects) > 0:
+                    self._create_collection_instance(cab_dashed, f"{view_name}_{cabinet_name}_Dashed", dashed_freestyle)
+                else:
+                    # Clean up empty collection
+                    bpy.data.collections.remove(cab_dashed)
+            else:
+                # Non-cabinet child (e.g. applied end panels, other geometry)
+                if not self._is_cage(child) and not self._is_helper(child):
+                    # Add to wall solid collection
+                    if child.name not in wall_solid.objects:
+                        wall_solid.objects.link(child)
+    
+    def _create_collection_instance(self, collection: bpy.types.Collection, name: str, 
+                                     freestyle_collection: bpy.types.Collection) -> bpy.types.Object:
+        """Create a collection instance object in the elevation scene and add to a Freestyle collection."""
+        instance = bpy.data.objects.new(name, None)
+        instance.empty_display_size = .01
+        instance.instance_type = 'COLLECTION'
+        instance.instance_collection = collection
+        self.scene.collection.objects.link(instance)
+        
+        if freestyle_collection and instance.name not in freestyle_collection.objects:
+            freestyle_collection.objects.link(instance)
+        
+        self.collection_instances.append(instance)
+        self.content_collections.append(collection)
+        return instance
+    
+    def _collect_objects_split(self, obj: bpy.types.Object, solid_col: bpy.types.Collection, 
+                               dashed_col: bpy.types.Collection):
+        """Recursively sort an object tree into solid and dashed collections.
+        
+        Interior parts (frameless or face frame) go to dashed, all other visible
+        geometry goes to solid. Cages and helpers are skipped but their children are processed.
+        """
+        if not self._is_cage(obj) and not self._is_helper(obj):
+            if obj.get('IS_FRAMELESS_INTERIOR_PART') or obj.get('IS_FACE_FRAME_INTERIOR_PART'):
+                if obj.name not in dashed_col.objects:
+                    dashed_col.objects.link(obj)
+            else:
+                if obj.name not in solid_col.objects:
+                    solid_col.objects.link(obj)
+        
+        for child in obj.children:
+            self._collect_objects_split(child, solid_col, dashed_col)
+    
+    @staticmethod
+    def _is_cage(obj: bpy.types.Object) -> bool:
+        """Check if an object is a cage (organizational container, not visible geometry)."""
+        return is_cage_object(obj)
+    
+    @staticmethod
+    def _is_helper(obj: bpy.types.Object) -> bool:
+        """Check if an object is a helper empty (not visible geometry)."""
+        return is_helper_object(obj)
+    
+    def update(self):
+        """Update the elevation view to reflect changes in the 3D model."""
+        if not self.wall_obj or not self.camera:
+            return
+        
+        wall = hb_types.GeoNodeWall(self.wall_obj)
+        wall_length = wall.get_input('Length')
+        wall_height = wall.get_input('Height')
+        
+        # Update camera position
+        wall_center_local = Vector((wall_length / 2, -2, wall_height / 2))
+        wall_center_world = self.wall_obj.matrix_world @ wall_center_local
+        self.camera.location = wall_center_world
+        
+        # Update camera rotation if wall rotated
+        wall_rotation_z = self.wall_obj.rotation_euler.z
+        self.camera.rotation_euler = (math.radians(90), 0, wall_rotation_z)
+        
+        # Update ortho scale
+        margin = 0.2
+        max_dimension = max(wall_length, wall_height) + margin * 2
+        self.set_camera_ortho_scale(max_dimension)
+
+
+class PlanView(LayoutView):
+    """Plan view - top-down orthographic projection."""
+
+    content_collection: bpy.types.Collection = None
+    collection_instance: bpy.types.Object = None
+    # Looking straight down, one level of depth behind a cabinet's top
+    # surface is almost always a flush-joint tie rather than a part that
+    # is genuinely hidden -- finished ends and butted cabinet sides drop
+    # out of the drawing without this.
+    solid_qi_end: int = 1
+
+    def __init__(self, scene=None):
+        super().__init__(scene)
+        if scene:
+            for obj in scene.objects:
+                if obj.type == 'EMPTY' and obj.instance_type == 'COLLECTION':
+                    self.collection_instance = obj
+                    self.content_collection = obj.instance_collection
+                    break
+    
+    def create(self, name: str = "Floor Plan", source_scene=None,
+               paper_size: str = 'LETTER', landscape: bool = True) -> bpy.types.Scene:
+        """
+        Create a plan view showing walls from a specific room.
+        
+        Args:
+            name: Name for the view
+            source_scene: Scene to pull walls from (current room).
+                          If None, falls back to all walls.
+            paper_size: Paper size (LETTER, LEGAL, TABLOID, A4, A3)
+            landscape: If True, use landscape orientation
+        
+        Returns:
+            The created scene
+        """
+        # Create scene (this switches context to the new scene)
+        self.create_scene(name)
+        self.scene['IS_PLAN_VIEW'] = True
+        # Set paper size before framing so the camera aspect is correct
+        self.set_paper_size(paper_size, landscape)
+        
+        # Find walls from the source scene (current room) or all objects
+        walls = []
+        min_x, max_x = float('inf'), float('-inf')
+        min_y, max_y = float('inf'), float('-inf')
+        
+        search_objects = source_scene.objects if source_scene else bpy.data.objects
+        for obj in search_objects:
+            if 'IS_WALL_BP' in obj:
+                walls.append(obj)
+                wall = hb_types.GeoNodeWall(obj)
+                wall_length = wall.get_input('Length')
+                
+                # Get wall start and end points in world space
+                start = obj.matrix_world @ Vector((0, 0, 0))
+                end = obj.matrix_world @ Vector((wall_length, 0, 0))
+                
+                min_x = min(min_x, start.x, end.x)
+                max_x = max(max_x, start.x, end.x)
+                min_y = min(min_y, start.y, end.y)
+                max_y = max(max_y, start.y, end.y)
+        
+        if not walls:
+            # No walls found, create default camera position
+            center = Vector((0, 0, 5))
+            size = 10
+        else:
+            # Calculate center and size
+            center_x = (min_x + max_x) / 2
+            center_y = (min_y + max_y) / 2
+            center = Vector((center_x, center_y, 5))  # 5m above
+            
+            width = max_x - min_x
+            height = max_y - min_y
+            size = max(width, height) + 1  # 1m margin
+        
+        # Create camera looking straight down
+        camera_rotation = (0, 0, 0)  # Looking down -Z
+        self.create_camera(f"{name} Camera", center, camera_rotation)
+        self.set_camera_ortho_scale(size)
+        
+        # Create collection for all walls and their children
+        self.content_collection = bpy.data.collections.new(f"{name} Content")
+        
+        for wall_obj in walls:
+            self._add_object_to_collection(wall_obj, self.content_collection)
+        
+        # Create collection instance
+        self.collection_instance = bpy.data.objects.new(f"{name} Instance", None)
+        self.collection_instance.empty_display_size = .01
+        self.collection_instance.instance_type = 'COLLECTION'
+        self.collection_instance.instance_collection = self.content_collection
+        self.scene.collection.objects.link(self.collection_instance)
+        
+        # Add collection instance to Freestyle Solid collection
+        solid_collection = self.get_freestyle_collection('SOLID')
+        if solid_collection and self.collection_instance.name not in solid_collection.objects:
+            solid_collection.objects.link(self.collection_instance)
+        
+        # Add title block
+        self.title_block = TitleBlock()
+        self.title_block.create(self.scene, self.camera)
+        
+        return self.scene
+    
+    def _fit_camera_to_content(self, wall_obj):
+        """Adjust camera position and ortho scale to fit all wall content."""
+
+        wall = hb_types.GeoNodeWall(wall_obj)
+        wall_length = wall.get_input('Length')
+        wall_height = wall.get_input('Height')
+        
+        # Get wall's local coordinate system
+        wall_matrix = wall_obj.matrix_world
+        wall_matrix_inv = wall_matrix.inverted()
+        
+        # Start with wall bounds in wall's local space
+        min_x, max_x = 0, wall_length
+        min_z, max_z = 0, wall_height
+        
+        # Check all children for their bounds in wall's local space
+        for child in wall_obj.children_recursive:
+            # Skip cages and helper objects
+            is_cage = is_cage_object(child)
+            is_helper = is_helper_object(child)
+            
+            if is_cage or is_helper:
+                continue
+            
+            # Get child's world position and convert to wall's local space
+            child_world_pos = child.matrix_world.translation
+            child_local_pos = wall_matrix_inv @ child_world_pos
+            
+            # Get child dimensions if it's a geo node object
+            child_width = 0
+            child_height = 0
+            if hasattr(child, 'home_builder') and child.home_builder.mod_name:
+                try:
+                    geo_obj = hb_types.GeoNodeObject(child)
+                    child_width = geo_obj.get_input('Dim X') if 'Dim X' in [i.name for i in geo_obj.obj.modifiers[geo_obj.obj.home_builder.mod_name].node_group.interface.items_tree] else 0
+                    child_height = geo_obj.get_input('Dim Z') if 'Dim Z' in [i.name for i in geo_obj.obj.modifiers[geo_obj.obj.home_builder.mod_name].node_group.interface.items_tree] else 0
+                except:
+                    pass
+            
+            # Update bounds
+            min_x = min(min_x, child_local_pos.x)
+            max_x = max(max_x, child_local_pos.x + child_width)
+            min_z = min(min_z, child_local_pos.z)
+            max_z = max(max_z, child_local_pos.z + child_height)
+        
+        # Calculate center and size
+        center_x = (min_x + max_x) / 2
+        center_z = (min_z + max_z) / 2
+        
+        width = max_x - min_x
+        height = max_z - min_z
+        
+        # Add margin
+        margin = 0.3  # 30cm margin
+        width += margin * 2
+        height += margin * 2
+        
+        # Update camera position (center on content)
+        camera_local_pos = Vector((center_x, -2, center_z))
+        camera_world_pos = wall_matrix @ camera_local_pos
+        self.camera.location = camera_world_pos
+        
+        # Set ortho scale to fit content
+        max_dimension = max(width, height)
+        self.set_camera_ortho_scale(max_dimension)
+
+    def _add_object_to_collection(self, obj: bpy.types.Object, collection: bpy.types.Collection):
+        """Recursively add object and its children to collection.
+        Skips cage objects (GeoNodeCage) as they are containers, not visible geometry."""
+        
+        # Skip cage objects and helper empties - they are organizational, not visible geometry
+        is_cage = is_cage_object(obj)
+        is_helper = is_helper_object(obj)
+        
+        if not is_cage and not is_helper:
+            if obj.name not in collection.objects:
+                collection.objects.link(obj)
+        
+        for child in obj.children:
+            self._add_object_to_collection(child, collection)
+
+
+class View3D(LayoutView):
+    """3D perspective or isometric view."""
+    
+    content_collection: bpy.types.Collection = None
+    collection_instance: bpy.types.Object = None
+    
+    def create(self, name: str = "3D View", perspective: bool = True, source_scene=None,
+               paper_size: str = 'LETTER', landscape: bool = True) -> bpy.types.Scene:
+        """
+        Create a 3D view.
+        
+        Args:
+            name: Name for the view
+            perspective: True for perspective, False for isometric
+            source_scene: Scene to pull walls from (the room). If None,
+                          falls back to all walls in the file.
+            paper_size: Paper size (LETTER, LEGAL, TABLOID, A4, A3)
+            landscape: If True, use landscape orientation
+        
+        Returns:
+            The created scene
+        """
+        self.create_scene(name)
+        self.scene['IS_3D_VIEW'] = True
+        # 3D views always draw with Freestyle, whatever the line-engine
+        # preference says: the 3/4 framing is GP Line Art's worst case
+        # (grazing ties, dropped edge-on edges), and a 3D page has no
+        # flat cells that would profit from live GP lines. Whole-scene
+        # switch, so the exporter's per-scene Freestyle path applies.
+        if get_scene_line_engine(self.scene) == LINE_ENGINE_LINEART:
+            remove_line_art_from_scene(self.scene)
+            self.scene.render.use_freestyle = True
+            self._setup_freestyle_linesets()
+            self.scene[LINE_ENGINE_PROP] = LINE_ENGINE_FREESTYLE
+        # Set paper size so the render resolution matches the sheet
+        self.set_paper_size(paper_size, landscape)
+        
+        # Find bounds of all walls
+        walls = [obj for obj in (source_scene.objects if source_scene else bpy.data.objects) if 'IS_WALL_BP' in obj]
+        
+        if walls:
+            # Calculate center
+            centers = []
+            for wall_obj in walls:
+                wall = hb_types.GeoNodeWall(wall_obj)
+                wall_length = wall.get_input('Length')
+                center = wall_obj.matrix_world @ Vector((wall_length / 2, 0, 0))
+                centers.append(center)
+            
+            avg_center = sum(centers, Vector()) / len(centers)
+            
+            # Position camera at 45° angle
+            distance = 8
+            camera_pos = avg_center + Vector((distance, -distance, distance))
+        else:
+            camera_pos = Vector((8, -8, 8))
+            avg_center = Vector((0, 0, 0))
+        
+        # Create camera
+        cam_data = bpy.data.cameras.new(f"{name} Camera")
+        if perspective:
+            cam_data.type = 'PERSP'
+            cam_data.lens = 35
+        else:
+            cam_data.type = 'ORTHO'
+            cam_data.ortho_scale = 10
+        
+        self.camera = bpy.data.objects.new(f"{name} Camera", cam_data)
+        self.scene.collection.objects.link(self.camera)
+        self.camera.location = camera_pos
+        
+        # Point camera at center
+        direction = avg_center - camera_pos
+        rot_quat = direction.to_track_quat('-Z', 'Y')
+        self.camera.rotation_euler = rot_quat.to_euler()
+        
+        self.scene.camera = self.camera
+        
+        # Create collection for all objects
+        self.content_collection = bpy.data.collections.new(f"{name} Content")
+        
+        for wall_obj in walls:
+            self._add_object_to_collection(wall_obj, self.content_collection)
+        
+        # Create collection instance
+        self.collection_instance = bpy.data.objects.new(f"{name} Instance", None)
+        self.collection_instance.empty_display_size = .01
+        self.collection_instance.instance_type = 'COLLECTION'
+        self.collection_instance.instance_collection = self.content_collection
+        self.scene.collection.objects.link(self.collection_instance)
+        
+        # Add collection instance to Freestyle Solid collection
+        solid_collection = self.get_freestyle_collection('SOLID')
+        if solid_collection and self.collection_instance.name not in solid_collection.objects:
+            solid_collection.objects.link(self.collection_instance)
+        
+        # Add title block
+        self.title_block = TitleBlock()
+        self.title_block.create(self.scene, self.camera)
+        
+        return self.scene
+    
+    def _fit_camera_to_content(self, wall_obj):
+        """Adjust camera position and ortho scale to fit all wall content."""
+
+        wall = hb_types.GeoNodeWall(wall_obj)
+        wall_length = wall.get_input('Length')
+        wall_height = wall.get_input('Height')
+        
+        # Get wall's local coordinate system
+        wall_matrix = wall_obj.matrix_world
+        wall_matrix_inv = wall_matrix.inverted()
+        
+        # Start with wall bounds in wall's local space
+        min_x, max_x = 0, wall_length
+        min_z, max_z = 0, wall_height
+        
+        # Check all children for their bounds in wall's local space
+        for child in wall_obj.children_recursive:
+            # Skip cages and helper objects
+            is_cage = is_cage_object(child)
+            is_helper = is_helper_object(child)
+            
+            if is_cage or is_helper:
+                continue
+            
+            # Get child's world position and convert to wall's local space
+            child_world_pos = child.matrix_world.translation
+            child_local_pos = wall_matrix_inv @ child_world_pos
+            
+            # Get child dimensions if it's a geo node object
+            child_width = 0
+            child_height = 0
+            if hasattr(child, 'home_builder') and child.home_builder.mod_name:
+                try:
+                    geo_obj = hb_types.GeoNodeObject(child)
+                    child_width = geo_obj.get_input('Dim X') if 'Dim X' in [i.name for i in geo_obj.obj.modifiers[geo_obj.obj.home_builder.mod_name].node_group.interface.items_tree] else 0
+                    child_height = geo_obj.get_input('Dim Z') if 'Dim Z' in [i.name for i in geo_obj.obj.modifiers[geo_obj.obj.home_builder.mod_name].node_group.interface.items_tree] else 0
+                except:
+                    pass
+            
+            # Update bounds
+            min_x = min(min_x, child_local_pos.x)
+            max_x = max(max_x, child_local_pos.x + child_width)
+            min_z = min(min_z, child_local_pos.z)
+            max_z = max(max_z, child_local_pos.z + child_height)
+        
+        # Calculate center and size
+        center_x = (min_x + max_x) / 2
+        center_z = (min_z + max_z) / 2
+        
+        width = max_x - min_x
+        height = max_z - min_z
+        
+        # Add margin
+        margin = 0.3  # 30cm margin
+        width += margin * 2
+        height += margin * 2
+        
+        # Update camera position (center on content)
+        camera_local_pos = Vector((center_x, -2, center_z))
+        camera_world_pos = wall_matrix @ camera_local_pos
+        self.camera.location = camera_world_pos
+        
+        # Set ortho scale to fit content
+        max_dimension = max(width, height)
+        self.set_camera_ortho_scale(max_dimension)
+
+    def _add_object_to_collection(self, obj: bpy.types.Object, collection: bpy.types.Collection):
+        """Recursively add object and its children to collection.
+        Skips cage objects (GeoNodeCage) as they are containers, not visible geometry."""
+        
+        # Skip cage objects and helper empties - they are organizational, not visible geometry
+        is_cage = is_cage_object(obj)
+        is_helper = is_helper_object(obj)
+        
+        if not is_cage and not is_helper:
+            if obj.name not in collection.objects:
+                collection.objects.link(obj)
+        
+        for child in obj.children:
+            self._add_object_to_collection(child, collection)
+
+
+class MultiView(LayoutView):
+    """Multi-view layout showing multiple orthographic views of an object (plan, elevations, sides)."""
+    
+    source_obj: bpy.types.Object = None
+    content_collection: bpy.types.Collection = None
+    content_collection_dashed: bpy.types.Collection = None
+    view_instances: list = None
+    dashed_instances: list = None
+    
+    # View type definitions: (type_id, label, rotation_euler)
+    # Rotations position the camera to look at the object from that direction
+    VIEW_TYPES = {
+        'PLAN': ('Plan View', (0, 0, 0)),                                              # Top down, looking -Z
+        'FRONT': ('Front Elevation', (math.radians(-90), 0, 0)),                       # Looking at front face
+        'BACK': ('Back Elevation', (math.radians(90), 0, math.radians(180))),          # Looking at back face
+        'LEFT': ('Left Side', (0, math.radians(-90), math.radians(-90))),              # Looking at left side
+        'RIGHT': ('Right Side', (0, math.radians(90), math.radians(90))),              # Looking at right side
+        'ISO': ('Isometric View', None),  # rotation handled inline in _create_iso_left()
+    }
+    
+    def __init__(self, scene=None):
+        super().__init__(scene)
+        self.view_instances = []
+        self.dashed_instances = []
+        if scene:
+            # Find source object
+            source_name = scene.get('SOURCE_OBJECT')
+            if source_name and source_name in bpy.data.objects:
+                self.source_obj = bpy.data.objects[source_name]
+            
+            # Find content collection
+            coll_name = scene.get('CONTENT_COLLECTION')
+            if coll_name and coll_name in bpy.data.collections:
+                self.content_collection = bpy.data.collections[coll_name]
+    
+    def create(self, source_obj: bpy.types.Object, views: list, 
+               name: str = None, paper_size: str = 'TABLOID', 
+               landscape: bool = True) -> bpy.types.Scene:
+        """
+        Create a multi-view layout for an object using architectural cross layout.
+        
+        Layout arrangement (when all views selected):
+                    [Back]
+                    [Plan]
+            [Left] [Front] [Right]
+        
+        Args:
+            source_obj: The object to create views for (e.g., cabinet group)
+            views: List of view types to include ('PLAN', 'FRONT', 'BACK', 'LEFT', 'RIGHT')
+            name: Optional name for the layout
+            paper_size: Paper size (default TABLOID for multi-view)
+            landscape: Paper orientation
+        
+        Returns:
+            The created scene
+        """
+        self.source_obj = source_obj
+        
+        if not views:
+            return None
+        
+        # Get object dimensions
+        obj_width, obj_depth, obj_height = self._get_object_dimensions(source_obj)
+        
+        # Create scene
+        view_name = name or f"{source_obj.name} Layout"
+        self.create_scene(view_name)
+        self.scene['IS_MULTI_VIEW'] = True
+        self.scene['SOURCE_OBJECT'] = source_obj.name
+        
+        # Set paper size
+        self.set_paper_size(paper_size, landscape)
+        
+        # Create collection for source object content
+        self.content_collection = bpy.data.collections.new(f"{view_name} Content")
+        self.scene['CONTENT_COLLECTION'] = self.content_collection.name
+        
+        # Add source object and children to collection
+        self._add_object_to_collection(source_obj, self.content_collection)
+
+        # Interior parts (shelves behind doors) -> dashed-content
+        # collection so each cell can also instance them into DASHED
+        # freestyle (the hidden-line pass ElevationView gets via
+        # _collect_objects_split). Built once; both the cross-layout
+        # and iso-left paths reuse it.
+        self.content_collection_dashed = self._build_dashed_content_collection(
+            source_obj, view_name)
+        
+        # Get source object's WORLD location and rotation to offset instances.
+        # Use matrix_world (not .location/.rotation_euler) so we capture every
+        # source of transform: parents, constraints (e.g. Copy Location used by
+        # HB5's wall placement), delta transforms, drivers. Reading .location
+        # directly misses all of those and breaks the layout when the wall is
+        # placed far from origin or rotated via constraint.
+        # decompose() also conveniently splits off scale, so we operate on
+        # pure rotation regardless of object scale.
+        _swl, _swr, _sws = source_obj.matrix_world.decompose()
+        source_loc = _swl.copy()
+        source_rot_matrix = _swr.to_matrix()
+        source_rot_matrix_inv = source_rot_matrix.inverted()
+        
+        # Spacing between views
+        gap = units.inch(12)
+        
+        # Iso-left layout: ISO column on the left, with PLAN above FRONT (elevation)
+        # stacked in the right column. Used by compact-room shop drawings (vanity
+        # rooms with one cabinet wall and no islands).
+        if 'ISO' in views:
+            return self._create_iso_left(
+                views, obj_width, obj_depth, obj_height, gap,
+                source_loc, source_rot_matrix_inv, view_name)
+        
+        # Calculate visual bounds for cross layout
+        # All positions are for visual edges, not origins
+        
+        # Front view visual bounds (reference point)
+        front_vis_bottom = 0
+        front_vis_top = front_vis_bottom + obj_height
+        front_vis_left = 0
+        front_vis_right = front_vis_left + obj_width
+        front_vis_center_x = (front_vis_left + front_vis_right) / 2
+        
+        # Plan view visual bounds (above Front)
+        plan_vis_bottom = front_vis_top + gap  # front edge of plan (closest to front view)
+        plan_vis_top = plan_vis_bottom + obj_depth  # back edge of plan
+        
+        # Back view visual bounds (above Plan)
+        back_vis_bottom = plan_vis_top + gap
+        back_vis_top = back_vis_bottom + obj_height
+        
+        # Left view visual bounds (left of Front)
+        left_vis_right = front_vis_left - gap
+        left_vis_left = left_vis_right - obj_depth
+        
+        # Right view visual bounds (right of Front)
+        right_vis_left = front_vis_right + gap
+        right_vis_right = right_vis_left + obj_depth
+        
+        # Create each view instance
+        for view_type in views:
+            view_label, base_rotation = self.VIEW_TYPES[view_type]
+            
+            # Create collection instance
+            instance = bpy.data.objects.new(f"{view_label} Instance", None)
+            instance.empty_display_size = 0.01
+            instance.instance_type = 'COLLECTION'
+            instance.instance_collection = self.content_collection
+            self.scene.collection.objects.link(instance)
+            
+            # Calculate combined rotation: view rotation with source rotation cancelled out
+            # This ensures cabinet appears axis-aligned regardless of its original rotation
+            view_matrix = Euler(base_rotation, 'XYZ').to_matrix()
+            combined_matrix = view_matrix @ source_rot_matrix_inv
+            combined_euler = combined_matrix.to_euler('XYZ')
+            instance.rotation_euler = combined_euler
+            
+            # Calculate origin position based on view type
+            base_pos = self._calculate_instance_position(
+                view_type, 
+                front_vis_left, front_vis_bottom, front_vis_center_x,
+                plan_vis_top, back_vis_top,
+                left_vis_left, right_vis_left,
+                obj_width, obj_depth, obj_height
+            )
+            
+            # Calculate offset: transform source_loc by the combined instance rotation
+            # When instance is rotated, objects in collection rotate around instance origin
+            offset = combined_matrix @ source_loc
+            
+            instance.location = base_pos - offset
+            # Dashed hidden-line pass only on true elevation cells --
+            # not PLAN / ISO (see _create_iso_left note).
+            if view_type not in ('PLAN', 'ISO'):
+                self._add_dashed_cell_instance(instance, view_label)
+            
+            self.view_instances.append(instance)
+        
+        # Calculate total bounds for camera
+        min_x = left_vis_left if 'LEFT' in views else front_vis_left
+        max_x = right_vis_right if 'RIGHT' in views else front_vis_right
+        min_y = front_vis_bottom
+        max_y = back_vis_top if 'BACK' in views else (plan_vis_top if 'PLAN' in views else front_vis_top)
+        
+        total_width = max_x - min_x
+        total_height = max_y - min_y
+        center_x = (min_x + max_x) / 2
+        center_y = (min_y + max_y) / 2
+        
+        # Create camera
+        margin = units.inch(6)
+        ortho_scale = max(total_width, total_height) + margin * 2
+        
+        cam_data = bpy.data.cameras.new(f"{view_name} Camera")
+        cam_data.type = 'ORTHO'
+        cam_data.ortho_scale = ortho_scale
+        
+        self.camera = bpy.data.objects.new(f"{view_name} Camera", cam_data)
+        self.scene.collection.objects.link(self.camera)
+        self.scene.camera = self.camera
+        
+        # Set camera scale for normalized coordinates
+        self.camera.scale = (ortho_scale, ortho_scale, ortho_scale)
+        
+        # Position camera centered on layout, looking down
+        self.camera.location = (center_x, center_y, 10)
+        self.camera.rotation_euler = (0, 0, 0)
+        
+        # Add view instances to Freestyle Solid collection
+        solid_collection = self.get_freestyle_collection('SOLID')
+        if solid_collection:
+            for instance in self.view_instances:
+                if instance.name not in solid_collection.objects:
+                    solid_collection.objects.link(instance)
+
+        # Interior-part dashed siblings -> DASHED freestyle.
+        dashed_collection = self.get_freestyle_collection('DASHED')
+        if dashed_collection:
+            for d in self.dashed_instances:
+                if d.name not in dashed_collection.objects:
+                    dashed_collection.objects.link(d)
+        
+        # Add title block
+        self.title_block = TitleBlock()
+        self.title_block.create(self.scene, self.camera)
+        
+        return self.scene
+    
+    def _create_iso_left(self, views, obj_w, obj_d, obj_h, gap_unused,
+                         source_loc_unused, source_rot_inv_unused, view_name):
+        """Build a compact-room shop drawing page (elevation + plan + iso).
+        
+        The camera looks HORIZONTALLY at the wall (Rx 90 deg), exactly
+        like a standalone elevation. The elevation renders at the wall's
+        native world position with no transform — which is why standalone
+        elevations always look perfect. The plan and iso views are added as
+        rotated collection instances positioned at fixed wall-local offsets
+        from the elevation:
+        
+            [ Iso ]   [ Plan ]
+                      [ Elev ]
+        
+        Because all positions are expressed in WALL-LOCAL coordinates, the
+        layout is identical across rooms regardless of where the wall sits
+        in world space or how it's rotated. The wall's matrix_world is
+        applied once at the end (camera position; instance matrices) to put
+        everything in world frame.
+        """
+        wall_obj = self.source_obj
+        
+        # ------------------------------------------------------------------
+        # READ PASS — must run against the source scene's depsgraph.
+        #
+        # By the time we're called, create_scene() has already switched
+        # bpy.context.window.scene to the new (empty) layout scene. That
+        # means bpy.context.view_layer.update() and
+        # bpy.context.evaluated_depsgraph_get() both operate on the layout
+        # scene's view layer / depsgraph — which does NOT contain wall_obj
+        # or any of its descendants.
+        #
+        # When _compute_recursive_bbox calls obj.evaluated_get(depsgraph)
+        # for descendants that aren't in that depsgraph, Blender falls back
+        # to the unevaluated copy whose parent-chain transforms haven't
+        # been applied. Their matrix_world reads as identity, so their
+        # bound_box corners sit at world (0,0,0). After we multiply by
+        # wall.matrix_world.inverted(), that polluted origin becomes a
+        # wall-local point at (-W.t.x, -W.t.y, 0) — i.e. it scales with
+        # the wall's world position. bb_min[1] (cabinet front protrusion)
+        # gets clobbered to -W.t.y whenever the wall sits at +Y in world
+        # space, and the plan view ends up rendered with an offset that
+        # tracks the wall's world Y instead of the true protrusion.
+        #
+        # Fix: switch the active window scene back to the source scene
+        # (the one that actually contains wall_obj) for the duration of
+        # the depsgraph-sensitive reads, then restore the layout scene
+        # before any writes. The layout scene's contents haven't been
+        # populated yet, so swapping it out here is safe.
+        # ------------------------------------------------------------------
+        prev_window_scene = bpy.context.window.scene if bpy.context.window else None
+        source_scene = next(
+            (s for s in bpy.data.scenes
+             if not s.get('IS_LAYOUT_VIEW') and wall_obj.name in s.objects),
+            None,
+        )
+        if (source_scene is not None and bpy.context.window
+                and source_scene is not prev_window_scene):
+            bpy.context.window.scene = source_scene
+        try:
+            bpy.context.view_layer.update()
+            
+            # Wall canonical dimensions (used for elevation framing and plan offset).
+            wall = hb_types.GeoNodeWall(wall_obj)
+            wall_length = wall.get_input('Length')
+            wall_height = wall.get_input('Height')
+            wall_thickness = wall.get_input('Thickness')
+            
+            # Frame every view is taken from. The wall's own matrix,
+            # unless the wall's product hangs on its back face -- then
+            # the frame is spun end-for-end so the camera faces the
+            # cabinets instead of the blank side of the wall.
+            W = wall_view_frame(wall_obj, wall_length, wall_thickness)
+            
+            # Recursive bbox in that frame -- includes cabinet protrusion.
+            bb_min, bb_max = self._compute_recursive_bbox(
+                wall_obj, frame_matrix=W)
+        finally:
+            if (source_scene is not None and bpy.context.window
+                    and bpy.context.window.scene is not prev_window_scene
+                    and prev_window_scene is not None):
+                bpy.context.window.scene = prev_window_scene
+        bb_w = bb_max[0] - bb_min[0]
+        bb_d = bb_max[1] - bb_min[1]
+        bb_h = bb_max[2] - bb_min[2]
+        
+        # ----------------------------------------------------------------
+        # Iso rotation in the +Y-looking camera frame.
+        # In the look-down (-Z) frame, iso = Rx(theta) @ Rz(-45 deg).
+        # The look-+Y camera is rotated by Rx(+90 deg) relative to look-down,
+        # so the equivalent rotation in this frame is:
+        #   Rx(+90) @ Rx(theta) @ Rz(-45) = Rx(90 + theta) @ Rz(-45)
+        # For theta = -60 deg (front-heavy iso): Rx(30) @ Rz(-45).
+        # iso_x_angle_deg controls the top-vs-front balance, same as before.
+        # ----------------------------------------------------------------
+        iso_x_angle_deg = -60.0
+        iso_x_rad_local = math.radians(90.0 + iso_x_angle_deg)
+        iso_cos = math.cos(iso_x_rad_local)
+        iso_sin = math.sin(iso_x_rad_local)
+        SQRT_HALF = 0.707106781
+        
+        # Iso projection of wall-local (x, y, z), with camera looking +Y:
+        #   screen_X = world_x = SQRT_HALF * (x + y)
+        #   screen_Y = world_z = SQRT_HALF * iso_sin * (-x + y) + iso_cos * z
+        # iso_sin > 0 and iso_cos > 0 for iso_x_rad_local in (0, 90).
+        iso_view_w = SQRT_HALF * (bb_w + bb_d)
+        iso_view_h = SQRT_HALF * iso_sin * (bb_w + bb_d) + iso_cos * bb_h
+        
+        # ----------------------------------------------------------------
+        # Paper-space layout parameters (all in paper-inches).
+        # ----------------------------------------------------------------
+        iso_gap_inches = 1.0       # gap between iso column and elevation
+        plan_gap_inches = 0.5      # gap between elevation and plan above
+        margin_left_inches = 0.5
+        margin_right_inches = 0.5
+        margin_top_inches = 0.5
+        margin_bottom_inches = 1.5  # title block area
+        
+        paper_size = self.paper_size or 'LETTER'
+        landscape = self.landscape if hasattr(self, 'landscape') else True
+        
+        from .operators import layouts as _layouts_ops
+        
+        if paper_size not in _layouts_ops.PAPER_SIZES_INCHES:
+            paper_size = 'LETTER'
+        paper_w_in, paper_h_in = _layouts_ops.PAPER_SIZES_INCHES[paper_size]
+        if landscape:
+            paper_w_in, paper_h_in = paper_h_in, paper_w_in
+        page_long_in = max(paper_w_in, paper_h_in)
+        page_short_in = min(paper_w_in, paper_h_in)
+        
+        # Pick the largest scale where composed content fits inside the
+        # printable page area (page minus margins). Capped at 1/2"=1' so
+        # composed pages come in at a consistent scale with other layout
+        # views unless the content forces a coarser step.
+        scale_ladder = ('1/2"=1\'',
+                        '3/8"=1\'', '1/4"=1\'', '3/16"=1\'', '1/8"=1\'')
+        chosen_scale = None
+        for scale_str in scale_ladder:
+            iso_gap_m = _layouts_ops.paper_to_world(iso_gap_inches, scale_str)
+            plan_gap_m = _layouts_ops.paper_to_world(plan_gap_inches, scale_str)
+            
+            composed_w = iso_view_w + iso_gap_m + wall_length
+            composed_h = max(iso_view_h, wall_height + plan_gap_m + bb_d)
+            
+            avail_w = _layouts_ops.paper_to_world(
+                page_long_in - margin_left_inches - margin_right_inches, scale_str)
+            avail_h = _layouts_ops.paper_to_world(
+                page_short_in - margin_top_inches - margin_bottom_inches, scale_str)
+            
+            if composed_w <= avail_w and composed_h <= avail_h:
+                chosen_scale = scale_str
+                break
+        if chosen_scale is None:
+            chosen_scale = scale_ladder[-1]
+        
+        iso_gap = _layouts_ops.paper_to_world(iso_gap_inches, chosen_scale)
+        plan_gap = _layouts_ops.paper_to_world(plan_gap_inches, chosen_scale)
+        
+        # ----------------------------------------------------------------
+        # Wall-local offsets for the three views.
+        # Elevation: no offset, no rotation — wall stays at its native pos.
+        # Plan:      Rx(+90 deg), translated +Z so cabinet faces sit just
+        #            above the elevation top.
+        # Iso:       Rx(iso_x_rad_local) @ Rz(-45 deg), translated -X and +Z
+        #            so the iso's right edge sits just left of elevation
+        #            and its bottom aligns with elevation bottom (z=0).
+        # ----------------------------------------------------------------
+        # Plan: after Rx(+90), wall point (x,y,z) -> (x, -z, y). Plan content
+        # screen-Y (= world-Z) range becomes [bb_min.y, bb_max.y]. To put the
+        # cabinet faces (bb_min.y, most negative) at z = wall_height + plan_gap:
+        plan_offset_z = wall_height + plan_gap - bb_min[1]
+        
+        # Iso: anchor right edge at world-X = -iso_gap, bottom at world-Z = 0.
+        iso_offset_x = -iso_gap - SQRT_HALF * (bb_max[0] + bb_max[1])
+        # Iso unshifted min screen-Y = SQRT_HALF*iso_sin*(bb_min.y-bb_max.x) + iso_cos*bb_min.z
+        iso_offset_z = -(SQRT_HALF * iso_sin * (bb_min[1] - bb_max[0])
+                         + iso_cos * bb_min[2])
+        
+        # ----------------------------------------------------------------
+        # Build instance matrices.
+        # The content_collection holds the wall + children with their
+        # original world matrices. To make the wall content appear at a
+        # transformed position W_target, the instance matrix is:
+        #   M_E = W_target @ W^-1
+        # where W_target = W @ M_local for a given view's wall-local
+        # transform M_local. So:
+        #   M_E = W @ M_local @ W^-1
+        # For M_local = identity (elevation), M_E = identity.
+        # ----------------------------------------------------------------
+        W_inv = W.inverted()
+        
+        M_elev_local = Matrix.Identity(4)
+        M_plan_local = (Matrix.Translation(Vector((0.0, 0.0, plan_offset_z)))
+                        @ Matrix.Rotation(math.radians(90.0), 4, 'X'))
+        M_iso_local = (Matrix.Translation(Vector((iso_offset_x, 0.0, iso_offset_z)))
+                       @ Matrix.Rotation(iso_x_rad_local, 4, 'X')
+                       @ Matrix.Rotation(math.radians(-45.0), 4, 'Z'))
+        
+        instance_specs = (
+            ('FRONT', self.VIEW_TYPES['FRONT'][0], M_elev_local),
+            ('PLAN',  self.VIEW_TYPES['PLAN'][0],  M_plan_local),
+            ('ISO',   self.VIEW_TYPES['ISO'][0],   M_iso_local),
+        )
+        
+        for view_type, label, M_local in instance_specs:
+            if view_type not in views:
+                continue
+            instance = bpy.data.objects.new(f"{label} Instance", None)
+            instance.empty_display_size = 0.01
+            instance.instance_type = 'COLLECTION'
+            instance.instance_collection = self.content_collection
+            self.scene.collection.objects.link(instance)
+            instance.matrix_world = W @ M_local @ W_inv
+            self.view_instances.append(instance)
+            # Dashed hidden-line pass only on true elevation cells --
+            # PLAN (top-down) and ISO show interior shelves edge-on /
+            # in 3D where dashed hidden lines just add clutter.
+            if view_type not in ('PLAN', 'ISO'):
+                self._add_dashed_cell_instance(instance, label)
+        
+        # ----------------------------------------------------------------
+        # Camera positioning: anchor to the WALL, not to visible content.
+        # The elevation's right edge always lands at page_right - margin_r,
+        # and the elevation's bottom always lands at page_bottom + margin_b,
+        # for every room at the chosen scale. Different wall sizes extend
+        # MORE content leftward (toward iso) and upward (toward plan), but
+        # the elevation anchor points themselves never move.
+        # ----------------------------------------------------------------
+        # Page dimensions in world meters at the chosen scale.
+        ortho_w_world = _layouts_ops.paper_to_world(page_long_in, chosen_scale)
+        ortho_h_world = _layouts_ops.paper_to_world(page_short_in, chosen_scale)
+        margin_l_world = _layouts_ops.paper_to_world(margin_left_inches, chosen_scale)
+        margin_r_world = _layouts_ops.paper_to_world(margin_right_inches, chosen_scale)
+        margin_t_world = _layouts_ops.paper_to_world(margin_top_inches, chosen_scale)
+        margin_b_world = _layouts_ops.paper_to_world(margin_bottom_inches, chosen_scale)
+        
+        # Camera frames the page from camera_x - ortho_w/2 to camera_x + ortho_w/2
+        # in wall-local X, similarly in Z. To put elevation right edge
+        # (wall-local x = wall_length) at page right minus margin:
+        #   wall_length = camera_x + ortho_w/2 - margin_r_world
+        # => camera_x = wall_length - ortho_w/2 + margin_r_world
+        # To put elevation bottom (wall-local z = 0) at page bottom plus
+        # margin_b (title block area):
+        #   0 = camera_z - ortho_h/2 + margin_b_world
+        # => camera_z = ortho_h/2 - margin_b_world
+        camera_local_x = wall_length - ortho_w_world / 2.0 + margin_r_world
+        camera_local_z = ortho_h_world / 2.0 - margin_b_world
+        
+        # Camera distance from wall along -Y in wall-local (orthographic, so
+        # only matters for the camera clip range, not for projection).
+        camera_distance = 10.0
+        camera_local_pos = Vector((camera_local_x, -camera_distance, camera_local_z))
+        camera_world_pos = W @ camera_local_pos
+        
+        # Camera rotation in world: extract wall's Z-rotation from matrix_world
+        # so constraints / parents / driven rotations are respected.
+        wall_rotation_z = W.to_euler('XYZ').z
+        camera_rotation = (math.radians(90.0), 0.0, wall_rotation_z)
+        
+        cam_data = bpy.data.cameras.new(f"{view_name} Camera")
+        cam_data.type = 'ORTHO'
+        self.camera = bpy.data.objects.new(f"{view_name} Camera", cam_data)
+        self.scene.collection.objects.link(self.camera)
+        self.scene.camera = self.camera
+        # Build the camera transform as a matrix and assign matrix_world directly.
+        # Going through .location + .rotation_euler updates matrix_basis but NOT
+        # matrix_world (the depsgraph hasn't evaluated yet at this point in the
+        # create flow), and Blender renders using matrix_world. The result is
+        # the camera renders from world origin instead of where it should be.
+        camera_matrix_world = (Matrix.Translation(camera_world_pos)
+                               @ Euler(camera_rotation, 'XYZ').to_matrix().to_4x4())
+        self.camera.matrix_world = camera_matrix_world
+        
+        # Pin drawing scale; update_layout_scale callback handles ortho_scale,
+        # resolution and title block border.
+        self.scene.hb_paper_size = paper_size
+        self.scene.hb_paper_landscape = landscape
+        self.scene.hb_layout_scale = chosen_scale
+        
+        # Freestyle
+        solid_collection = self.get_freestyle_collection('SOLID')
+        if solid_collection:
+            for instance in self.view_instances:
+                if instance.name not in solid_collection.objects:
+                    solid_collection.objects.link(instance)
+
+        # Interior-part dashed siblings -> DASHED freestyle.
+        dashed_collection = self.get_freestyle_collection('DASHED')
+        if dashed_collection:
+            for d in self.dashed_instances:
+                if d.name not in dashed_collection.objects:
+                    dashed_collection.objects.link(d)
+        
+        # Title block — after hb_layout_scale set so border sizing is right.
+        self.title_block = TitleBlock()
+        self.title_block.create(self.scene, self.camera)
+        
+        return self.scene
+
+    def _build_dashed_content_collection(self, source_obj, view_name):
+        """Collect the source's INTERIOR parts (shelves and anything else
+        hidden behind doors, tagged IS_FACE_FRAME_INTERIOR_PART /
+        IS_FRAMELESS_INTERIOR_PART) into a dashed-content collection.
+
+        MultiView instances ONE content collection per cell and links
+        every instance into SOLID freestyle, so interior parts -- present
+        in the content but occluded -- get no SOLID strokes and no DASHED
+        pass either, and never draw. ElevationView avoids this by splitting
+        each cabinet into solid / dashed sub-collections
+        (_collect_objects_split). Here we build ONE dashed collection for
+        the whole source and instance it (front elevation cell only) into
+        DASHED freestyle.
+
+        Interior parts are MOVED out of the solid content, not copied.
+        Blender freestyle selects by SOURCE object, so leaving a shared
+        interior part in BOTH the solid content (instanced at every cell)
+        and the dashed content marks that source object 'dashed'
+        EVERYWHERE it's instanced -- the shelves then draw dashed on the
+        plan and iso cells too, not just the elevation. Removing them from
+        solid content (mirroring _collect_objects_split exactly) leaves
+        them only in the front dashed instance. Behind-door parts are
+        hidden on every cell anyway, so the solid cells lose nothing.
+        Only parts behind a real front are moved -- open-shelving
+        parts (open opening) stay in solid content so they remain
+        VISIBLE / solid on the iso and plan cells (see occluded()).
+
+        Returns the collection, or None when the source has no interior
+        parts (callers then skip the dashed instances).
+        """
+        dashed = bpy.data.collections.new(f"{view_name} Content Dashed")
+
+        def occluded(o):
+            """An interior part is hidden-line (dashed) only when its
+            enclosing face-frame opening has a real front. An OPEN
+            opening (front_type 'NONE', open shelving) leaves it
+            VISIBLE, so it must stay in the solid content and draw
+            normally on every cell (incl. the iso) -- otherwise open
+            shelves vanish. Walk up to the opening cage; default to
+            occluded when none is found (e.g. frameless, which has no
+            face-frame opening cage -- preserves prior behavior)."""
+            p = o.parent
+            while p is not None:
+                if p.get('IS_FACE_FRAME_OPENING_CAGE'):
+                    ffo = getattr(p, 'face_frame_opening', None)
+                    ft = getattr(ffo, 'front_type', 'NONE') if ffo else 'NONE'
+                    return ft != 'NONE'
+                p = p.parent
+            return True
+
+        def visit(o):
+            if (not is_cage_object(o) and not is_helper_object(o)
+                    and (o.get('IS_FRAMELESS_INTERIOR_PART')
+                         or o.get('IS_FACE_FRAME_INTERIOR_PART'))
+                    and occluded(o)):
+                if o.name not in dashed.objects:
+                    dashed.objects.link(o)
+            for ch in o.children:
+                visit(ch)
+
+        visit(source_obj)
+        if len(dashed.objects) == 0:
+            bpy.data.collections.remove(dashed)
+            return None
+        # Move (not copy): unlink interior parts from the solid content
+        # collection so they're instanced ONLY by the dashed front cell.
+        # (See docstring: freestyle is source-object based.)
+        if self.content_collection is not None:
+            for o in list(dashed.objects):
+                if o.name in self.content_collection.objects:
+                    self.content_collection.objects.unlink(o)
+        return dashed
+
+    def _add_dashed_cell_instance(self, solid_instance, label):
+        """Create a dashed sibling of a cell's solid instance: same
+        transform, referencing the interior-only dashed-content
+        collection, so the cell's interior parts (shelves behind doors)
+        get the DASHED hidden-line freestyle pass. No-op when the source
+        has no interior parts. Linked to DASHED freestyle by the caller
+        after the cell loop.
+        """
+        if self.content_collection_dashed is None:
+            return None
+        d = bpy.data.objects.new(f"{label} Dashed Instance", None)
+        d.empty_display_size = 0.01
+        d.instance_type = 'COLLECTION'
+        d.instance_collection = self.content_collection_dashed
+        self.scene.collection.objects.link(d)
+        # Parent at identity local transform: the dashed sibling shares
+        # the solid cell's transform exactly (the cell is a parentless
+        # empty) and follows when the cell is repositioned or scaled.
+        d.parent = solid_instance
+        self.dashed_instances.append(d)
+        return d
+
+    def _compute_recursive_bbox(self, source_obj, frame_matrix=None):
+        """Compute bbox of source_obj plus renderable descendants in
+        source_obj's local coords. Cage and helper objects are skipped.
+
+        frame_matrix overrides the frame the bbox is measured in; it
+        defaults to source_obj's own evaluated matrix.
+        
+        Uses the evaluated depsgraph so matrix_world reads reflect any
+        drivers / constraints / geometry-node updates, not the raw stored
+        values which can be stale on a freshly-loaded file.
+        
+        Returns (bb_min, bb_max) as Vectors.
+        """
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        source_eval = source_obj.evaluated_get(depsgraph)
+        frame = (frame_matrix if frame_matrix is not None
+                 else source_eval.matrix_world)
+        obj_matrix_inv = frame.inverted()
+        mn = [float('inf')] * 3
+        mx = [float('-inf')] * 3
+        
+        def visit(o):
+            # Skip annotation objects (dim CURVEs + FONT labels). Their
+            # evaluated bound_box reflects the GN-generated geometry --
+            # leader lines, tick marks, glyph meshes -- which often
+            # extends far past the actual feature being annotated and
+            # would inflate the natural ortho_scale enough to drop the
+            # iso-left scale ladder one or two steps coarser than the
+            # cabinet content alone needs. We still walk their children
+            # in case non-annotation geometry is parented underneath
+            # (defensive; no current case).
+            if o.get("IS_2D_ANNOTATION"):
+                for ch in o.children:
+                    visit(ch)
+                return
+            if not is_cage_object(o) and not is_helper_object(o):
+                try:
+                    if hasattr(o, 'bound_box') and o.type != 'EMPTY':
+                        o_eval = o.evaluated_get(depsgraph)
+                        mw = o_eval.matrix_world
+                        for c in o.bound_box:
+                            world = mw @ Vector(c)
+                            local = obj_matrix_inv @ world
+                            for i in range(3):
+                                if local[i] < mn[i]: mn[i] = local[i]
+                                if local[i] > mx[i]: mx[i] = local[i]
+                except Exception:
+                    pass
+            for ch in o.children:
+                visit(ch)
+        
+        visit(source_obj)
+        
+        if mn[0] == float('inf'):
+            if hasattr(source_obj, 'dimensions'):
+                return Vector((0, 0, 0)), Vector(source_obj.dimensions)
+            return Vector((0, 0, 0)), Vector((1, 1, 1))
+        
+        return Vector(mn), Vector(mx)
+    
+    def _get_object_dimensions(self, obj):
+        """Get object dimensions from GeoNode inputs or bounding box."""
+        try:
+            # Try to get from GeoNode cage
+            cage = hb_types.GeoNodeCage(obj)
+            width = cage.get_input('Dim X')
+            depth = cage.get_input('Dim Y')
+            height = cage.get_input('Dim Z')
+            return (width, depth, height)
+        except:
+            pass
+        
+        # Fallback to bounding box
+        if hasattr(obj, 'dimensions'):
+            return (obj.dimensions.x, obj.dimensions.y, obj.dimensions.z)
+        
+        return (1, 1, 1)
+    
+    def _calculate_grid(self, num_views):
+        """Calculate grid layout for views."""
+        if num_views <= 2:
+            return (num_views, 1)
+        elif num_views <= 4:
+            return (2, 2)
+        else:
+            return (3, 2)
+    
+    def _calculate_instance_position(self, view_type, 
+                                     front_vis_left, front_vis_bottom, front_vis_center_x,
+                                     plan_vis_top, back_vis_top,
+                                     left_vis_left, right_vis_left,
+                                     obj_width, obj_depth, obj_height):
+        """Calculate origin position for a rotated instance based on visual bounds.
+        
+        Each rotation transforms where the origin appears relative to the visual bounds.
+        This method converts from desired visual position to required origin position.
+        
+        Args:
+            view_type: Type of view ('PLAN', 'FRONT', 'BACK', 'LEFT', 'RIGHT')
+            front_vis_left: X position of Front view's left edge
+            front_vis_bottom: Y position of Front view's bottom edge  
+            front_vis_center_x: X center of Front/Plan/Back column
+            plan_vis_top: Y position of Plan view's top (back) edge
+            back_vis_top: Y position of Back view's top edge
+            left_vis_left: X position of Left view's left edge
+            right_vis_left: X position of Right view's left edge
+            obj_width, obj_depth, obj_height: Object dimensions
+        """
+        if view_type == 'PLAN':
+            # Rotation (0,0,0): Origin at back-left corner
+            # Visual: origin is at top-left, extends +X (width) and -Y (depth)
+            return Vector((front_vis_left, plan_vis_top, 0))
+        
+        elif view_type == 'FRONT':
+            # Rotation (-90°,0,0): Tipped forward, origin at bottom-left
+            # Visual: origin at bottom-left, extends +X (width) and +Y (height)
+            # Z offset = -depth to bring front face to Z=0 plane
+            return Vector((front_vis_left, front_vis_bottom, -obj_depth))
+        
+        elif view_type == 'BACK':
+            # Rotation (90°,0,180°): Tipped back and flipped
+            # Due to 180° Z rotation, origin shifts to right side
+            # X offset = +obj_width to align visual left edge with front
+            return Vector((front_vis_left + obj_width, back_vis_top, 0))
+        
+        elif view_type == 'LEFT':
+            # Rotation (0,-90°,-90°): Shows left side of cabinet
+            # Origin at visual bottom-left, extends +X (depth) and +Y (height)
+            return Vector((left_vis_left, front_vis_bottom, 0))
+        
+        elif view_type == 'RIGHT':
+            # Rotation (0,90°,90°): Shows right side of cabinet  
+            # Due to rotation, origin shifts right by depth
+            # X offset = +obj_depth to align visual left edge
+            # Z offset = -width
+            return Vector((right_vis_left + obj_depth, front_vis_bottom, -obj_width))
+        
+        return Vector((front_vis_left, front_vis_bottom, 0))
+    
+    def _add_object_to_collection(self, obj, collection):
+        """Recursively add object and children to collection, skipping cages/helpers."""
+        is_cage = is_cage_object(obj)
+        is_helper = is_helper_object(obj)
+        
+        if not is_cage and not is_helper:
+            if obj.name not in collection.objects:
+                collection.objects.link(obj)
+        
+        for child in obj.children:
+            self._add_object_to_collection(child, collection)
+    
+    def _create_view_label(self, text, x, y):
+        """Create a text label for a view."""
+        text_curve = bpy.data.curves.new(f"Label_{text}", 'FONT')
+        text_curve.body = text
+        text_curve.size = units.inch(0.5)
+        text_curve.align_x = 'CENTER'
+        text_curve.align_y = 'BOTTOM'
+        
+        text_obj = bpy.data.objects.new(f"Label_{text}", text_curve)
+        self.scene.collection.objects.link(text_obj)
+        text_obj.location = (x, y, 0)
+        
+        # Black material
+        mat = bpy.data.materials.new(f"Label_{text}_Mat")
+        mat.use_nodes = True
+        bsdf = mat.node_tree.nodes.get("Principled BSDF")
+        if bsdf:
+            bsdf.inputs["Base Color"].default_value = (0, 0, 0, 1)
+        text_obj.data.materials.append(mat)
+
+        return text_obj
+
+
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+
+def get_layout_view_from_scene(scene: bpy.types.Scene) -> LayoutView:
+    """Get the appropriate LayoutView subclass for a scene."""
+    if not scene.get('IS_LAYOUT_VIEW'):
+        return None
+    
+    if scene.get('IS_ELEVATION_VIEW'):
+        return ElevationView(scene)
+    elif scene.get('IS_PLAN_VIEW'):
+        return PlanView(scene)
+    elif scene.get('IS_3D_VIEW'):
+        return View3D(scene)
+    elif scene.get('IS_MULTI_VIEW'):
+        return MultiView(scene)
+    else:
+        return LayoutView(scene)
+
+
+def create_elevation_for_wall(wall_obj: bpy.types.Object) -> ElevationView:
+    """Convenience function to create an elevation view for a wall."""
+    view = ElevationView()
+    view.create(wall_obj)
+    return view
+
+
+def create_plan_view() -> PlanView:
+    """Convenience function to create a plan view."""
+    view = PlanView()
+    view.create()
+    return view
+
+
+def create_3d_view(perspective: bool = True) -> View3D:
+    """Convenience function to create a 3D view."""
+    view = View3D()
+    view.create(perspective=perspective)
+    return view
+
+
+def create_all_elevations() -> list:
+    """Create elevation views for all walls in the scene."""
+    views = []
+    for obj in bpy.data.objects:
+        if 'IS_WALL_BP' in obj:
+            view = create_elevation_for_wall(obj)
+            views.append(view)
+    return views
+
+
+def create_multi_view(source_obj: bpy.types.Object, views: list) -> MultiView:
+    """Convenience function to create a multi-view layout.
+    
+    Args:
+        source_obj: Object to create views for
+        views: List of view types ('PLAN', 'FRONT', 'BACK', 'LEFT', 'RIGHT')
+    """
+    view = MultiView()
+    view.create(source_obj, views)
+    return view
