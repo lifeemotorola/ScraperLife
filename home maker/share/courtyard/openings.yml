@@ -1,0 +1,133 @@
+---
+house entrance:
+  family: tunis entry
+  type: door
+  cill: 0.02
+house entrance single storey:
+  family: tunis entry no roof
+  type: door
+  cill: 0.02
+retail entrance:
+  family: tunis shopfront
+  type: door
+  cill: 0.02
+kitchen sahn door:
+  family: arch
+  type: door
+  cill: 0.02
+living sahn door:
+  family: arch
+  type: door
+  cill: 0.02
+circulation sahn door:
+  family: arch
+  type: door
+  cill: 0.02
+bedroom sahn door:
+  family: single inside door
+  type: door
+  cill: 0.02
+toilet sahn door:
+  family: single inside door
+  type: door
+  cill: 0.02
+kitchen outside door:
+  family: arch
+  type: door
+  cill: 0.02
+living outside door:
+  family: arch
+  type: door
+  cill: 0.02
+circulation outside door:
+  family: arch
+  type: door
+  cill: 0.02
+bedroom outside door:
+  family: single inside door
+  type: door
+  cill: 0.02
+kitchen living inside door:
+  family: arch thin
+  type: door
+  cill: 0.02
+kitchen inside door:
+  family: arch thin
+  type: door
+  cill: 0.02
+living inside door:
+  family: arch thin
+  type: door
+  cill: 0.02
+circulation inside door:
+  family: arch thin
+  type: door
+  cill: 0.02
+bedroom inside door:
+  family: single inside door
+  type: door
+  cill: 0.02
+toilet inside door:
+  family: single inside door
+  type: door
+  cill: 0.02
+kitchen outside window:
+  family: shuttered window
+  type: window
+  cill: 1.05
+living outside window:
+  family: shuttered window
+  type: window
+  cill: 0.75
+circulation outside window:
+  family: shuttered window
+  type: window
+  cill: 0.75
+bedroom outside window:
+  family: shuttered window
+  type: window
+  cill: 0.75
+toilet outside window:
+  family: shuttered window
+  type: window
+  cill: 0.75
+kitchen street window:
+  family: tiny window
+  type: window
+  cill: 2.0
+living street window:
+  family: tiny window
+  type: window
+  cill: 2.0
+circulation street window:
+  family: tiny window
+  type: window
+  cill: 2.0
+bedroom street window:
+  family: tiny window
+  type: window
+  cill: 2.0
+toilet street window:
+  family: tiny window
+  type: window
+  cill: 2.0
+kitchen sahn window:
+  family: shuttered window
+  type: window
+  cill: 1.05
+living sahn window:
+  family: shuttered window
+  type: window
+  cill: 0.75
+circulation sahn window:
+  family: shuttered window
+  type: window
+  cill: 0.75
+bedroom sahn window:
+  family: shuttered window
+  type: window
+  cill: 0.75
+toilet sahn window:
+  family: shuttered window
+  type: window
+  cill: 0.75
