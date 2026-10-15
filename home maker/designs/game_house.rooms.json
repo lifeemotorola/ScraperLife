@@ -3,15 +3,197 @@
   "version": 1,
   "name": "Game house",
   "rooms": [
-    {"vertices": [[0,0],[5,0],[5,7],[0,7]], "elevation": 0.0, "height": 3.2, "stylename": "default", "usage": "living", "code": "g1"},
-    {"vertices": [[5,0],[8,0],[8,7],[5,7]], "elevation": 0.0, "height": 3.2, "stylename": "default", "usage": "kitchen", "code": "g2"},
-    {"vertices": [[0,0],[4,0],[4,7],[0,7]], "elevation": 3.2, "height": 3.0, "stylename": "default", "usage": "bedroom", "code": "u1"},
-    {"vertices": [[4,0],[8,0],[8,7],[4,7]], "elevation": 3.2, "height": 3.0, "stylename": "default", "usage": "bedroom", "code": "u2"}
+    {
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          0,
+          7
+        ]
+      ],
+      "elevation": 0.0,
+      "height": 3.2,
+      "stylename": "default",
+      "usage": "circulation",
+      "code": "g1"
+    },
+    {
+      "vertices": [
+        [
+          3,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          3,
+          7
+        ]
+      ],
+      "elevation": 0.0,
+      "height": 3.2,
+      "stylename": "default",
+      "usage": "living",
+      "code": "g2"
+    },
+    {
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          0,
+          7
+        ]
+      ],
+      "elevation": 3.2,
+      "height": 3.0,
+      "stylename": "default",
+      "usage": "bedroom",
+      "code": "u1"
+    },
+    {
+      "vertices": [
+        [
+          4,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          4,
+          7
+        ]
+      ],
+      "elevation": 3.2,
+      "height": 3.0,
+      "stylename": "default",
+      "usage": "bedroom",
+      "code": "u2"
+    }
   ],
   "faces": [
-    {"vertices": [[0,0,6.2],[4,0,8.0],[8,0,6.2]], "stylename": "default"},
-    {"vertices": [[8,7,6.2],[4,7,8.0],[0,7,6.2]], "stylename": "default"},
-    {"vertices": [[0,0,6.2],[4,0,8.0],[4,7,8.0],[0,7,6.2]], "stylename": "default"},
-    {"vertices": [[4,0,8.0],[8,0,6.2],[8,7,6.2],[4,7,8.0]], "stylename": "default"}
+    {
+      "vertices": [
+        [
+          0,
+          0,
+          6.2
+        ],
+        [
+          4,
+          0,
+          8.0
+        ],
+        [
+          8,
+          0,
+          6.2
+        ]
+      ],
+      "stylename": "default"
+    },
+    {
+      "vertices": [
+        [
+          8,
+          7,
+          6.2
+        ],
+        [
+          4,
+          7,
+          8.0
+        ],
+        [
+          0,
+          7,
+          6.2
+        ]
+      ],
+      "stylename": "default"
+    },
+    {
+      "vertices": [
+        [
+          0,
+          0,
+          6.2
+        ],
+        [
+          4,
+          0,
+          8.0
+        ],
+        [
+          4,
+          7,
+          8.0
+        ],
+        [
+          0,
+          7,
+          6.2
+        ]
+      ],
+      "stylename": "default"
+    },
+    {
+      "vertices": [
+        [
+          4,
+          0,
+          8.0
+        ],
+        [
+          8,
+          0,
+          6.2
+        ],
+        [
+          8,
+          7,
+          6.2
+        ],
+        [
+          4,
+          7,
+          8.0
+        ]
+      ],
+      "stylename": "default"
+    }
   ]
 }

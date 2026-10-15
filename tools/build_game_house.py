@@ -2,9 +2,9 @@
 """Build the game's house model: Homemaker design + porch, door and chimney.
 
 1. Homemaker's rooms2ifc.py turns home maker/designs/game_house.rooms.json into IFC.
-2. tools/ifc_to_glb.py converts that IFC into game-space mesh parts.
-3. This script adds the porch, door, steps and chimney (Homemaker's rooms don't place
-   doors or porches) and writes one GLB, assets/Environment/homemaker-house.glb.
+2. tools/ifc_to_glb.py converts that IFC (doors and windows included) into game-space parts.
+3. This script adds the porch, steps and chimney, which Homemaker's rooms don't place,
+   and writes one GLB, assets/Environment/homemaker-house.glb.
 
 Run with a Python that has ifcopenshell, numpy, trimesh and Homemaker's requirements:
     python3 tools/build_game_house.py
@@ -49,18 +49,17 @@ def box(lo, hi, colour):
 
 
 def extras():
+    """Porch, steps and chimney. The front door is Homemaker's own "house entrance" (an IfcDoor
+    from share/library.ifc), placed at the middle of the hall's front wall, x = 1.5."""
     parts = []
-    # Porch: deck in front of the house, a roof on four posts, and two steps down to the path.
-    parts.append(box([1.0, -2.6, 0.0], [7.0, 0.0, 0.18], DECK))
-    parts.append(box([0.8, -2.8, 2.9], [7.2, 0.2, 3.1], ROOF))
-    for x in (1.1, 6.9):
+    # Porch over the hall's front wall: a deck, a roof on four posts, and two steps down.
+    parts.append(box([-0.3, -2.6, 0.0], [3.3, 0.0, 0.18], DECK))
+    parts.append(box([-0.5, -2.8, 2.9], [3.5, 0.2, 3.1], ROOF))
+    for x in (0.0, 3.0):
         for y in (-2.5, -0.1):
             parts.append(box([x - 0.08, y - 0.08, 0.18], [x + 0.08, y + 0.08, 2.9], WHITE))
-    parts.append(box([2.0, -3.2, 0.0], [6.0, -2.6, 0.09], STEP))
-    parts.append(box([2.0, -3.6, 0.0], [6.0, -3.2, 0.04], STEP))
-    # Front door in the living-room wall, with a white frame.
-    parts.append(box([1.95, -0.10, 0.18], [3.05, 0.04, 2.45], WHITE))
-    parts.append(box([2.1, -0.06, 0.18], [2.9, 0.06, 2.3], DOOR))
+    parts.append(box([0.5, -3.2, 0.0], [2.5, -2.6, 0.09], STEP))
+    parts.append(box([0.5, -3.6, 0.0], [2.5, -3.2, 0.04], STEP))
     # Chimney on the roof of the rear slope.
     parts.append(box([5.4, 4.2, 6.0], [6.2, 5.0, 8.9], CHIMNEY))
     return parts
