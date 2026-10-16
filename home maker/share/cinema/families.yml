@@ -1,0 +1,8 @@
+---
+# This is a simple family that consists of a single 600mm wide old-fashioned
+# cinema seat.
+
+Cinema seat:
+  -
+    typename: 'Cinema seat 600'
+    height: 0.0

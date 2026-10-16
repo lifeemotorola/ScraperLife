@@ -4,7 +4,7 @@ import { makeSign } from './Building.js';
 
 // The authored house, converted from assets/Environment/old-house.dae by tools/convert_house_glb.py.
 // A binary GLB parses far faster than the 4.7 MB COLLADA XML, and its textures are embedded and resized.
-const HOUSE_URL = new URL('../../assets/Environment/old-house.glb', import.meta.url).href;
+const HOUSE_URL = new URL('../../assets/Environment/homemaker-house.glb', import.meta.url).href;
 
 let templatePromise = null;
 
