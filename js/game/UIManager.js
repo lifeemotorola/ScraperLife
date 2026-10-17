@@ -557,22 +557,42 @@ export class UIManager {
 
   // House names, drawn on the expanded world map at each house's position. They are re-placed
   // every frame with the other map points (see the HUD update), so they follow the map centre.
-  setPlaceNames(places = []) {
+  // Clicking a name sets it as the route target (onPick); clicking the active one again clears it.
+  setPlaceNames(places = [], onPick = null) {
     const grid = this.el.worldMapGrid;
     this.placeMarkers?.forEach((marker) => marker.world.remove());
     this.placeMarkers = [];
-    for (const { x, z, label } of places) {
-      if (!label || !grid) continue;
+    this.onPlacePick = onPick;
+    for (const place of places) {
+      if (!place.label || !grid) continue;
       const world = document.createElement('div');
       world.className = 'world-map-point place';
+      world.tabIndex = 0;
+      world.setAttribute('role', 'button');
       const pin = document.createElement('b');
       const text = document.createElement('span');
-      text.textContent = label;
+      text.textContent = place.label;
       world.append(pin, text);
+      const pick = (event) => {
+        event.stopPropagation();
+        this.onPlacePick?.(place);
+      };
+      world.addEventListener('click', pick);
+      world.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); pick(event); }
+      });
       grid.append(world);
-      this.placeMarkers.push({ x, z, world });
+      this.placeMarkers.push({ place, x: place.x, z: place.z, world });
     }
     this.positionPlaceMarkers();
+  }
+
+  // Highlights the house on the map that is the current route target (null clears it).
+  setWaypoint(place) {
+    this.waypoint = place || null;
+    for (const marker of this.placeMarkers || []) {
+      marker.world.classList.toggle('active', marker.place === this.waypoint);
+    }
   }
 
   positionPlaceMarkers() {

@@ -107,7 +107,7 @@ export class Game {
     this.combat = new CombatSystem();
     this.physics = new PhysicsEngine();
     this.city = new City(this.scene, this.physics); this.city.build({ lampLightCount: this.isMobile ? 3 : 5 });
-    this.ui.setPlaceNames(this.city.placeNames);
+    this.ui.setPlaceNames(this.city.placeNames, (place) => this.toggleWaypoint(place));
     // (-16, 0, 10) stands on the open street by Kollie Radio Works; findFree guarantees
     // the spawn never lands inside a building collider again (that reads as Markie
     // rotating in place, unable to move).
@@ -809,7 +809,64 @@ export class Game {
     const nextFov = this.camera.fov + (view.fov - this.camera.fov) * .12;
     if (Math.abs(nextFov - this.camera.fov) > .01) { this.camera.fov = nextFov; this.camera.updateProjectionMatrix(); }
   }
+  // Route from the world map: clicking a house name sets it as the target. The route is a dashed
+  // line on the ground and a beacon at the house. It is a straight line, not a path around walls.
+  toggleWaypoint(place) {
+    if (this.waypoint?.label === place.label) { this.clearWaypoint(); return; }
+    this.clearWaypoint();
+    this.waypoint = place;
+    const target = new THREE.Vector3(place.entrance.x, 0, place.entrance.z);
+    this.waypointTarget = target;
+    const beacon = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.1, 0.4, 5, 12, 1, true),
+      new THREE.MeshBasicMaterial({ color: 0xffb454, transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false })
+    );
+    beacon.position.set(target.x, 2.5, target.z);
+    this.scene.add(beacon);
+    this.waypointBeacon = beacon;
+    const geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+    const line = new THREE.Line(geometry, new THREE.LineDashedMaterial({ color: 0xffb454, dashSize: 0.6, gapSize: 0.4, transparent: true, opacity: 0.85 }));
+    line.frustumCulled = false;
+    this.scene.add(line);
+    this.waypointLine = line;
+    this.ui.setWaypoint(place);
+    this.ui.toast(`ROUTE // ${place.label}`);
+  }
+
+  clearWaypoint() {
+    for (const key of ['waypointBeacon', 'waypointLine']) {
+      const object = this[key];
+      if (!object) continue;
+      this.scene.remove(object);
+      object.geometry?.dispose?.();
+      object.material?.dispose?.();
+      this[key] = null;
+    }
+    this.waypoint = null;
+    this.waypointTarget = null;
+    this.ui.setWaypoint(null);
+  }
+
+  // Keeps the route line on the player, and clears the route when Markie is close to the stop.
+  updateWaypoint(delta) {
+    if (!this.waypoint || !this.waypointTarget) return;
+    const target = this.waypointTarget;
+    const here = this.player.position;
+    if (Math.hypot(target.x - here.x, target.z - here.z) < 2.5) {
+      this.ui.toast(`ARRIVED // ${this.waypoint.label}`);
+      this.clearWaypoint();
+      return;
+    }
+    const positions = this.waypointLine.geometry.attributes.position;
+    positions.setXYZ(0, here.x, 0.15, here.z);
+    positions.setXYZ(1, target.x, 0.15, target.z);
+    positions.needsUpdate = true;
+    this.waypointLine.computeLineDistances();
+    if (this.waypointBeacon) this.waypointBeacon.rotation.y += delta * 1.5;
+  }
+
   objectiveTarget() {
+    if (this.waypointTarget) return this.waypointTarget;
     if (this.missions.canRepair) return this.city.generatorPosition;
     if (this.missions.is('mentor')) return this.npcs.kollie.position;
     if (this.missions.is('market')) return this.npcs.tenneh.position;
@@ -878,13 +935,14 @@ export class Game {
     if (this.interaction) this.ui.showInteraction(this.interaction.text); else this.ui.hideInteraction();
     this.dotTimer = (this.dotTimer || 0) + delta;
     if (this.dotTimer > 0.1) { this.dotTimer = 0; this.refreshRemoteDots(); }
+    this.updateWaypoint(delta);
     this.ui.updateStatus({
       resolve: this.combat.resolve,
       maxResolve: this.combat.maxResolve,
       pulse: this.pulse.charge,
       player: this.player.position,
       target: this.objectiveTarget(),
-      missionTitle: this.missions.mission.title,
+      missionTitle: this.waypoint ? `ROUTE // ${this.waypoint.label}` : this.missions.mission.title,
       npcs: this.npcs,
     });
   }

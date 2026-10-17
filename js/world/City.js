@@ -22,7 +22,10 @@ export class City {
       [-32, -8, 9, 9, 10, 0x4a5a56, 'OLD HARBOR'], [32, -18, 10, 8, 9, 0x3d4f4e, 'CONTAINER YARD'], [ -8, -32, 14, 9, 8, 0x5e4e3e, 'SCRAP FIELD'], [ 28, 22, 9, 9, 11, 0x4b5e5a, 'TIDE APARTMENTS'], [-30, 32, 11, 7, 9, 0x5a6260, 'UNION HOUSE'], [ 10, -34, 12, 8, 9, 0x6b5a42, 'FUEL DEPOT'],
     ];
     // House names are shown on the world map only, so keep each one with its position.
-    this.placeNames = buildingData.map(([x, z, , , , , label]) => ({ x, z, label }));
+    // `entrance` is a stop just in front of each house's street (-Z) face, so a route ends outside the walls.
+    this.placeNames = buildingData.map(([x, z, , depth, , , label]) => ({
+      x, z, label, entrance: { x, z: z - depth / 2 - 1.5 },
+    }));
     // Every block gets its collider now, so movement is the same whether or not the house model has loaded.
     const blocks = buildingData.map(([x,z,width,depth,height,color,label]) => {
       const building = new Building(this.scene, this.physics, { x,z,width,depth,height,color,label });
