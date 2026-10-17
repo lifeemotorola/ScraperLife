@@ -555,6 +555,59 @@ export class UIManager {
     this.el.progressBar.style.width = `${mission.percent(scrap)}%`;
   }
 
+  // House names, drawn on the expanded world map at each house's position. They are re-placed
+  // every frame with the other map points (see the HUD update), so they follow the map centre.
+  // Clicking a name sets it as the route target (onPick); clicking the active one again clears it.
+  setPlaceNames(places = [], onPick = null) {
+    const grid = this.el.worldMapGrid;
+    this.placeMarkers?.forEach((marker) => marker.world.remove());
+    this.placeMarkers = [];
+    this.onPlacePick = onPick;
+    for (const place of places) {
+      if (!place.label || !grid) continue;
+      const world = document.createElement('div');
+      world.className = 'world-map-point place';
+      world.tabIndex = 0;
+      world.setAttribute('role', 'button');
+      const pin = document.createElement('b');
+      const text = document.createElement('span');
+      text.textContent = place.label;
+      world.append(pin, text);
+      const pick = (event) => {
+        event.stopPropagation();
+        this.onPlacePick?.(place);
+      };
+      world.addEventListener('click', pick);
+      world.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); pick(event); }
+      });
+      grid.append(world);
+      this.placeMarkers.push({ place, x: place.x, z: place.z, world });
+    }
+    this.positionPlaceMarkers();
+  }
+
+  // Highlights the house on the map that is the current route target (null clears it).
+  setWaypoint(place) {
+    this.waypoint = place || null;
+    for (const marker of this.placeMarkers || []) {
+      marker.world.classList.toggle('active', marker.place === this.waypoint);
+    }
+  }
+
+  positionPlaceMarkers() {
+    if (!this.placeMarkers?.length) return;
+    const B = this.worldBounds;
+    const range = B * 2;
+    for (const marker of this.placeMarkers) {
+      const u = (marker.x - this.mapCentre.x + B) / range;
+      const v = (marker.z - this.mapCentre.z + B) / range;
+      marker.world.style.left = `${u * 100}%`;
+      marker.world.style.top = `${v * 100}%`;
+      marker.world.hidden = u < 0 || u > 1 || v < 0 || v > 1;
+    }
+  }
+
   setRemoteDots(players) {
     const B = this.worldBounds;
     const range = B * 2;
@@ -614,6 +667,7 @@ export class UIManager {
       this.el.worldMapPlayer.style.left = `${((player.x - this.mapCentre.x + B) / range) * 100}%`;
       this.el.worldMapPlayer.style.top = `${((player.z - this.mapCentre.z + B) / range) * 100}%`;
     }
+    this.positionPlaceMarkers();
     if (this.el.worldMapObjective) {
       this.el.worldMapObjective.style.left = `${((target.x - this.mapCentre.x + B) / range) * 100}%`;
       this.el.worldMapObjective.style.top = `${((target.z - this.mapCentre.z + B) / range) * 100}%`;

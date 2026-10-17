@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { createGLTFLoader } from '../loaders/gltf.js';
-import { makeSign } from './Building.js';
 
 // The authored house, converted from assets/Environment/old-house.dae by tools/convert_house_glb.py.
 // A binary GLB parses far faster than the 4.7 MB COLLADA XML, and its textures are embedded and resized.
@@ -92,15 +91,6 @@ export function placeHouses(scene, template, placements) {
     created.push(instanced);
   }
 
-  // The model has no sign of its own, so each street name goes over its house's front (-Z) face.
-  placements.forEach(({ x, z, width, depth, height, label }) => {
-    if (!label) return;
-    const sign = makeSign(label, Math.min(width * 1.1, 5));
-    sign.position.set(x, Math.min(height, 3.2) - .35, z - depth / 2 - .08);
-    // A plane faces +Z by default; turn it so its text reads from the street side (-Z).
-    sign.rotation.y = Math.PI;
-    scene.add(sign);
-    created.push(sign);
-  });
+  // House names are not drawn on the houses; they go on the world map (see UIManager.setPlaceNames).
   return created;
 }
