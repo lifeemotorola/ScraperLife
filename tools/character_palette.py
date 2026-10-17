@@ -149,6 +149,12 @@ WARDROBE_BOTTOM_STYLES = (
 WARDROBE_HEADWEAR_STYLES = (
     "none", "cap", "sports-cap", "flat-cap", "headwrap", "headband", "beanie", "kufi", "hardhat", "bandana",
 )
+# Garment colours a random outfit can start from (each is then jittered per character).
+OUTFIT_BASE_COLOURS = (
+    "#2f5d5b", "#26333c", "#3b2a1f", "#562b28", "#502d30", "#4a5a38", "#6b5a42", "#2d3e5c",
+    "#7a4a2e", "#5b4c6e", "#8a7a4e", "#3d4a4a", "#8c3b2e", "#1f2a2e", "#c9b98c", "#9fb1bb",
+)
+OUTFIT_SLOTS = ("shirt", "pants", "shoes", "gloves", "pack")
 # Slots coloured once for the whole cast (see SHARED_COLOURS).
 SHARED_SLOTS = []
 
@@ -359,21 +365,36 @@ def darken(value, amount):
     return rgb_to_hex(tuple(c * 255 for c in colorsys.hsv_to_rgb(hue, saturation, brightness * (1 - amount))))
 
 
+def random_wardrobe(rng):
+    """A random outfit: one top, one bottom, one headwear, a pack or not, and a jersey number 0-9."""
+    return {
+        "top": rng.choice(WARDROBE_TOP_STYLES),
+        "bottom": rng.choice(WARDROBE_BOTTOM_STYLES),
+        "headwear": rng.choice(WARDROBE_HEADWEAR_STYLES),
+        "backpack": rng.random() < 0.4,
+        "number": rng.randint(0, 9),
+    }
+
+
 def character_palette(entry, seed):
-    """One character's colours: skin from the ramp, wardrobe from the art direction, jittered."""
+    """One character's look. Skin and hair come from the roster; the outfit (styles and garment
+    colours) is random per character, but deterministic for a given seed."""
     rng = seeded_rng(seed, entry["id"])
     skin = jitter(SKIN_RAMP[entry["skin"] % len(SKIN_RAMP)], rng, value_span=0.05, hue_span=0.012)
     hair = jitter(entry.get("hair", "#171109"), rng, value_span=0.10, hue_span=0.02)
     colours = {"skin": skin, "hair": hair, "brows": darken(hair, 0.22)}
-    for slot, base in entry["outfit"].items():
-        colours[slot] = jitter(base, rng, value_span=0.09, hue_span=0.025)
+    outfit_rng = seeded_rng(seed, entry["id"], "outfit")
+    wardrobe = random_wardrobe(outfit_rng)
+    for slot in OUTFIT_SLOTS:
+        base = outfit_rng.choice(OUTFIT_BASE_COLOURS)
+        colours[slot] = jitter(base, outfit_rng, value_span=0.09, hue_span=0.025)
     return {
         "name": entry["name"],
         "label": entry["label"],
         "role": entry["role"],
         "voice": entry["voice"],
         "accent": entry["accent"],
-        "wardrobe": dict(entry["wardrobe"]),
+        "wardrobe": wardrobe,
         "seed": hashlib.blake2b(f"{seed}|{entry['id']}".encode("utf-8"), digest_size=4).hexdigest(),
         "colors": colours,
     }

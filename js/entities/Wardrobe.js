@@ -298,9 +298,12 @@ function addAccessoryMesh(parent, geometry, material, name) {
   return mesh;
 }
 
+// Hats are switched off for now: the palette still records a headwear style, but nothing is drawn.
+const HEADWEAR_ENABLED = false;
+
 function attachHeadwear(root, palette, renderOptions) {
   const style = palette?.wardrobe?.headwear || 'none';
-  if (style === 'none') return null;
+  if (!HEADWEAR_ENABLED || style === 'none') return null;
   const head = root.getObjectByName('head');
   if (!head) return null;
 
