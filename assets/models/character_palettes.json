@@ -76,22 +76,22 @@
       "voice": "greeter",
       "accent": "#75c5bb",
       "wardrobe": {
-        "top": "street-tee",
-        "bottom": "field-cargo",
-        "headwear": "cap",
-        "backpack": true,
-        "number": 0
+        "top": "wrap-blouse",
+        "bottom": "dark-denim",
+        "headwear": "flat-cap",
+        "backpack": false,
+        "number": 8
       },
       "seed": "d696921b",
       "colors": {
         "skin": "#66412a",
         "hair": "#181209",
         "brows": "#130e07",
-        "shirt": "#33635c",
-        "pants": "#28383d",
-        "shoes": "#3d2d22",
-        "gloves": "#202c29",
-        "pack": "#ca873d"
+        "shirt": "#66573d",
+        "pants": "#2b425d",
+        "shoes": "#1f282d",
+        "gloves": "#543138",
+        "pack": "#475935"
       }
     },
     "musu": {
@@ -101,22 +101,22 @@
       "voice": "greeter",
       "accent": "#f4b07a",
       "wardrobe": {
-        "top": "print-blouse",
-        "bottom": "pattern-trouser",
-        "headwear": "headwrap",
-        "backpack": false,
-        "number": 0
+        "top": "track-jacket",
+        "bottom": "tailored-pants",
+        "headwear": "none",
+        "backpack": true,
+        "number": 6
       },
       "seed": "551050d1",
       "colors": {
         "skin": "#8f623d",
         "hair": "#19120f",
         "brows": "#140e0c",
-        "shirt": "#995050",
-        "pants": "#513446",
-        "shoes": "#442e28",
-        "gloves": "#68413f",
-        "pack": "#8d5c4f"
+        "shirt": "#7c4d2a",
+        "pants": "#a6bac4",
+        "shoes": "#3d2922",
+        "gloves": "#9fb0bc",
+        "pack": "#3a2a20"
       }
     },
     "kollie": {
@@ -126,22 +126,22 @@
       "voice": "lecturer",
       "accent": "#9fd7ff",
       "wardrobe": {
-        "top": "work-shirt",
-        "bottom": "pressed-trouser",
-        "headwear": "flat-cap",
+        "top": "print-blouse",
+        "bottom": "formal-trousers",
+        "headwear": "none",
         "backpack": false,
-        "number": 0
+        "number": 8
       },
       "seed": "3f9b3b3f",
       "colors": {
         "skin": "#4a2b18",
         "hair": "#ddd4c9",
         "brows": "#aca59d",
-        "shirt": "#415b6f",
-        "pants": "#37322d",
-        "shoes": "#291e19",
-        "gloves": "#44352b",
-        "pack": "#74673d"
+        "shirt": "#2f5851",
+        "pants": "#665376",
+        "shoes": "#2c4662",
+        "gloves": "#abc2cb",
+        "pack": "#924b2f"
       }
     },
     "tenneh": {
@@ -151,22 +151,22 @@
       "voice": "greeter",
       "accent": "#ffb454",
       "wardrobe": {
-        "top": "wrap-blouse",
-        "bottom": "straight-jeans",
-        "headwear": "headband",
-        "backpack": false,
-        "number": 0
+        "top": "hi-vis-vest",
+        "bottom": "dark-denim",
+        "headwear": "hardhat",
+        "backpack": true,
+        "number": 1
       },
       "seed": "d8459414",
       "colors": {
         "skin": "#91633e",
         "hair": "#19140b",
         "brows": "#141009",
-        "shirt": "#c76928",
-        "pants": "#413328",
-        "shoes": "#623924",
-        "gloves": "#7f5838",
-        "pack": "#a33d26"
+        "shirt": "#502c2f",
+        "pants": "#222e32",
+        "shoes": "#4f2e34",
+        "gloves": "#2b5750",
+        "pack": "#85744d"
       }
     },
     "flomo": {
@@ -176,22 +176,22 @@
       "voice": "greeter",
       "accent": "#a8d26a",
       "wardrobe": {
-        "top": "football-jersey",
-        "bottom": "track-pants",
-        "headwear": "sports-cap",
+        "top": "tactical-polo",
+        "bottom": "rolled-jeans",
+        "headwear": "kufi",
         "backpack": false,
-        "number": 8
+        "number": 2
       },
       "seed": "32bca77f",
       "colors": {
         "skin": "#77462f",
         "hair": "#161109",
         "brows": "#110d07",
-        "shirt": "#5e6b38",
-        "pants": "#344964",
-        "shoes": "#3a2f24",
-        "gloves": "#2e3828",
-        "pack": "#776c34"
+        "shirt": "#233039",
+        "pants": "#333d60",
+        "shoes": "#635073",
+        "gloves": "#735e45",
+        "pack": "#4a5e3c"
       }
     },
     "sia": {
@@ -201,22 +201,22 @@
       "voice": "greeter",
       "accent": "#ffd08a",
       "wardrobe": {
-        "top": "graphic-tee",
-        "bottom": "rolled-jeans",
+        "top": "track-jacket",
+        "bottom": "pattern-trouser",
         "headwear": "beanie",
         "backpack": true,
-        "number": 0
+        "number": 6
       },
       "seed": "1a80662c",
       "colors": {
         "skin": "#9b6c44",
         "hair": "#161108",
         "brows": "#110d06",
-        "shirt": "#ca673e",
-        "pants": "#42505e",
-        "shoes": "#a68547",
-        "gloves": "#444540",
-        "pack": "#c89035"
+        "shirt": "#917f53",
+        "pants": "#1d282c",
+        "shoes": "#a0b5bc",
+        "gloves": "#512c2f",
+        "pack": "#24313b"
       }
     },
     "garmai": {
@@ -226,22 +226,22 @@
       "voice": "lecturer",
       "accent": "#c760b0",
       "wardrobe": {
-        "top": "hoodie",
-        "bottom": "tailored-pants",
-        "headwear": "headwrap",
+        "top": "tailored-suit",
+        "bottom": "pressed-trouser",
+        "headwear": "flat-cap",
         "backpack": false,
-        "number": 0
+        "number": 6
       },
       "seed": "873d63a9",
       "colors": {
         "skin": "#824b2b",
         "hair": "#181009",
         "brows": "#130c07",
-        "shirt": "#5d3963",
-        "pants": "#312b3a",
-        "shoes": "#3d2f36",
-        "gloves": "#483844",
-        "pack": "#664563"
+        "shirt": "#26343d",
+        "pants": "#553233",
+        "shoes": "#3d2f22",
+        "gloves": "#7e522a",
+        "pack": "#2e425b"
       }
     },
     "boakai": {
@@ -251,22 +251,22 @@
       "voice": "greeter",
       "accent": "#d8c07a",
       "wardrobe": {
-        "top": "utility-vest",
-        "bottom": "work-cargo",
-        "headwear": "none",
+        "top": "striped-jersey",
+        "bottom": "market-jeans",
+        "headwear": "hardhat",
         "backpack": true,
-        "number": 0
+        "number": 2
       },
       "seed": "aa57788a",
       "colors": {
         "skin": "#542c1b",
         "hair": "#171208",
         "brows": "#120e06",
-        "shirt": "#826d43",
-        "pants": "#494839",
-        "shoes": "#453124",
-        "gloves": "#74653d",
-        "pack": "#726945"
+        "shirt": "#4f613e",
+        "pants": "#512725",
+        "shoes": "#27313c",
+        "gloves": "#4f5b36",
+        "pack": "#3c2c21"
       }
     },
     "jallah": {
@@ -276,22 +276,22 @@
       "voice": "greeter",
       "accent": "#ff6b5e",
       "wardrobe": {
-        "top": "bomber",
-        "bottom": "dark-denim",
-        "headwear": "beanie",
-        "backpack": false,
-        "number": 0
+        "top": "hi-vis-vest",
+        "bottom": "track-pants",
+        "headwear": "headwrap",
+        "backpack": true,
+        "number": 6
       },
       "seed": "7e0b8627",
       "colors": {
         "skin": "#603822",
         "hair": "#17100a",
         "brows": "#120c08",
-        "shirt": "#3d3d42",
-        "pants": "#2a2930",
-        "shoes": "#26211f",
-        "gloves": "#4f322d",
-        "pack": "#3d3836"
+        "shirt": "#714025",
+        "pants": "#502d24",
+        "shoes": "#233339",
+        "gloves": "#735d44",
+        "pack": "#534767"
       }
     },
     "togar": {
@@ -301,22 +301,22 @@
       "voice": "lecturer",
       "accent": "#9aa7b0",
       "wardrobe": {
-        "top": "tactical-polo",
-        "bottom": "tactical-pants",
-        "headwear": "none",
+        "top": "tailored-suit",
+        "bottom": "pattern-trouser",
+        "headwear": "cap",
         "backpack": true,
-        "number": 0
+        "number": 1
       },
       "seed": "616068e7",
       "colors": {
         "skin": "#412318",
         "hair": "#191108",
         "brows": "#140d06",
-        "shirt": "#2f3437",
-        "pants": "#25282d",
-        "shoes": "#1b1d1e",
-        "gloves": "#313439",
-        "pack": "#272a2d"
+        "shirt": "#1c252b",
+        "pants": "#804d32",
+        "shoes": "#1c262b",
+        "gloves": "#615072",
+        "pack": "#42504e"
       }
     },
     "vardee": {
@@ -326,9 +326,9 @@
       "voice": "lecturer",
       "accent": "#ff3b3b",
       "wardrobe": {
-        "top": "tailored-suit",
-        "bottom": "suit-trousers",
-        "headwear": "none",
+        "top": "market-polo",
+        "bottom": "tailored-pants",
+        "headwear": "flat-cap",
         "backpack": false,
         "number": 0
       },
@@ -337,11 +337,11 @@
         "skin": "#412217",
         "hair": "#170f08",
         "brows": "#120c06",
-        "shirt": "#471b22",
-        "pants": "#211b1d",
-        "shoes": "#211d1c",
-        "gloves": "#371f22",
-        "pack": "#2b1a1c"
+        "shirt": "#212d32",
+        "pants": "#834730",
+        "shoes": "#242d39",
+        "gloves": "#7c482a",
+        "pack": "#743f29"
       }
     },
     "kormah": {
@@ -351,22 +351,22 @@
       "voice": "lecturer",
       "accent": "#bca36a",
       "wardrobe": {
-        "top": "formal-tunic",
-        "bottom": "formal-trousers",
-        "headwear": "kufi",
+        "top": "football-jersey",
+        "bottom": "tactical-pants",
+        "headwear": "none",
         "backpack": false,
-        "number": 0
+        "number": 6
       },
       "seed": "acb93fcc",
       "colors": {
         "skin": "#6e4327",
         "hair": "#231c18",
         "brows": "#1b1613",
-        "shirt": "#3e4b46",
-        "pants": "#262b2c",
-        "shoes": "#241d19",
-        "gloves": "#343932",
-        "pack": "#413f37"
+        "shirt": "#3f2e20",
+        "pants": "#414d4e",
+        "shoes": "#5e4d72",
+        "gloves": "#554567",
+        "pack": "#baa884"
       }
     },
     "watch-east-1": {
@@ -376,22 +376,22 @@
       "voice": "greeter",
       "accent": "#ff7041",
       "wardrobe": {
-        "top": "striped-jersey",
-        "bottom": "uniform-trousers",
-        "headwear": "cap",
+        "top": "tactical-polo",
+        "bottom": "formal-trousers",
+        "headwear": "beanie",
         "backpack": false,
-        "number": 4
+        "number": 3
       },
       "seed": "12466076",
       "colors": {
         "skin": "#a3714d",
         "hair": "#18110a",
         "brows": "#130d08",
-        "shirt": "#6c2d2a",
-        "pants": "#36282f",
-        "shoes": "#221b1b",
-        "gloves": "#412224",
-        "pack": "#3d2327"
+        "shirt": "#402f21",
+        "pants": "#9caeb7",
+        "shoes": "#425150",
+        "gloves": "#2b3c56",
+        "pack": "#964336"
       }
     },
     "watch-market-2": {
@@ -401,22 +401,22 @@
       "voice": "greeter",
       "accent": "#ff8a50",
       "wardrobe": {
-        "top": "market-polo",
-        "bottom": "market-jeans",
-        "headwear": "sports-cap",
+        "top": "wrap-blouse",
+        "bottom": "dark-denim",
+        "headwear": "cap",
         "backpack": false,
-        "number": 0
+        "number": 6
       },
       "seed": "7d4c024a",
       "colors": {
         "skin": "#6d4326",
         "hair": "#171208",
         "brows": "#120e06",
-        "shirt": "#6e4435",
-        "pants": "#352e32",
-        "shoes": "#211b1b",
-        "gloves": "#402a27",
-        "pack": "#4c333d"
+        "shirt": "#26343d",
+        "pants": "#4a5535",
+        "shoes": "#223137",
+        "gloves": "#24313a",
+        "pack": "#24313b"
       }
     },
     "watch-docks-3": {
@@ -426,22 +426,22 @@
       "voice": "greeter",
       "accent": "#e85f43",
       "wardrobe": {
-        "top": "hi-vis-vest",
-        "bottom": "dock-workwear",
-        "headwear": "hardhat",
+        "top": "utility-vest",
+        "bottom": "straight-jeans",
+        "headwear": "bandana",
         "backpack": true,
-        "number": 0
+        "number": 2
       },
       "seed": "241c4f3d",
       "colors": {
         "skin": "#865436",
         "hair": "#161208",
         "brows": "#110e06",
-        "shirt": "#763b32",
-        "pants": "#303037",
-        "shoes": "#241f22",
-        "gloves": "#57302f",
-        "pack": "#48262d"
+        "shirt": "#374344",
+        "pants": "#505d3a",
+        "shoes": "#435634",
+        "gloves": "#544868",
+        "pack": "#5d4e6f"
       }
     },
     "watch-harbor-4": {
@@ -451,22 +451,22 @@
       "voice": "greeter",
       "accent": "#dc5740",
       "wardrobe": {
-        "top": "track-jacket",
-        "bottom": "harbor-track-pants",
-        "headwear": "bandana",
+        "top": "print-blouse",
+        "bottom": "straight-jeans",
+        "headwear": "flat-cap",
         "backpack": false,
-        "number": 0
+        "number": 9
       },
       "seed": "e1100ca8",
       "colors": {
         "skin": "#402017",
         "hair": "#161009",
         "brows": "#110c07",
-        "shirt": "#602b2e",
-        "pants": "#302c2f",
-        "shoes": "#221f1d",
-        "gloves": "#3c2422",
-        "pack": "#3c2528"
+        "shirt": "#8d814e",
+        "pants": "#4f2326",
+        "shoes": "#853b32",
+        "gloves": "#36231b",
+        "pack": "#827948"
       }
     },
     "watch-warehouse-5": {
@@ -476,22 +476,22 @@
       "voice": "greeter",
       "accent": "#ff8054",
       "wardrobe": {
-        "top": "cargo-vest",
-        "bottom": "warehouse-cargo",
-        "headwear": "hardhat",
-        "backpack": true,
-        "number": 0
+        "top": "hi-vis-vest",
+        "bottom": "tailored-pants",
+        "headwear": "sports-cap",
+        "backpack": false,
+        "number": 7
       },
       "seed": "bbfe5e49",
       "colors": {
         "skin": "#7c4d33",
         "hair": "#161008",
         "brows": "#110c06",
-        "shirt": "#8d4231",
-        "pants": "#3d3537",
-        "shoes": "#231c1c",
-        "gloves": "#582b2d",
-        "pack": "#4e2a2a"
+        "shirt": "#c6b38b",
+        "pants": "#aabec7",
+        "shoes": "#4e2628",
+        "gloves": "#37241b",
+        "pack": "#96a8ae"
       }
     }
   }
