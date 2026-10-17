@@ -298,6 +298,9 @@ body { font-family:Outfit,Arial,sans-serif; }
 /* Remote players on the minimap and the expanded map. */
 .map-remote { position:absolute; z-index:2; width:7px; height:7px; border-radius:50%; background:#ffb454; border:1px solid #1a2426; transform:translate(-50%,-50%); box-shadow:0 0 6px rgba(255,180,84,.7); }
 .world-map-point.remote b { background:#ffb454; color:#ffb454; box-shadow:0 0 10px #ffb454; }
+.world-map-point[hidden] { display:none; }
+.world-map-point.place b { width:6px; height:6px; background:#cfd8d3; color:#cfd8d3; box-shadow:0 0 6px #cfd8d3; }
+.world-map-point.place span { font-size:6.5px; background:rgba(0,0,0,.4); color:#e6ece9; }
 
 /* Scavenger Journal & Field Workbench */
 .journal-button { position:absolute; top:26px; right:152px; z-index:8; display:flex; align-items:center; gap:8px; padding:10px 13px; border:1px solid rgba(117,197,187,.35); background:rgba(11,22,23,.75); color:#dce7dd; font:600 9px/1 'DM Mono',monospace; letter-spacing:.13em; backdrop-filter:blur(8px); pointer-events:auto; transition:transform .15s,background .15s,border-color .15s; }

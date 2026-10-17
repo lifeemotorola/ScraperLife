@@ -54,7 +54,6 @@ export class Building {
     awning.position.set(0, -height / 2 + 2.32, -depth / 2 - .34); awning.rotation.x = -.16; group.add(awning);
     const entryLight = new THREE.Mesh(new THREE.SphereGeometry(.09, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffbd68 }));
     entryLight.position.set(.72, -height / 2 + 2.15, -depth / 2 - .1); group.add(entryLight);
-    if (label) { const sign = makeSign(label, Math.min(width * 1.1, 5)); sign.position.set(0, -height / 2 + 2.7, -depth / 2 - .08); group.add(sign); }
     this.scene.add(group);
     return group;
   }

@@ -107,6 +107,7 @@ export class Game {
     this.combat = new CombatSystem();
     this.physics = new PhysicsEngine();
     this.city = new City(this.scene, this.physics); this.city.build({ lampLightCount: this.isMobile ? 3 : 5 });
+    this.ui.setPlaceNames(this.city.placeNames);
     // (-16, 0, 10) stands on the open street by Kollie Radio Works; findFree guarantees
     // the spawn never lands inside a building collider again (that reads as Markie
     // rotating in place, unable to move).
