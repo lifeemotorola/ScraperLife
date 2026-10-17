@@ -417,9 +417,78 @@ const sharedCache = new Map();
 // Loads (once) the one body the whole cast is made of. Every caller gets the SAME promise, so
 // the sixteen in-world characters cost one 5.3 MB download and one glTF parse. Cull bounds are
 // computed here, once, from every clip, and every clone inherits them (SkinnedMesh.copy).
+// The shared body is one mesh with one material (the skin), so the wardrobe has nothing to dress.
+// Split its triangles by body region into three material groups once, when the shared rig loads:
+// trousers (legs, below the waist), shirt (torso and arms, above it) and skin (head, hands, feet).
+// Region boundaries are in the model's own units, the same space the wardrobe shader reads.
+// The new materials are named so applyPalette can colour them through the palette's slots.
+export const WARDROBE_SHIRT_MATERIAL = 'WardrobeShirt';
+export const WARDROBE_PANTS_MATERIAL = 'WardrobePants';
+const WAIST_Y = 1.18;
+const SHOULDER_Y = 1.98;
+const FEET_Y = 0.14;
+const TROUSER_HALF_WIDTH = 0.3;
+const SLEEVE_END_Y = 1.1;       // arms end here; hands below are skin
+
+function splitBodyRegions(root) {
+  root.traverse((object) => {
+    if (!object.isMesh || Array.isArray(object.material)) return;
+    const geometry = object.geometry;
+    if (!geometry.attributes.position) return;
+    const pos = geometry.attributes.position;
+    // The Markie GLB is not indexed: its vertices come in consecutive triangles.
+    const index = geometry.index
+      ? geometry.index.array
+      : Uint32Array.from({ length: pos.count }, (_, i) => i);
+    const buckets = { skin: [], shirt: [], pants: [] };
+    for (let t = 0; t < index.length; t += 3) {
+      const a = index[t], b = index[t + 1], c = index[t + 2];
+      const cx = (pos.getX(a) + pos.getX(b) + pos.getX(c)) / 3;
+      const cy = (pos.getY(a) + pos.getY(b) + pos.getY(c)) / 3;
+      const outer = Math.abs(cx) >= TROUSER_HALF_WIDTH;
+      let key = 'skin';
+      if (cy >= WAIST_Y && cy <= SHOULDER_Y) key = 'shirt';
+      else if (outer && cy >= SLEEVE_END_Y && cy < WAIST_Y) key = 'shirt'; // arms hang below the waist
+      else if (!outer && cy >= FEET_Y && cy < WAIST_Y) key = 'pants';
+      buckets[key].push(a, b, c);
+    }
+    const order = ['skin', 'shirt', 'pants'];
+    const total = index.length;
+    const merged = new Uint32Array(total);
+    let offset = 0;
+    geometry.clearGroups();
+    order.forEach((key, materialIndex) => {
+      merged.set(buckets[key], offset);
+      if (buckets[key].length) geometry.addGroup(offset, buckets[key].length, materialIndex);
+      offset += buckets[key].length;
+    });
+    geometry.setIndex(new THREE.BufferAttribute(merged, 1));
+    const skinMaterial = object.material;
+    const shirt = skinMaterial.clone();
+    shirt.name = WARDROBE_SHIRT_MATERIAL;
+    const pants = skinMaterial.clone();
+    pants.name = WARDROBE_PANTS_MATERIAL;
+    object.material = [skinMaterial, shirt, pants];
+  });
+  return root;
+}
+
+// Palette slots with the split body's shirt and trouser materials added, so applyPalette colours them.
+function slotsWithWardrobeRegions(slots) {
+  const out = { ...(slots || {}) };
+  const add = (slot, name) => {
+    const info = out[slot] || {};
+    out[slot] = { ...info, materials: [...(info.materials || []), name] };
+  };
+  add('shirt', WARDROBE_SHIRT_MATERIAL);
+  add('pants', WARDROBE_PANTS_MATERIAL);
+  return out;
+}
+
 export function loadSharedCharacter(url, { manifest = null, onProgress } = {}) {
   if (!sharedCache.has(url)) {
     const loading = loadCharacter(url, { manifest, onProgress }).then((loaded) => {
+      splitBodyRegions(loaded.root);
       expandCullBounds(loaded.root, loaded.clips);
       return { ...loaded, url };
     });
@@ -474,7 +543,7 @@ export function instantiateCharacter(shared, { palette = null, paletteData = nul
   // Copy wardrobe materials even without a colour palette: procedural cloth uniforms must be
   // independent per actor, just like their skeleton and pose.
   const materials = applyPalette(root, palette, {
-    slots: paletteData?.slots || shared.slots || {},
+    slots: slotsWithWardrobeRegions(paletteData?.slots || shared.slots || {}),
     shared: paletteData?.shared || shared.shared || {},
   });
   const wardrobe = applyWardrobe(root, materials, palette, { shadow, cull });
