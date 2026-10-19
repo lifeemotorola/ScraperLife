@@ -31,7 +31,7 @@ import { MAX_MEMBERS } from '../../shared/session-protocol.js';
 // camera (up the screen). Keep both conventions in sync with InputManager.getMovement().
 export const CAMERA_MODES = [
   { label: 'ACTION VIEW', offset: new THREE.Vector3(1.7, 4.8, -8.6), lookHeight: 1.65, ahead: 2.3, fov: 58, smooth: .10 },
-  { label: 'WIDE VIEW', offset: new THREE.Vector3(0, 10.4, -14.5), lookHeight: 1.0, ahead: 2.4, fov: 60, smooth: .075 },
+  { label: 'WIDE VIEW', offset: new THREE.Vector3(0, 5.2, -8.0), lookHeight: 1.0, ahead: 2.4, fov: 60, smooth: .075 },
   { label: 'CITY VIEW', offset: new THREE.Vector3(0, 22, -24), lookHeight: .3, ahead: 1.4, fov: 66, smooth: .055 },
   { label: 'PLATFORM VIEW', offset: new THREE.Vector3(0, 32, -32), lookHeight: -1.2, ahead: 0.5, fov: 70, smooth: .045 },
 ];
