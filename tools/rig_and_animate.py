@@ -2126,6 +2126,11 @@ def cmd_build(args):
     log(f"normalised: height {info.get('height')} (was {info.get('measuredHeight'):.2f}), "
         f"feet at z={info.get('feetZ')}, facing via {info.get('yawSource')}")
     trim_non_deform_bones(rig, meshes)
+    # An armature whose meshes carry no skin weights (MPFB exports like this) would stay rigid.
+    # Weight them only after normalise(), so the bind pose matches the final scale and position.
+    if not any(len(m.vertex_groups) for m in meshes):
+        log(f"armature has {len(meshes)} unweighted meshes - skinning them to {rig.name}")
+        skin_meshes(rig, meshes, {}, prefer="auto")
     if args.decimate and args.decimate < 1.0:
         for mesh in meshes:
             mod = mesh.modifiers.new("Decimate", "DECIMATE")

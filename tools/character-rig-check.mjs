@@ -91,8 +91,8 @@ check('feet are on y=0', Math.abs(box.min.y) < 0.05, `bbox min y = ${box.min.y.t
 // tools/rig_and_animate.py uses to author the rig. +Z must be forward.
 const bone = (name) => scene.getObjectByName(name);
 const worldOf = (obj) => { const v = new THREE.Vector3(); obj.getWorldPosition(v); return v; };
-const toeL = bone('ball_l') || bone('toe_l') || bone('LeftToeBase');
-const ankleL = bone('foot_l') || bone('LeftFoot');
+const toeL = bone('ball_l') || bone('toe_l') || bone('LeftToeBase') || bone('mixamorigLeftToeBase');
+const ankleL = bone('foot_l') || bone('LeftFoot') || bone('mixamorigLeftFoot');
 if (toeL && ankleL) {
   const forward = worldOf(toeL).z - worldOf(ankleL).z;
   check('character faces +Z (the game forward axis)', forward > 0.01,

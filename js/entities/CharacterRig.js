@@ -433,6 +433,10 @@ const SLEEVE_END_Y = 1.1;       // arms end here; hands below are skin
 function splitBodyRegions(root) {
   root.traverse((object) => {
     if (!object.isMesh || Array.isArray(object.material)) return;
+    // The MPFB body exports a low-poly proxy that duplicates the body. Hide it; it is never drawn.
+    if (/low-poly/i.test(object.material?.name || '')) { object.visible = false; return; }
+    // Only the body is split. Eyes, teeth, shoes and a suit keep their own materials.
+    if (!/(^|\.)body/i.test(object.material?.name || '')) return;
     const geometry = object.geometry;
     if (!geometry.attributes.position) return;
     const pos = geometry.attributes.position;

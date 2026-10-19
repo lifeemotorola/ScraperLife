@@ -121,7 +121,7 @@ SLOTS = [
     ("mouth",  [r"mouth", r"teeth", r"tongue", r"lips?"],                                 0.55, False),
     ("brows",  [r"brow", r"lash"],                                                        0.80, True),
     ("hair",   [r"hair", r"beard", r"moustache"],                                         0.45, True),
-    ("skin",   [r"^head", r"^body", r"^arms?", r"^face", r"skin", r"^neck", r"^hands?$"], 0.62, True),
+    ("skin",   [r"^head", r"(^|\.)body", r"^arms?", r"^face", r"skin", r"^neck", r"^hands?$"], 0.62, True),
     ("shirt",  [r"jacket", r"shirt", r"top", r"hoodie", r"tee", r"vest", r"coat"],        0.78, True),
     ("pants",  [r"jeans", r"pants", r"trouser", r"shorts", r"skirt"],                     0.88, True),
     ("shoes",  [r"shoe", r"boot", r"sneaker", r"sandal"],                                 0.50, True),
