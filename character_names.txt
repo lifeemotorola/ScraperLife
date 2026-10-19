@@ -1,0 +1,28 @@
+CHARACTER NAMES - ScraperLife
+==============================
+
+Full name                 In-game label       Role
+------------------------  ------------------  ----------------------
+Markie Kollie             MARKIE              Protagonist (player)
+Musu Kollie               (palette name)      Mother - memory
+Old Man Kollie            OLD MAN KOLLIE      Mentor
+Tenneh                    TENNEH              Love interest
+Flomo                     FLOMO               Best friend
+Sia                       SIA                 Street kid
+Garmai                    GARMAI              Information broker
+Boakai                    BOAKAI              Equipment fixer
+Jallah                    JALLAH              Rival
+Togar                     TOGAR               Lieutenant
+Vardee                    VARDEE              Antagonist
+Kormah                    KORMAH              Corrupt official
+East Watch                (palette name)      Street watch
+Market Watch              (palette name)      Street watch
+Docks Watch               (palette name)      Street watch
+Harbor Watch              (palette name)      Street watch
+Warehouse Watch           (palette name)      Street watch
+
+Total: 17 characters.
+
+Sources
+- Names and roles: assets/models/character_palettes.json
+- In-game labels: js/game/Game.js (roster entries)
