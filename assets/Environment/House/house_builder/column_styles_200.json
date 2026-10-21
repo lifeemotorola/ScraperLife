@@ -1,0 +1,2602 @@
+[
+  {
+    "id": "C001",
+    "name": "Square Pier \u2014 Compact",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C002",
+    "name": "Square Pier \u2014 Slender",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C003",
+    "name": "Square Pier \u2014 Balanced",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C004",
+    "name": "Square Pier \u2014 Broad Base",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C005",
+    "name": "Square Pier \u2014 Wide Capital",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C006",
+    "name": "Square Pier \u2014 Raised Base",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C007",
+    "name": "Square Pier \u2014 Fine Detail",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C008",
+    "name": "Square Pier \u2014 Deep Detail",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C009",
+    "name": "Square Pier \u2014 Porch",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C010",
+    "name": "Square Pier \u2014 Veranda",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C011",
+    "name": "Square Pier \u2014 Balcony",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C012",
+    "name": "Square Pier \u2014 Entrance",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C013",
+    "name": "Square Pier \u2014 Garden",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C014",
+    "name": "Square Pier \u2014 Courtyard",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C015",
+    "name": "Square Pier \u2014 Formal",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C016",
+    "name": "Square Pier \u2014 Grand",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C017",
+    "name": "Square Pier \u2014 Estate",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C018",
+    "name": "Square Pier \u2014 Monument",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C019",
+    "name": "Square Pier \u2014 Tall Profile",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C020",
+    "name": "Square Pier \u2014 Signature",
+    "family": "Square Pier",
+    "settings": {
+      "column_style": "SQUARE",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  },
+  {
+    "id": "C021",
+    "name": "Smooth Classical \u2014 Compact",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C022",
+    "name": "Smooth Classical \u2014 Slender",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C023",
+    "name": "Smooth Classical \u2014 Balanced",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C024",
+    "name": "Smooth Classical \u2014 Broad Base",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C025",
+    "name": "Smooth Classical \u2014 Wide Capital",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C026",
+    "name": "Smooth Classical \u2014 Raised Base",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C027",
+    "name": "Smooth Classical \u2014 Fine Detail",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C028",
+    "name": "Smooth Classical \u2014 Deep Detail",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C029",
+    "name": "Smooth Classical \u2014 Porch",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C030",
+    "name": "Smooth Classical \u2014 Veranda",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C031",
+    "name": "Smooth Classical \u2014 Balcony",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C032",
+    "name": "Smooth Classical \u2014 Entrance",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C033",
+    "name": "Smooth Classical \u2014 Garden",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C034",
+    "name": "Smooth Classical \u2014 Courtyard",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C035",
+    "name": "Smooth Classical \u2014 Formal",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C036",
+    "name": "Smooth Classical \u2014 Grand",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C037",
+    "name": "Smooth Classical \u2014 Estate",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C038",
+    "name": "Smooth Classical \u2014 Monument",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C039",
+    "name": "Smooth Classical \u2014 Tall Profile",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C040",
+    "name": "Smooth Classical \u2014 Signature",
+    "family": "Smooth Classical",
+    "settings": {
+      "column_style": "CLASSICAL",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  },
+  {
+    "id": "C041",
+    "name": "Fluted Round \u2014 Compact",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C042",
+    "name": "Fluted Round \u2014 Slender",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C043",
+    "name": "Fluted Round \u2014 Balanced",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C044",
+    "name": "Fluted Round \u2014 Broad Base",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C045",
+    "name": "Fluted Round \u2014 Wide Capital",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C046",
+    "name": "Fluted Round \u2014 Raised Base",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C047",
+    "name": "Fluted Round \u2014 Fine Detail",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C048",
+    "name": "Fluted Round \u2014 Deep Detail",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C049",
+    "name": "Fluted Round \u2014 Porch",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C050",
+    "name": "Fluted Round \u2014 Veranda",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C051",
+    "name": "Fluted Round \u2014 Balcony",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C052",
+    "name": "Fluted Round \u2014 Entrance",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C053",
+    "name": "Fluted Round \u2014 Garden",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C054",
+    "name": "Fluted Round \u2014 Courtyard",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C055",
+    "name": "Fluted Round \u2014 Formal",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C056",
+    "name": "Fluted Round \u2014 Grand",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C057",
+    "name": "Fluted Round \u2014 Estate",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C058",
+    "name": "Fluted Round \u2014 Monument",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C059",
+    "name": "Fluted Round \u2014 Tall Profile",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C060",
+    "name": "Fluted Round \u2014 Signature",
+    "family": "Fluted Round",
+    "settings": {
+      "column_style": "FLUTED",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  },
+  {
+    "id": "C061",
+    "name": "Fluted Square \u2014 Compact",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C062",
+    "name": "Fluted Square \u2014 Slender",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C063",
+    "name": "Fluted Square \u2014 Balanced",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C064",
+    "name": "Fluted Square \u2014 Broad Base",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C065",
+    "name": "Fluted Square \u2014 Wide Capital",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C066",
+    "name": "Fluted Square \u2014 Raised Base",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C067",
+    "name": "Fluted Square \u2014 Fine Detail",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C068",
+    "name": "Fluted Square \u2014 Deep Detail",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C069",
+    "name": "Fluted Square \u2014 Porch",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C070",
+    "name": "Fluted Square \u2014 Veranda",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C071",
+    "name": "Fluted Square \u2014 Balcony",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C072",
+    "name": "Fluted Square \u2014 Entrance",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C073",
+    "name": "Fluted Square \u2014 Garden",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C074",
+    "name": "Fluted Square \u2014 Courtyard",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C075",
+    "name": "Fluted Square \u2014 Formal",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C076",
+    "name": "Fluted Square \u2014 Grand",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C077",
+    "name": "Fluted Square \u2014 Estate",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C078",
+    "name": "Fluted Square \u2014 Monument",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C079",
+    "name": "Fluted Square \u2014 Tall Profile",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C080",
+    "name": "Fluted Square \u2014 Signature",
+    "family": "Fluted Square",
+    "settings": {
+      "column_style": "SQUARE_FLUTED",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  },
+  {
+    "id": "C081",
+    "name": "Decorative Round \u2014 Compact",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C082",
+    "name": "Decorative Round \u2014 Slender",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C083",
+    "name": "Decorative Round \u2014 Balanced",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C084",
+    "name": "Decorative Round \u2014 Broad Base",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C085",
+    "name": "Decorative Round \u2014 Wide Capital",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C086",
+    "name": "Decorative Round \u2014 Raised Base",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C087",
+    "name": "Decorative Round \u2014 Fine Detail",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C088",
+    "name": "Decorative Round \u2014 Deep Detail",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C089",
+    "name": "Decorative Round \u2014 Porch",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C090",
+    "name": "Decorative Round \u2014 Veranda",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C091",
+    "name": "Decorative Round \u2014 Balcony",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C092",
+    "name": "Decorative Round \u2014 Entrance",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C093",
+    "name": "Decorative Round \u2014 Garden",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C094",
+    "name": "Decorative Round \u2014 Courtyard",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C095",
+    "name": "Decorative Round \u2014 Formal",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C096",
+    "name": "Decorative Round \u2014 Grand",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C097",
+    "name": "Decorative Round \u2014 Estate",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C098",
+    "name": "Decorative Round \u2014 Monument",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C099",
+    "name": "Decorative Round \u2014 Tall Profile",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C100",
+    "name": "Decorative Round \u2014 Signature",
+    "family": "Decorative Round",
+    "settings": {
+      "column_style": "ORNATE",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  },
+  {
+    "id": "C101",
+    "name": "Tuscan Inspired \u2014 Compact",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C102",
+    "name": "Tuscan Inspired \u2014 Slender",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C103",
+    "name": "Tuscan Inspired \u2014 Balanced",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C104",
+    "name": "Tuscan Inspired \u2014 Broad Base",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C105",
+    "name": "Tuscan Inspired \u2014 Wide Capital",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C106",
+    "name": "Tuscan Inspired \u2014 Raised Base",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C107",
+    "name": "Tuscan Inspired \u2014 Fine Detail",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C108",
+    "name": "Tuscan Inspired \u2014 Deep Detail",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C109",
+    "name": "Tuscan Inspired \u2014 Porch",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C110",
+    "name": "Tuscan Inspired \u2014 Veranda",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C111",
+    "name": "Tuscan Inspired \u2014 Balcony",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C112",
+    "name": "Tuscan Inspired \u2014 Entrance",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C113",
+    "name": "Tuscan Inspired \u2014 Garden",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C114",
+    "name": "Tuscan Inspired \u2014 Courtyard",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C115",
+    "name": "Tuscan Inspired \u2014 Formal",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C116",
+    "name": "Tuscan Inspired \u2014 Grand",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C117",
+    "name": "Tuscan Inspired \u2014 Estate",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C118",
+    "name": "Tuscan Inspired \u2014 Monument",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C119",
+    "name": "Tuscan Inspired \u2014 Tall Profile",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C120",
+    "name": "Tuscan Inspired \u2014 Signature",
+    "family": "Tuscan Inspired",
+    "settings": {
+      "column_style": "TUSCAN",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  },
+  {
+    "id": "C121",
+    "name": "Doric Inspired \u2014 Compact",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C122",
+    "name": "Doric Inspired \u2014 Slender",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C123",
+    "name": "Doric Inspired \u2014 Balanced",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C124",
+    "name": "Doric Inspired \u2014 Broad Base",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C125",
+    "name": "Doric Inspired \u2014 Wide Capital",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C126",
+    "name": "Doric Inspired \u2014 Raised Base",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C127",
+    "name": "Doric Inspired \u2014 Fine Detail",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C128",
+    "name": "Doric Inspired \u2014 Deep Detail",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C129",
+    "name": "Doric Inspired \u2014 Porch",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C130",
+    "name": "Doric Inspired \u2014 Veranda",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C131",
+    "name": "Doric Inspired \u2014 Balcony",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C132",
+    "name": "Doric Inspired \u2014 Entrance",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C133",
+    "name": "Doric Inspired \u2014 Garden",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C134",
+    "name": "Doric Inspired \u2014 Courtyard",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C135",
+    "name": "Doric Inspired \u2014 Formal",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C136",
+    "name": "Doric Inspired \u2014 Grand",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C137",
+    "name": "Doric Inspired \u2014 Estate",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C138",
+    "name": "Doric Inspired \u2014 Monument",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C139",
+    "name": "Doric Inspired \u2014 Tall Profile",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C140",
+    "name": "Doric Inspired \u2014 Signature",
+    "family": "Doric Inspired",
+    "settings": {
+      "column_style": "DORIC",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  },
+  {
+    "id": "C141",
+    "name": "Octagonal \u2014 Compact",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C142",
+    "name": "Octagonal \u2014 Slender",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C143",
+    "name": "Octagonal \u2014 Balanced",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C144",
+    "name": "Octagonal \u2014 Broad Base",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C145",
+    "name": "Octagonal \u2014 Wide Capital",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C146",
+    "name": "Octagonal \u2014 Raised Base",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C147",
+    "name": "Octagonal \u2014 Fine Detail",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C148",
+    "name": "Octagonal \u2014 Deep Detail",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C149",
+    "name": "Octagonal \u2014 Porch",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C150",
+    "name": "Octagonal \u2014 Veranda",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C151",
+    "name": "Octagonal \u2014 Balcony",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C152",
+    "name": "Octagonal \u2014 Entrance",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C153",
+    "name": "Octagonal \u2014 Garden",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C154",
+    "name": "Octagonal \u2014 Courtyard",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C155",
+    "name": "Octagonal \u2014 Formal",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C156",
+    "name": "Octagonal \u2014 Grand",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C157",
+    "name": "Octagonal \u2014 Estate",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C158",
+    "name": "Octagonal \u2014 Monument",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C159",
+    "name": "Octagonal \u2014 Tall Profile",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C160",
+    "name": "Octagonal \u2014 Signature",
+    "family": "Octagonal",
+    "settings": {
+      "column_style": "OCTAGONAL",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  },
+  {
+    "id": "C161",
+    "name": "Banded Round \u2014 Compact",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C162",
+    "name": "Banded Round \u2014 Slender",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C163",
+    "name": "Banded Round \u2014 Balanced",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C164",
+    "name": "Banded Round \u2014 Broad Base",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C165",
+    "name": "Banded Round \u2014 Wide Capital",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C166",
+    "name": "Banded Round \u2014 Raised Base",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C167",
+    "name": "Banded Round \u2014 Fine Detail",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C168",
+    "name": "Banded Round \u2014 Deep Detail",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C169",
+    "name": "Banded Round \u2014 Porch",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C170",
+    "name": "Banded Round \u2014 Veranda",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C171",
+    "name": "Banded Round \u2014 Balcony",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C172",
+    "name": "Banded Round \u2014 Entrance",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C173",
+    "name": "Banded Round \u2014 Garden",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C174",
+    "name": "Banded Round \u2014 Courtyard",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C175",
+    "name": "Banded Round \u2014 Formal",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C176",
+    "name": "Banded Round \u2014 Grand",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C177",
+    "name": "Banded Round \u2014 Estate",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C178",
+    "name": "Banded Round \u2014 Monument",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C179",
+    "name": "Banded Round \u2014 Tall Profile",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C180",
+    "name": "Banded Round \u2014 Signature",
+    "family": "Banded Round",
+    "settings": {
+      "column_style": "BANDED",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  },
+  {
+    "id": "C181",
+    "name": "Spiral Fluted \u2014 Compact",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.28,
+      "plinth_height": 0.14,
+      "flute_count": 8,
+      "flute_depth": 0.025,
+      "capital_flare": 1.15
+    }
+  },
+  {
+    "id": "C182",
+    "name": "Spiral Fluted \u2014 Slender",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.29,
+      "plinth_height": 0.195,
+      "flute_count": 10,
+      "flute_depth": 0.033,
+      "capital_flare": 1.18
+    }
+  },
+  {
+    "id": "C183",
+    "name": "Spiral Fluted \u2014 Balanced",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.3,
+      "plinth_height": 0.25,
+      "flute_count": 12,
+      "flute_depth": 0.041,
+      "capital_flare": 1.21
+    }
+  },
+  {
+    "id": "C184",
+    "name": "Spiral Fluted \u2014 Broad Base",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.31,
+      "plinth_height": 0.305,
+      "flute_count": 14,
+      "flute_depth": 0.049,
+      "capital_flare": 1.24
+    }
+  },
+  {
+    "id": "C185",
+    "name": "Spiral Fluted \u2014 Wide Capital",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.32,
+      "plinth_height": 0.36,
+      "flute_count": 16,
+      "flute_depth": 0.057,
+      "capital_flare": 1.27
+    }
+  },
+  {
+    "id": "C186",
+    "name": "Spiral Fluted \u2014 Raised Base",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.33,
+      "plinth_height": 0.14,
+      "flute_count": 18,
+      "flute_depth": 0.065,
+      "capital_flare": 1.3
+    }
+  },
+  {
+    "id": "C187",
+    "name": "Spiral Fluted \u2014 Fine Detail",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.34,
+      "plinth_height": 0.195,
+      "flute_count": 20,
+      "flute_depth": 0.073,
+      "capital_flare": 1.33
+    }
+  },
+  {
+    "id": "C188",
+    "name": "Spiral Fluted \u2014 Deep Detail",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.35,
+      "plinth_height": 0.25,
+      "flute_count": 22,
+      "flute_depth": 0.081,
+      "capital_flare": 1.36
+    }
+  },
+  {
+    "id": "C189",
+    "name": "Spiral Fluted \u2014 Porch",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.36,
+      "plinth_height": 0.305,
+      "flute_count": 24,
+      "flute_depth": 0.089,
+      "capital_flare": 1.39
+    }
+  },
+  {
+    "id": "C190",
+    "name": "Spiral Fluted \u2014 Veranda",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.37,
+      "plinth_height": 0.36,
+      "flute_count": 26,
+      "flute_depth": 0.097,
+      "capital_flare": 1.42
+    }
+  },
+  {
+    "id": "C191",
+    "name": "Spiral Fluted \u2014 Balcony",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.38,
+      "plinth_height": 0.14,
+      "flute_count": 28,
+      "flute_depth": 0.025,
+      "capital_flare": 1.45
+    }
+  },
+  {
+    "id": "C192",
+    "name": "Spiral Fluted \u2014 Entrance",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.39,
+      "plinth_height": 0.195,
+      "flute_count": 30,
+      "flute_depth": 0.033,
+      "capital_flare": 1.48
+    }
+  },
+  {
+    "id": "C193",
+    "name": "Spiral Fluted \u2014 Garden",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.4,
+      "plinth_height": 0.25,
+      "flute_count": 32,
+      "flute_depth": 0.041,
+      "capital_flare": 1.51
+    }
+  },
+  {
+    "id": "C194",
+    "name": "Spiral Fluted \u2014 Courtyard",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.41,
+      "plinth_height": 0.305,
+      "flute_count": 8,
+      "flute_depth": 0.049,
+      "capital_flare": 1.54
+    }
+  },
+  {
+    "id": "C195",
+    "name": "Spiral Fluted \u2014 Formal",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.42,
+      "plinth_height": 0.36,
+      "flute_count": 10,
+      "flute_depth": 0.057,
+      "capital_flare": 1.57
+    }
+  },
+  {
+    "id": "C196",
+    "name": "Spiral Fluted \u2014 Grand",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.43,
+      "plinth_height": 0.14,
+      "flute_count": 12,
+      "flute_depth": 0.065,
+      "capital_flare": 1.6
+    }
+  },
+  {
+    "id": "C197",
+    "name": "Spiral Fluted \u2014 Estate",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.44,
+      "plinth_height": 0.195,
+      "flute_count": 14,
+      "flute_depth": 0.073,
+      "capital_flare": 1.63
+    }
+  },
+  {
+    "id": "C198",
+    "name": "Spiral Fluted \u2014 Monument",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.45,
+      "plinth_height": 0.25,
+      "flute_count": 16,
+      "flute_depth": 0.081,
+      "capital_flare": 1.66
+    }
+  },
+  {
+    "id": "C199",
+    "name": "Spiral Fluted \u2014 Tall Profile",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.46,
+      "plinth_height": 0.305,
+      "flute_count": 18,
+      "flute_depth": 0.089,
+      "capital_flare": 1.69
+    }
+  },
+  {
+    "id": "C200",
+    "name": "Spiral Fluted \u2014 Signature",
+    "family": "Spiral Fluted",
+    "settings": {
+      "column_style": "SPIRAL",
+      "column_size": 0.47,
+      "plinth_height": 0.36,
+      "flute_count": 20,
+      "flute_depth": 0.097,
+      "capital_flare": 1.72
+    }
+  }
+]

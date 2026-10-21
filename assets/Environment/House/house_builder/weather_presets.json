@@ -1,0 +1,80 @@
+{
+  "FRESH": {
+    "name": "Fresh / Clean",
+    "amounts": {
+      "moss": 0,
+      "rust": 0,
+      "oxidation": 0,
+      "dirt": 0,
+      "streaks": 0,
+      "salt": 0,
+      "wear": 0,
+      "wetness": 0
+    }
+  },
+  "TROPICAL": {
+    "name": "Tropical Damp",
+    "amounts": {
+      "moss": 0.6,
+      "rust": 0.15,
+      "oxidation": 0.1,
+      "dirt": 0.35,
+      "streaks": 0.6,
+      "salt": 0.15,
+      "wear": 0.15,
+      "wetness": 0.4
+    }
+  },
+  "COASTAL": {
+    "name": "Coastal Salt Air",
+    "amounts": {
+      "moss": 0.2,
+      "rust": 0.5,
+      "oxidation": 0.55,
+      "dirt": 0.25,
+      "streaks": 0.4,
+      "salt": 0.6,
+      "wear": 0.3,
+      "wetness": 0.15
+    }
+  },
+  "AGED": {
+    "name": "Aged / Neglected",
+    "amounts": {
+      "moss": 0.7,
+      "rust": 0.55,
+      "oxidation": 0.4,
+      "dirt": 0.65,
+      "streaks": 0.75,
+      "salt": 0.4,
+      "wear": 0.6,
+      "wetness": 0.1
+    }
+  },
+  "RUSTED": {
+    "name": "Rusty Metal",
+    "amounts": {
+      "moss": 0.05,
+      "rust": 0.9,
+      "oxidation": 0.2,
+      "dirt": 0.35,
+      "streaks": 0.45,
+      "salt": 0.1,
+      "wear": 0.3,
+      "wetness": 0.05
+    }
+  },
+  "RAIN": {
+    "name": "Rain Soaked",
+    "amounts": {
+      "moss": 0.3,
+      "rust": 0.1,
+      "oxidation": 0.05,
+      "dirt": 0.2,
+      "streaks": 0.8,
+      "salt": 0.05,
+      "wear": 0.1,
+      "wetness": 0.8
+    }
+  }
+}

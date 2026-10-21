@@ -1,0 +1,201 @@
+ID,Name,Family,Width,Plinth height,Flutes,Groove depth ratio,Capital spread
+C001,Square Pier — Compact,Square Pier,0.28,0.14,8,0.025,1.15
+C002,Square Pier — Slender,Square Pier,0.29,0.195,10,0.033,1.18
+C003,Square Pier — Balanced,Square Pier,0.3,0.25,12,0.041,1.21
+C004,Square Pier — Broad Base,Square Pier,0.31,0.305,14,0.049,1.24
+C005,Square Pier — Wide Capital,Square Pier,0.32,0.36,16,0.057,1.27
+C006,Square Pier — Raised Base,Square Pier,0.33,0.14,18,0.065,1.3
+C007,Square Pier — Fine Detail,Square Pier,0.34,0.195,20,0.073,1.33
+C008,Square Pier — Deep Detail,Square Pier,0.35,0.25,22,0.081,1.36
+C009,Square Pier — Porch,Square Pier,0.36,0.305,24,0.089,1.39
+C010,Square Pier — Veranda,Square Pier,0.37,0.36,26,0.097,1.42
+C011,Square Pier — Balcony,Square Pier,0.38,0.14,28,0.025,1.45
+C012,Square Pier — Entrance,Square Pier,0.39,0.195,30,0.033,1.48
+C013,Square Pier — Garden,Square Pier,0.4,0.25,32,0.041,1.51
+C014,Square Pier — Courtyard,Square Pier,0.41,0.305,8,0.049,1.54
+C015,Square Pier — Formal,Square Pier,0.42,0.36,10,0.057,1.57
+C016,Square Pier — Grand,Square Pier,0.43,0.14,12,0.065,1.6
+C017,Square Pier — Estate,Square Pier,0.44,0.195,14,0.073,1.63
+C018,Square Pier — Monument,Square Pier,0.45,0.25,16,0.081,1.66
+C019,Square Pier — Tall Profile,Square Pier,0.46,0.305,18,0.089,1.69
+C020,Square Pier — Signature,Square Pier,0.47,0.36,20,0.097,1.72
+C021,Smooth Classical — Compact,Smooth Classical,0.28,0.14,8,0.025,1.15
+C022,Smooth Classical — Slender,Smooth Classical,0.29,0.195,10,0.033,1.18
+C023,Smooth Classical — Balanced,Smooth Classical,0.3,0.25,12,0.041,1.21
+C024,Smooth Classical — Broad Base,Smooth Classical,0.31,0.305,14,0.049,1.24
+C025,Smooth Classical — Wide Capital,Smooth Classical,0.32,0.36,16,0.057,1.27
+C026,Smooth Classical — Raised Base,Smooth Classical,0.33,0.14,18,0.065,1.3
+C027,Smooth Classical — Fine Detail,Smooth Classical,0.34,0.195,20,0.073,1.33
+C028,Smooth Classical — Deep Detail,Smooth Classical,0.35,0.25,22,0.081,1.36
+C029,Smooth Classical — Porch,Smooth Classical,0.36,0.305,24,0.089,1.39
+C030,Smooth Classical — Veranda,Smooth Classical,0.37,0.36,26,0.097,1.42
+C031,Smooth Classical — Balcony,Smooth Classical,0.38,0.14,28,0.025,1.45
+C032,Smooth Classical — Entrance,Smooth Classical,0.39,0.195,30,0.033,1.48
+C033,Smooth Classical — Garden,Smooth Classical,0.4,0.25,32,0.041,1.51
+C034,Smooth Classical — Courtyard,Smooth Classical,0.41,0.305,8,0.049,1.54
+C035,Smooth Classical — Formal,Smooth Classical,0.42,0.36,10,0.057,1.57
+C036,Smooth Classical — Grand,Smooth Classical,0.43,0.14,12,0.065,1.6
+C037,Smooth Classical — Estate,Smooth Classical,0.44,0.195,14,0.073,1.63
+C038,Smooth Classical — Monument,Smooth Classical,0.45,0.25,16,0.081,1.66
+C039,Smooth Classical — Tall Profile,Smooth Classical,0.46,0.305,18,0.089,1.69
+C040,Smooth Classical — Signature,Smooth Classical,0.47,0.36,20,0.097,1.72
+C041,Fluted Round — Compact,Fluted Round,0.28,0.14,8,0.025,1.15
+C042,Fluted Round — Slender,Fluted Round,0.29,0.195,10,0.033,1.18
+C043,Fluted Round — Balanced,Fluted Round,0.3,0.25,12,0.041,1.21
+C044,Fluted Round — Broad Base,Fluted Round,0.31,0.305,14,0.049,1.24
+C045,Fluted Round — Wide Capital,Fluted Round,0.32,0.36,16,0.057,1.27
+C046,Fluted Round — Raised Base,Fluted Round,0.33,0.14,18,0.065,1.3
+C047,Fluted Round — Fine Detail,Fluted Round,0.34,0.195,20,0.073,1.33
+C048,Fluted Round — Deep Detail,Fluted Round,0.35,0.25,22,0.081,1.36
+C049,Fluted Round — Porch,Fluted Round,0.36,0.305,24,0.089,1.39
+C050,Fluted Round — Veranda,Fluted Round,0.37,0.36,26,0.097,1.42
+C051,Fluted Round — Balcony,Fluted Round,0.38,0.14,28,0.025,1.45
+C052,Fluted Round — Entrance,Fluted Round,0.39,0.195,30,0.033,1.48
+C053,Fluted Round — Garden,Fluted Round,0.4,0.25,32,0.041,1.51
+C054,Fluted Round — Courtyard,Fluted Round,0.41,0.305,8,0.049,1.54
+C055,Fluted Round — Formal,Fluted Round,0.42,0.36,10,0.057,1.57
+C056,Fluted Round — Grand,Fluted Round,0.43,0.14,12,0.065,1.6
+C057,Fluted Round — Estate,Fluted Round,0.44,0.195,14,0.073,1.63
+C058,Fluted Round — Monument,Fluted Round,0.45,0.25,16,0.081,1.66
+C059,Fluted Round — Tall Profile,Fluted Round,0.46,0.305,18,0.089,1.69
+C060,Fluted Round — Signature,Fluted Round,0.47,0.36,20,0.097,1.72
+C061,Fluted Square — Compact,Fluted Square,0.28,0.14,8,0.025,1.15
+C062,Fluted Square — Slender,Fluted Square,0.29,0.195,10,0.033,1.18
+C063,Fluted Square — Balanced,Fluted Square,0.3,0.25,12,0.041,1.21
+C064,Fluted Square — Broad Base,Fluted Square,0.31,0.305,14,0.049,1.24
+C065,Fluted Square — Wide Capital,Fluted Square,0.32,0.36,16,0.057,1.27
+C066,Fluted Square — Raised Base,Fluted Square,0.33,0.14,18,0.065,1.3
+C067,Fluted Square — Fine Detail,Fluted Square,0.34,0.195,20,0.073,1.33
+C068,Fluted Square — Deep Detail,Fluted Square,0.35,0.25,22,0.081,1.36
+C069,Fluted Square — Porch,Fluted Square,0.36,0.305,24,0.089,1.39
+C070,Fluted Square — Veranda,Fluted Square,0.37,0.36,26,0.097,1.42
+C071,Fluted Square — Balcony,Fluted Square,0.38,0.14,28,0.025,1.45
+C072,Fluted Square — Entrance,Fluted Square,0.39,0.195,30,0.033,1.48
+C073,Fluted Square — Garden,Fluted Square,0.4,0.25,32,0.041,1.51
+C074,Fluted Square — Courtyard,Fluted Square,0.41,0.305,8,0.049,1.54
+C075,Fluted Square — Formal,Fluted Square,0.42,0.36,10,0.057,1.57
+C076,Fluted Square — Grand,Fluted Square,0.43,0.14,12,0.065,1.6
+C077,Fluted Square — Estate,Fluted Square,0.44,0.195,14,0.073,1.63
+C078,Fluted Square — Monument,Fluted Square,0.45,0.25,16,0.081,1.66
+C079,Fluted Square — Tall Profile,Fluted Square,0.46,0.305,18,0.089,1.69
+C080,Fluted Square — Signature,Fluted Square,0.47,0.36,20,0.097,1.72
+C081,Decorative Round — Compact,Decorative Round,0.28,0.14,8,0.025,1.15
+C082,Decorative Round — Slender,Decorative Round,0.29,0.195,10,0.033,1.18
+C083,Decorative Round — Balanced,Decorative Round,0.3,0.25,12,0.041,1.21
+C084,Decorative Round — Broad Base,Decorative Round,0.31,0.305,14,0.049,1.24
+C085,Decorative Round — Wide Capital,Decorative Round,0.32,0.36,16,0.057,1.27
+C086,Decorative Round — Raised Base,Decorative Round,0.33,0.14,18,0.065,1.3
+C087,Decorative Round — Fine Detail,Decorative Round,0.34,0.195,20,0.073,1.33
+C088,Decorative Round — Deep Detail,Decorative Round,0.35,0.25,22,0.081,1.36
+C089,Decorative Round — Porch,Decorative Round,0.36,0.305,24,0.089,1.39
+C090,Decorative Round — Veranda,Decorative Round,0.37,0.36,26,0.097,1.42
+C091,Decorative Round — Balcony,Decorative Round,0.38,0.14,28,0.025,1.45
+C092,Decorative Round — Entrance,Decorative Round,0.39,0.195,30,0.033,1.48
+C093,Decorative Round — Garden,Decorative Round,0.4,0.25,32,0.041,1.51
+C094,Decorative Round — Courtyard,Decorative Round,0.41,0.305,8,0.049,1.54
+C095,Decorative Round — Formal,Decorative Round,0.42,0.36,10,0.057,1.57
+C096,Decorative Round — Grand,Decorative Round,0.43,0.14,12,0.065,1.6
+C097,Decorative Round — Estate,Decorative Round,0.44,0.195,14,0.073,1.63
+C098,Decorative Round — Monument,Decorative Round,0.45,0.25,16,0.081,1.66
+C099,Decorative Round — Tall Profile,Decorative Round,0.46,0.305,18,0.089,1.69
+C100,Decorative Round — Signature,Decorative Round,0.47,0.36,20,0.097,1.72
+C101,Tuscan Inspired — Compact,Tuscan Inspired,0.28,0.14,8,0.025,1.15
+C102,Tuscan Inspired — Slender,Tuscan Inspired,0.29,0.195,10,0.033,1.18
+C103,Tuscan Inspired — Balanced,Tuscan Inspired,0.3,0.25,12,0.041,1.21
+C104,Tuscan Inspired — Broad Base,Tuscan Inspired,0.31,0.305,14,0.049,1.24
+C105,Tuscan Inspired — Wide Capital,Tuscan Inspired,0.32,0.36,16,0.057,1.27
+C106,Tuscan Inspired — Raised Base,Tuscan Inspired,0.33,0.14,18,0.065,1.3
+C107,Tuscan Inspired — Fine Detail,Tuscan Inspired,0.34,0.195,20,0.073,1.33
+C108,Tuscan Inspired — Deep Detail,Tuscan Inspired,0.35,0.25,22,0.081,1.36
+C109,Tuscan Inspired — Porch,Tuscan Inspired,0.36,0.305,24,0.089,1.39
+C110,Tuscan Inspired — Veranda,Tuscan Inspired,0.37,0.36,26,0.097,1.42
+C111,Tuscan Inspired — Balcony,Tuscan Inspired,0.38,0.14,28,0.025,1.45
+C112,Tuscan Inspired — Entrance,Tuscan Inspired,0.39,0.195,30,0.033,1.48
+C113,Tuscan Inspired — Garden,Tuscan Inspired,0.4,0.25,32,0.041,1.51
+C114,Tuscan Inspired — Courtyard,Tuscan Inspired,0.41,0.305,8,0.049,1.54
+C115,Tuscan Inspired — Formal,Tuscan Inspired,0.42,0.36,10,0.057,1.57
+C116,Tuscan Inspired — Grand,Tuscan Inspired,0.43,0.14,12,0.065,1.6
+C117,Tuscan Inspired — Estate,Tuscan Inspired,0.44,0.195,14,0.073,1.63
+C118,Tuscan Inspired — Monument,Tuscan Inspired,0.45,0.25,16,0.081,1.66
+C119,Tuscan Inspired — Tall Profile,Tuscan Inspired,0.46,0.305,18,0.089,1.69
+C120,Tuscan Inspired — Signature,Tuscan Inspired,0.47,0.36,20,0.097,1.72
+C121,Doric Inspired — Compact,Doric Inspired,0.28,0.14,8,0.025,1.15
+C122,Doric Inspired — Slender,Doric Inspired,0.29,0.195,10,0.033,1.18
+C123,Doric Inspired — Balanced,Doric Inspired,0.3,0.25,12,0.041,1.21
+C124,Doric Inspired — Broad Base,Doric Inspired,0.31,0.305,14,0.049,1.24
+C125,Doric Inspired — Wide Capital,Doric Inspired,0.32,0.36,16,0.057,1.27
+C126,Doric Inspired — Raised Base,Doric Inspired,0.33,0.14,18,0.065,1.3
+C127,Doric Inspired — Fine Detail,Doric Inspired,0.34,0.195,20,0.073,1.33
+C128,Doric Inspired — Deep Detail,Doric Inspired,0.35,0.25,22,0.081,1.36
+C129,Doric Inspired — Porch,Doric Inspired,0.36,0.305,24,0.089,1.39
+C130,Doric Inspired — Veranda,Doric Inspired,0.37,0.36,26,0.097,1.42
+C131,Doric Inspired — Balcony,Doric Inspired,0.38,0.14,28,0.025,1.45
+C132,Doric Inspired — Entrance,Doric Inspired,0.39,0.195,30,0.033,1.48
+C133,Doric Inspired — Garden,Doric Inspired,0.4,0.25,32,0.041,1.51
+C134,Doric Inspired — Courtyard,Doric Inspired,0.41,0.305,8,0.049,1.54
+C135,Doric Inspired — Formal,Doric Inspired,0.42,0.36,10,0.057,1.57
+C136,Doric Inspired — Grand,Doric Inspired,0.43,0.14,12,0.065,1.6
+C137,Doric Inspired — Estate,Doric Inspired,0.44,0.195,14,0.073,1.63
+C138,Doric Inspired — Monument,Doric Inspired,0.45,0.25,16,0.081,1.66
+C139,Doric Inspired — Tall Profile,Doric Inspired,0.46,0.305,18,0.089,1.69
+C140,Doric Inspired — Signature,Doric Inspired,0.47,0.36,20,0.097,1.72
+C141,Octagonal — Compact,Octagonal,0.28,0.14,8,0.025,1.15
+C142,Octagonal — Slender,Octagonal,0.29,0.195,10,0.033,1.18
+C143,Octagonal — Balanced,Octagonal,0.3,0.25,12,0.041,1.21
+C144,Octagonal — Broad Base,Octagonal,0.31,0.305,14,0.049,1.24
+C145,Octagonal — Wide Capital,Octagonal,0.32,0.36,16,0.057,1.27
+C146,Octagonal — Raised Base,Octagonal,0.33,0.14,18,0.065,1.3
+C147,Octagonal — Fine Detail,Octagonal,0.34,0.195,20,0.073,1.33
+C148,Octagonal — Deep Detail,Octagonal,0.35,0.25,22,0.081,1.36
+C149,Octagonal — Porch,Octagonal,0.36,0.305,24,0.089,1.39
+C150,Octagonal — Veranda,Octagonal,0.37,0.36,26,0.097,1.42
+C151,Octagonal — Balcony,Octagonal,0.38,0.14,28,0.025,1.45
+C152,Octagonal — Entrance,Octagonal,0.39,0.195,30,0.033,1.48
+C153,Octagonal — Garden,Octagonal,0.4,0.25,32,0.041,1.51
+C154,Octagonal — Courtyard,Octagonal,0.41,0.305,8,0.049,1.54
+C155,Octagonal — Formal,Octagonal,0.42,0.36,10,0.057,1.57
+C156,Octagonal — Grand,Octagonal,0.43,0.14,12,0.065,1.6
+C157,Octagonal — Estate,Octagonal,0.44,0.195,14,0.073,1.63
+C158,Octagonal — Monument,Octagonal,0.45,0.25,16,0.081,1.66
+C159,Octagonal — Tall Profile,Octagonal,0.46,0.305,18,0.089,1.69
+C160,Octagonal — Signature,Octagonal,0.47,0.36,20,0.097,1.72
+C161,Banded Round — Compact,Banded Round,0.28,0.14,8,0.025,1.15
+C162,Banded Round — Slender,Banded Round,0.29,0.195,10,0.033,1.18
+C163,Banded Round — Balanced,Banded Round,0.3,0.25,12,0.041,1.21
+C164,Banded Round — Broad Base,Banded Round,0.31,0.305,14,0.049,1.24
+C165,Banded Round — Wide Capital,Banded Round,0.32,0.36,16,0.057,1.27
+C166,Banded Round — Raised Base,Banded Round,0.33,0.14,18,0.065,1.3
+C167,Banded Round — Fine Detail,Banded Round,0.34,0.195,20,0.073,1.33
+C168,Banded Round — Deep Detail,Banded Round,0.35,0.25,22,0.081,1.36
+C169,Banded Round — Porch,Banded Round,0.36,0.305,24,0.089,1.39
+C170,Banded Round — Veranda,Banded Round,0.37,0.36,26,0.097,1.42
+C171,Banded Round — Balcony,Banded Round,0.38,0.14,28,0.025,1.45
+C172,Banded Round — Entrance,Banded Round,0.39,0.195,30,0.033,1.48
+C173,Banded Round — Garden,Banded Round,0.4,0.25,32,0.041,1.51
+C174,Banded Round — Courtyard,Banded Round,0.41,0.305,8,0.049,1.54
+C175,Banded Round — Formal,Banded Round,0.42,0.36,10,0.057,1.57
+C176,Banded Round — Grand,Banded Round,0.43,0.14,12,0.065,1.6
+C177,Banded Round — Estate,Banded Round,0.44,0.195,14,0.073,1.63
+C178,Banded Round — Monument,Banded Round,0.45,0.25,16,0.081,1.66
+C179,Banded Round — Tall Profile,Banded Round,0.46,0.305,18,0.089,1.69
+C180,Banded Round — Signature,Banded Round,0.47,0.36,20,0.097,1.72
+C181,Spiral Fluted — Compact,Spiral Fluted,0.28,0.14,8,0.025,1.15
+C182,Spiral Fluted — Slender,Spiral Fluted,0.29,0.195,10,0.033,1.18
+C183,Spiral Fluted — Balanced,Spiral Fluted,0.3,0.25,12,0.041,1.21
+C184,Spiral Fluted — Broad Base,Spiral Fluted,0.31,0.305,14,0.049,1.24
+C185,Spiral Fluted — Wide Capital,Spiral Fluted,0.32,0.36,16,0.057,1.27
+C186,Spiral Fluted — Raised Base,Spiral Fluted,0.33,0.14,18,0.065,1.3
+C187,Spiral Fluted — Fine Detail,Spiral Fluted,0.34,0.195,20,0.073,1.33
+C188,Spiral Fluted — Deep Detail,Spiral Fluted,0.35,0.25,22,0.081,1.36
+C189,Spiral Fluted — Porch,Spiral Fluted,0.36,0.305,24,0.089,1.39
+C190,Spiral Fluted — Veranda,Spiral Fluted,0.37,0.36,26,0.097,1.42
+C191,Spiral Fluted — Balcony,Spiral Fluted,0.38,0.14,28,0.025,1.45
+C192,Spiral Fluted — Entrance,Spiral Fluted,0.39,0.195,30,0.033,1.48
+C193,Spiral Fluted — Garden,Spiral Fluted,0.4,0.25,32,0.041,1.51
+C194,Spiral Fluted — Courtyard,Spiral Fluted,0.41,0.305,8,0.049,1.54
+C195,Spiral Fluted — Formal,Spiral Fluted,0.42,0.36,10,0.057,1.57
+C196,Spiral Fluted — Grand,Spiral Fluted,0.43,0.14,12,0.065,1.6
+C197,Spiral Fluted — Estate,Spiral Fluted,0.44,0.195,14,0.073,1.63
+C198,Spiral Fluted — Monument,Spiral Fluted,0.45,0.25,16,0.081,1.66
+C199,Spiral Fluted — Tall Profile,Spiral Fluted,0.46,0.305,18,0.089,1.69
+C200,Spiral Fluted — Signature,Spiral Fluted,0.47,0.36,20,0.097,1.72

@@ -1,0 +1,5791 @@
+{
+  "houses": [
+    {
+      "id": "H01",
+      "name": "Monrovia Starter",
+      "family": "Compact Hip Bungalows",
+      "settings": {
+        "width": 8.0,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.55,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.4,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H02",
+      "name": "Paynesville Compact",
+      "family": "Compact Hip Bungalows",
+      "settings": {
+        "width": 9.25,
+        "depth": 9.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.61,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.55,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H03",
+      "name": "Brewerville Family",
+      "family": "Compact Hip Bungalows",
+      "settings": {
+        "width": 10.5,
+        "depth": 10.2,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.67,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.6999999999999997,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H04",
+      "name": "Gardnersville Raised",
+      "family": "Compact Hip Bungalows",
+      "settings": {
+        "width": 11.75,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.73,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.8499999999999996,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H05",
+      "name": "Kakata Wide Eaves",
+      "family": "Compact Hip Bungalows",
+      "settings": {
+        "width": 13.0,
+        "depth": 9.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.79,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.0,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H06",
+      "name": "Sinkor Veranda",
+      "family": "Full Veranda Bungalows",
+      "settings": {
+        "width": 10.0,
+        "depth": 9.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.55,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.4,
+        "veranda_width": 1.0,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H07",
+      "name": "Robertsfield Porch",
+      "family": "Full Veranda Bungalows",
+      "settings": {
+        "width": 11.25,
+        "depth": 10.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.61,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.55,
+        "veranda_width": 1.0,
+        "porch_columns": 4,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H08",
+      "name": "Gbarnga Family Veranda",
+      "family": "Full Veranda Bungalows",
+      "settings": {
+        "width": 12.5,
+        "depth": 11.2,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.67,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.6999999999999997,
+        "veranda_width": 1.0,
+        "porch_columns": 5,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H09",
+      "name": "Buchanan Long Porch",
+      "family": "Full Veranda Bungalows",
+      "settings": {
+        "width": 13.75,
+        "depth": 9.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.73,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.8499999999999996,
+        "veranda_width": 1.0,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H10",
+      "name": "Harper Grand Veranda",
+      "family": "Full Veranda Bungalows",
+      "settings": {
+        "width": 15.0,
+        "depth": 10.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.79,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.0,
+        "veranda_width": 1.0,
+        "porch_columns": 4,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H11",
+      "name": "Robertsport Breeze",
+      "family": "Coastal Bungalows",
+      "settings": {
+        "width": 9.0,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.85,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 1.0,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "COASTAL",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.4,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H12",
+      "name": "Marshall Coast",
+      "family": "Coastal Bungalows",
+      "settings": {
+        "width": 10.25,
+        "depth": 9.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.91,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 1.0,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "COASTAL",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.55,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H13",
+      "name": "Buchanan Seaside",
+      "family": "Coastal Bungalows",
+      "settings": {
+        "width": 11.5,
+        "depth": 10.2,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.97,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 1.0,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "COASTAL",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.6999999999999997,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H14",
+      "name": "Greenville Coastal",
+      "family": "Coastal Bungalows",
+      "settings": {
+        "width": 12.75,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 1.03,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 1.0,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "COASTAL",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.8499999999999996,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H15",
+      "name": "Harper Raised Coast",
+      "family": "Coastal Bungalows",
+      "settings": {
+        "width": 14.0,
+        "depth": 9.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 1.09,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 1.0,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "COASTAL",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.0,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H16",
+      "name": "Sinkor Column Villa",
+      "family": "Classical Villas",
+      "settings": {
+        "width": 11.0,
+        "depth": 10.0,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.55,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.0,
+        "veranda_width": 0.72,
+        "porch_columns": 4,
+        "column_size": 0.4,
+        "column_style": "CLASSICAL",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H17",
+      "name": "Paynesville Balcony Villa",
+      "family": "Classical Villas",
+      "settings": {
+        "width": 12.25,
+        "depth": 11.1,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.61,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.15,
+        "veranda_width": 0.72,
+        "porch_columns": 4,
+        "column_size": 0.4,
+        "column_style": "CLASSICAL",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H18",
+      "name": "Monrovia Classical",
+      "family": "Classical Villas",
+      "settings": {
+        "width": 13.5,
+        "depth": 12.2,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.67,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.3,
+        "veranda_width": 0.72,
+        "porch_columns": 4,
+        "column_size": 0.4,
+        "column_style": "CLASSICAL",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H19",
+      "name": "Brewerville Grand Villa",
+      "family": "Classical Villas",
+      "settings": {
+        "width": 14.75,
+        "depth": 10.0,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.73,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.4,
+        "veranda_width": 0.72,
+        "porch_columns": 4,
+        "column_size": 0.4,
+        "column_style": "CLASSICAL",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H20",
+      "name": "Montserrado Residence",
+      "family": "Classical Villas",
+      "settings": {
+        "width": 16.0,
+        "depth": 11.1,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.79,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.4,
+        "veranda_width": 0.72,
+        "porch_columns": 4,
+        "column_size": 0.4,
+        "column_style": "CLASSICAL",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H21",
+      "name": "Capital Modern",
+      "family": "Modern Flat Roofs",
+      "settings": {
+        "width": 8.0,
+        "depth": 9.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.55,
+        "roof_style": "FLAT",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": false,
+        "veranda_depth": 2.4,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H22",
+      "name": "Congo Town Terrace",
+      "family": "Modern Flat Roofs",
+      "settings": {
+        "width": 9.25,
+        "depth": 10.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.61,
+        "roof_style": "FLAT",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": false,
+        "veranda_depth": 2.55,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H23",
+      "name": "Urban Parapet",
+      "family": "Modern Flat Roofs",
+      "settings": {
+        "width": 10.5,
+        "depth": 11.2,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.67,
+        "roof_style": "FLAT",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": false,
+        "veranda_depth": 2.6999999999999997,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H24",
+      "name": "Minimal Family Home",
+      "family": "Modern Flat Roofs",
+      "settings": {
+        "width": 11.75,
+        "depth": 9.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.73,
+        "roof_style": "FLAT",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": false,
+        "veranda_depth": 2.8499999999999996,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H25",
+      "name": "Modern Tall Residence",
+      "family": "Modern Flat Roofs",
+      "settings": {
+        "width": 13.0,
+        "depth": 10.1,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.79,
+        "roof_style": "FLAT",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": false,
+        "veranda_depth": 3.0,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H26",
+      "name": "Tropical Shed Compact",
+      "family": "Shed Roof Homes",
+      "settings": {
+        "width": 8.0,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.55,
+        "roof_style": "SHED",
+        "roof_pitch": 12.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.4,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H27",
+      "name": "Garden Mono Pitch",
+      "family": "Shed Roof Homes",
+      "settings": {
+        "width": 9.25,
+        "depth": 9.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.61,
+        "roof_style": "SHED",
+        "roof_pitch": 12.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.55,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H28",
+      "name": "Raised Shed Home",
+      "family": "Shed Roof Homes",
+      "settings": {
+        "width": 10.5,
+        "depth": 10.2,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.67,
+        "roof_style": "SHED",
+        "roof_pitch": 12.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.6999999999999997,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H29",
+      "name": "Wide Mono Pitch",
+      "family": "Shed Roof Homes",
+      "settings": {
+        "width": 11.75,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.73,
+        "roof_style": "SHED",
+        "roof_pitch": 12.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.8499999999999996,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H30",
+      "name": "Two Level Shed",
+      "family": "Shed Roof Homes",
+      "settings": {
+        "width": 13.0,
+        "depth": 9.1,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.79,
+        "roof_style": "SHED",
+        "roof_pitch": 12.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "MODERN",
+        "surface": "PLASTER",
+        "roof_surface": "METAL",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.0,
+        "veranda_width": 0.6,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H31",
+      "name": "Gable Starter",
+      "family": "Gable Cottages",
+      "settings": {
+        "width": 7.0,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.55,
+        "roof_style": "GABLE",
+        "roof_pitch": 35.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.4,
+        "veranda_width": 0.65,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H32",
+      "name": "Garden Gable",
+      "family": "Gable Cottages",
+      "settings": {
+        "width": 8.25,
+        "depth": 9.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.61,
+        "roof_style": "GABLE",
+        "roof_pitch": 35.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.55,
+        "veranda_width": 0.65,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H33",
+      "name": "Country Cottage",
+      "family": "Gable Cottages",
+      "settings": {
+        "width": 9.5,
+        "depth": 10.2,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.67,
+        "roof_style": "GABLE",
+        "roof_pitch": 35.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.6999999999999997,
+        "veranda_width": 0.65,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H34",
+      "name": "Wide Gable Cottage",
+      "family": "Gable Cottages",
+      "settings": {
+        "width": 10.75,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.73,
+        "roof_style": "GABLE",
+        "roof_pitch": 35.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.8499999999999996,
+        "veranda_width": 0.65,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H35",
+      "name": "Two Storey Gable",
+      "family": "Gable Cottages",
+      "settings": {
+        "width": 12.0,
+        "depth": 9.1,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.79,
+        "roof_style": "GABLE",
+        "roof_pitch": 35.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.0,
+        "veranda_width": 0.65,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H36",
+      "name": "Brick Compact",
+      "family": "Brick Residences",
+      "settings": {
+        "width": 8.0,
+        "depth": 9.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.55,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "BRICK",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.4,
+        "veranda_width": 0.8,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H37",
+      "name": "Brick Family",
+      "family": "Brick Residences",
+      "settings": {
+        "width": 9.25,
+        "depth": 10.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.61,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "BRICK",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.55,
+        "veranda_width": 0.8,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H38",
+      "name": "Brick Veranda",
+      "family": "Brick Residences",
+      "settings": {
+        "width": 10.5,
+        "depth": 11.2,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.67,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "BRICK",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.6999999999999997,
+        "veranda_width": 0.8,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H39",
+      "name": "Brick Town Residence",
+      "family": "Brick Residences",
+      "settings": {
+        "width": 11.75,
+        "depth": 9.0,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.73,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "BRICK",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.8499999999999996,
+        "veranda_width": 0.8,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H40",
+      "name": "Brick Balcony Home",
+      "family": "Brick Residences",
+      "settings": {
+        "width": 13.0,
+        "depth": 10.1,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.79,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "BRICK",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.0,
+        "veranda_width": 0.8,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": false,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H41",
+      "name": "Duplex Veranda Massing",
+      "family": "Multi Storey Tropical",
+      "settings": {
+        "width": 10.0,
+        "depth": 10.0,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.55,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.4,
+        "veranda_width": 0.7,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H42",
+      "name": "Two Storey Tropical",
+      "family": "Multi Storey Tropical",
+      "settings": {
+        "width": 11.25,
+        "depth": 11.1,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.61,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.55,
+        "veranda_width": 0.7,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H43",
+      "name": "Three Storey Tropical",
+      "family": "Multi Storey Tropical",
+      "settings": {
+        "width": 12.5,
+        "depth": 12.2,
+        "floors": 3,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.67,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.6999999999999997,
+        "veranda_width": 0.7,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H44",
+      "name": "Columned Three Storey",
+      "family": "Multi Storey Tropical",
+      "settings": {
+        "width": 13.75,
+        "depth": 10.0,
+        "floors": 3,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.73,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.8499999999999996,
+        "veranda_width": 0.7,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "CLASSICAL",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H45",
+      "name": "Urban Four Storey",
+      "family": "Multi Storey Tropical",
+      "settings": {
+        "width": 15.0,
+        "depth": 11.1,
+        "floors": 4,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.79,
+        "roof_style": "HIP",
+        "roof_pitch": 28.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "PLASTER",
+        "roof_surface": "TILE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.0,
+        "veranda_width": 0.7,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": true,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H46",
+      "name": "Timber Cabin",
+      "family": "Timber Retreats",
+      "settings": {
+        "width": 7.0,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.55,
+        "roof_style": "GABLE",
+        "roof_pitch": 32.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 2,
+        "window_width": 1.05,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "TIMBER",
+        "roof_surface": "SHINGLE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.4,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H47",
+      "name": "Raised Timber Retreat",
+      "family": "Timber Retreats",
+      "settings": {
+        "width": 8.25,
+        "depth": 9.1,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.61,
+        "roof_style": "GABLE",
+        "roof_pitch": 32.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 3,
+        "window_width": 1.17,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "TIMBER",
+        "roof_surface": "SHINGLE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.55,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H48",
+      "name": "Timber Porch Home",
+      "family": "Timber Retreats",
+      "settings": {
+        "width": 9.5,
+        "depth": 10.2,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.67,
+        "roof_style": "GABLE",
+        "roof_pitch": 32.0,
+        "overhang": 0.65,
+        "windows_front": 3,
+        "windows_side": 4,
+        "window_width": 1.29,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "TIMBER",
+        "roof_surface": "SHINGLE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.6999999999999997,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H49",
+      "name": "Wide Timber Lodge",
+      "family": "Timber Retreats",
+      "settings": {
+        "width": 10.75,
+        "depth": 8.0,
+        "floors": 1,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.73,
+        "roof_style": "GABLE",
+        "roof_pitch": 32.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 2,
+        "window_width": 1.4100000000000001,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "TIMBER",
+        "roof_surface": "SHINGLE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 2.8499999999999996,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": false,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    },
+    {
+      "id": "H50",
+      "name": "Two Level Timber",
+      "family": "Timber Retreats",
+      "settings": {
+        "width": 12.0,
+        "depth": 9.1,
+        "floors": 2,
+        "floor_height": 3.2,
+        "wall_thickness": 0.22,
+        "slab": 0.18,
+        "foundation": 0.79,
+        "roof_style": "GABLE",
+        "roof_pitch": 32.0,
+        "overhang": 0.65,
+        "windows_front": 4,
+        "windows_side": 3,
+        "window_width": 1.53,
+        "window_height": 1.35,
+        "sill_height": 0.9,
+        "door_width": 1.1,
+        "door_height": 2.2,
+        "steps": true,
+        "ground": true,
+        "bevel": 0.012,
+        "style": "WARM",
+        "surface": "TIMBER",
+        "roof_surface": "SHINGLE",
+        "texture_scale": 1.0,
+        "veranda_enabled": true,
+        "veranda_depth": 3.0,
+        "veranda_width": 0.72,
+        "porch_columns": 3,
+        "column_size": 0.34,
+        "column_style": "SQUARE",
+        "porch_arches": false,
+        "railings": true,
+        "balcony": true,
+        "security_bars": true,
+        "belt_courses": true
+      }
+    }
+  ],
+  "textures": [
+    {
+      "id": "T001",
+      "name": "Brick \u2014 Fired Red",
+      "kind": "BRICK",
+      "color": [
+        0.48,
+        0.12,
+        0.055
+      ]
+    },
+    {
+      "id": "T002",
+      "name": "Brick \u2014 Rust",
+      "kind": "BRICK",
+      "color": [
+        0.38,
+        0.095,
+        0.04
+      ]
+    },
+    {
+      "id": "T003",
+      "name": "Brick \u2014 Terracotta",
+      "kind": "BRICK",
+      "color": [
+        0.6,
+        0.24,
+        0.12
+      ]
+    },
+    {
+      "id": "T004",
+      "name": "Brick \u2014 Chocolate",
+      "kind": "BRICK",
+      "color": [
+        0.19,
+        0.085,
+        0.045
+      ]
+    },
+    {
+      "id": "T005",
+      "name": "Brick \u2014 Buff",
+      "kind": "BRICK",
+      "color": [
+        0.6,
+        0.45,
+        0.25
+      ]
+    },
+    {
+      "id": "T006",
+      "name": "Brick \u2014 Sand",
+      "kind": "BRICK",
+      "color": [
+        0.7,
+        0.57,
+        0.38
+      ]
+    },
+    {
+      "id": "T007",
+      "name": "Brick \u2014 Charcoal",
+      "kind": "BRICK",
+      "color": [
+        0.075,
+        0.08,
+        0.085
+      ]
+    },
+    {
+      "id": "T008",
+      "name": "Brick \u2014 Rose",
+      "kind": "BRICK",
+      "color": [
+        0.6,
+        0.3,
+        0.24
+      ]
+    },
+    {
+      "id": "T009",
+      "name": "Brick \u2014 Cream",
+      "kind": "BRICK",
+      "color": [
+        0.78,
+        0.7,
+        0.52
+      ]
+    },
+    {
+      "id": "T010",
+      "name": "Brick \u2014 Weathered Brown",
+      "kind": "BRICK",
+      "color": [
+        0.27,
+        0.18,
+        0.12
+      ]
+    },
+    {
+      "id": "T011",
+      "name": "Concrete Block \u2014 Raw Grey",
+      "kind": "BLOCK",
+      "color": [
+        0.32,
+        0.34,
+        0.35
+      ]
+    },
+    {
+      "id": "T012",
+      "name": "Concrete Block \u2014 Ash",
+      "kind": "BLOCK",
+      "color": [
+        0.46,
+        0.47,
+        0.46
+      ]
+    },
+    {
+      "id": "T013",
+      "name": "Concrete Block \u2014 Dark Grey",
+      "kind": "BLOCK",
+      "color": [
+        0.15,
+        0.17,
+        0.18
+      ]
+    },
+    {
+      "id": "T014",
+      "name": "Concrete Block \u2014 Sand",
+      "kind": "BLOCK",
+      "color": [
+        0.55,
+        0.48,
+        0.36
+      ]
+    },
+    {
+      "id": "T015",
+      "name": "Concrete Block \u2014 Cream",
+      "kind": "BLOCK",
+      "color": [
+        0.7,
+        0.65,
+        0.51
+      ]
+    },
+    {
+      "id": "T016",
+      "name": "Concrete Block \u2014 Whitewash",
+      "kind": "BLOCK",
+      "color": [
+        0.82,
+        0.8,
+        0.73
+      ]
+    },
+    {
+      "id": "T017",
+      "name": "Concrete Block \u2014 Warm Grey",
+      "kind": "BLOCK",
+      "color": [
+        0.42,
+        0.39,
+        0.34
+      ]
+    },
+    {
+      "id": "T018",
+      "name": "Concrete Block \u2014 Earth",
+      "kind": "BLOCK",
+      "color": [
+        0.35,
+        0.27,
+        0.19
+      ]
+    },
+    {
+      "id": "T019",
+      "name": "Concrete Block \u2014 Slate",
+      "kind": "BLOCK",
+      "color": [
+        0.2,
+        0.24,
+        0.27
+      ]
+    },
+    {
+      "id": "T020",
+      "name": "Concrete Block \u2014 Pale Grey",
+      "kind": "BLOCK",
+      "color": [
+        0.62,
+        0.65,
+        0.65
+      ]
+    },
+    {
+      "id": "T021",
+      "name": "Fine Plaster \u2014 Ivory",
+      "kind": "PLASTER",
+      "color": [
+        0.84,
+        0.79,
+        0.65
+      ]
+    },
+    {
+      "id": "T022",
+      "name": "Fine Plaster \u2014 Peach",
+      "kind": "PLASTER",
+      "color": [
+        0.82,
+        0.5,
+        0.32
+      ]
+    },
+    {
+      "id": "T023",
+      "name": "Fine Plaster \u2014 Cream",
+      "kind": "PLASTER",
+      "color": [
+        0.88,
+        0.79,
+        0.55
+      ]
+    },
+    {
+      "id": "T024",
+      "name": "Fine Plaster \u2014 Sand",
+      "kind": "PLASTER",
+      "color": [
+        0.65,
+        0.52,
+        0.36
+      ]
+    },
+    {
+      "id": "T025",
+      "name": "Fine Plaster \u2014 White",
+      "kind": "PLASTER",
+      "color": [
+        0.91,
+        0.9,
+        0.85
+      ]
+    },
+    {
+      "id": "T026",
+      "name": "Fine Plaster \u2014 Mint",
+      "kind": "PLASTER",
+      "color": [
+        0.48,
+        0.7,
+        0.59
+      ]
+    },
+    {
+      "id": "T027",
+      "name": "Fine Plaster \u2014 Sky Blue",
+      "kind": "PLASTER",
+      "color": [
+        0.4,
+        0.65,
+        0.78
+      ]
+    },
+    {
+      "id": "T028",
+      "name": "Fine Plaster \u2014 Sage",
+      "kind": "PLASTER",
+      "color": [
+        0.4,
+        0.5,
+        0.34
+      ]
+    },
+    {
+      "id": "T029",
+      "name": "Fine Plaster \u2014 Rose",
+      "kind": "PLASTER",
+      "color": [
+        0.75,
+        0.44,
+        0.4
+      ]
+    },
+    {
+      "id": "T030",
+      "name": "Fine Plaster \u2014 Warm Grey",
+      "kind": "PLASTER",
+      "color": [
+        0.48,
+        0.45,
+        0.4
+      ]
+    },
+    {
+      "id": "T031",
+      "name": "Coarse Stucco \u2014 Ivory",
+      "kind": "STUCCO",
+      "color": [
+        0.8,
+        0.74,
+        0.59
+      ]
+    },
+    {
+      "id": "T032",
+      "name": "Coarse Stucco \u2014 Ochre",
+      "kind": "STUCCO",
+      "color": [
+        0.65,
+        0.43,
+        0.16
+      ]
+    },
+    {
+      "id": "T033",
+      "name": "Coarse Stucco \u2014 Terracotta",
+      "kind": "STUCCO",
+      "color": [
+        0.63,
+        0.26,
+        0.13
+      ]
+    },
+    {
+      "id": "T034",
+      "name": "Coarse Stucco \u2014 Taupe",
+      "kind": "STUCCO",
+      "color": [
+        0.4,
+        0.33,
+        0.26
+      ]
+    },
+    {
+      "id": "T035",
+      "name": "Coarse Stucco \u2014 White",
+      "kind": "STUCCO",
+      "color": [
+        0.86,
+        0.85,
+        0.79
+      ]
+    },
+    {
+      "id": "T036",
+      "name": "Coarse Stucco \u2014 Cream",
+      "kind": "STUCCO",
+      "color": [
+        0.78,
+        0.67,
+        0.43
+      ]
+    },
+    {
+      "id": "T037",
+      "name": "Coarse Stucco \u2014 Peach",
+      "kind": "STUCCO",
+      "color": [
+        0.78,
+        0.46,
+        0.28
+      ]
+    },
+    {
+      "id": "T038",
+      "name": "Coarse Stucco \u2014 Olive",
+      "kind": "STUCCO",
+      "color": [
+        0.33,
+        0.37,
+        0.2
+      ]
+    },
+    {
+      "id": "T039",
+      "name": "Coarse Stucco \u2014 Grey",
+      "kind": "STUCCO",
+      "color": [
+        0.38,
+        0.4,
+        0.39
+      ]
+    },
+    {
+      "id": "T040",
+      "name": "Coarse Stucco \u2014 Blue Grey",
+      "kind": "STUCCO",
+      "color": [
+        0.3,
+        0.42,
+        0.49
+      ]
+    },
+    {
+      "id": "T041",
+      "name": "Cast Concrete \u2014 Natural",
+      "kind": "CONCRETE",
+      "color": [
+        0.32,
+        0.33,
+        0.32
+      ]
+    },
+    {
+      "id": "T042",
+      "name": "Cast Concrete \u2014 Pale",
+      "kind": "CONCRETE",
+      "color": [
+        0.58,
+        0.6,
+        0.59
+      ]
+    },
+    {
+      "id": "T043",
+      "name": "Cast Concrete \u2014 Charcoal",
+      "kind": "CONCRETE",
+      "color": [
+        0.1,
+        0.12,
+        0.13
+      ]
+    },
+    {
+      "id": "T044",
+      "name": "Cast Concrete \u2014 Warm",
+      "kind": "CONCRETE",
+      "color": [
+        0.4,
+        0.36,
+        0.29
+      ]
+    },
+    {
+      "id": "T045",
+      "name": "Cast Concrete \u2014 Cool",
+      "kind": "CONCRETE",
+      "color": [
+        0.3,
+        0.36,
+        0.4
+      ]
+    },
+    {
+      "id": "T046",
+      "name": "Cast Concrete \u2014 Sandy",
+      "kind": "CONCRETE",
+      "color": [
+        0.5,
+        0.44,
+        0.32
+      ]
+    },
+    {
+      "id": "T047",
+      "name": "Cast Concrete \u2014 White",
+      "kind": "CONCRETE",
+      "color": [
+        0.72,
+        0.73,
+        0.7
+      ]
+    },
+    {
+      "id": "T048",
+      "name": "Cast Concrete \u2014 Brown",
+      "kind": "CONCRETE",
+      "color": [
+        0.27,
+        0.23,
+        0.18
+      ]
+    },
+    {
+      "id": "T049",
+      "name": "Cast Concrete \u2014 Ash",
+      "kind": "CONCRETE",
+      "color": [
+        0.44,
+        0.45,
+        0.43
+      ]
+    },
+    {
+      "id": "T050",
+      "name": "Cast Concrete \u2014 Slate",
+      "kind": "CONCRETE",
+      "color": [
+        0.18,
+        0.22,
+        0.25
+      ]
+    },
+    {
+      "id": "T051",
+      "name": "Wood Grain \u2014 Mahogany",
+      "kind": "WOOD",
+      "color": [
+        0.28,
+        0.075,
+        0.035
+      ]
+    },
+    {
+      "id": "T052",
+      "name": "Wood Grain \u2014 Teak",
+      "kind": "WOOD",
+      "color": [
+        0.42,
+        0.23,
+        0.075
+      ]
+    },
+    {
+      "id": "T053",
+      "name": "Wood Grain \u2014 Iroko Inspired",
+      "kind": "WOOD",
+      "color": [
+        0.38,
+        0.26,
+        0.11
+      ]
+    },
+    {
+      "id": "T054",
+      "name": "Wood Grain \u2014 Walnut",
+      "kind": "WOOD",
+      "color": [
+        0.18,
+        0.085,
+        0.035
+      ]
+    },
+    {
+      "id": "T055",
+      "name": "Wood Grain \u2014 Oak",
+      "kind": "WOOD",
+      "color": [
+        0.55,
+        0.38,
+        0.16
+      ]
+    },
+    {
+      "id": "T056",
+      "name": "Wood Grain \u2014 Pine",
+      "kind": "WOOD",
+      "color": [
+        0.68,
+        0.5,
+        0.23
+      ]
+    },
+    {
+      "id": "T057",
+      "name": "Wood Grain \u2014 Cedar",
+      "kind": "WOOD",
+      "color": [
+        0.4,
+        0.17,
+        0.065
+      ]
+    },
+    {
+      "id": "T058",
+      "name": "Wood Grain \u2014 Ebony",
+      "kind": "WOOD",
+      "color": [
+        0.045,
+        0.032,
+        0.025
+      ]
+    },
+    {
+      "id": "T059",
+      "name": "Wood Grain \u2014 Weathered",
+      "kind": "WOOD",
+      "color": [
+        0.27,
+        0.25,
+        0.21
+      ]
+    },
+    {
+      "id": "T060",
+      "name": "Wood Grain \u2014 Honey",
+      "kind": "WOOD",
+      "color": [
+        0.57,
+        0.3,
+        0.07
+      ]
+    },
+    {
+      "id": "T061",
+      "name": "Timber Siding \u2014 Natural",
+      "kind": "SIDING",
+      "color": [
+        0.4,
+        0.22,
+        0.09
+      ]
+    },
+    {
+      "id": "T062",
+      "name": "Timber Siding \u2014 Cedar",
+      "kind": "SIDING",
+      "color": [
+        0.45,
+        0.18,
+        0.07
+      ]
+    },
+    {
+      "id": "T063",
+      "name": "Timber Siding \u2014 Dark Brown",
+      "kind": "SIDING",
+      "color": [
+        0.13,
+        0.065,
+        0.035
+      ]
+    },
+    {
+      "id": "T064",
+      "name": "Timber Siding \u2014 Grey",
+      "kind": "SIDING",
+      "color": [
+        0.35,
+        0.37,
+        0.36
+      ]
+    },
+    {
+      "id": "T065",
+      "name": "Timber Siding \u2014 White",
+      "kind": "SIDING",
+      "color": [
+        0.8,
+        0.8,
+        0.74
+      ]
+    },
+    {
+      "id": "T066",
+      "name": "Timber Siding \u2014 Cream",
+      "kind": "SIDING",
+      "color": [
+        0.76,
+        0.68,
+        0.49
+      ]
+    },
+    {
+      "id": "T067",
+      "name": "Timber Siding \u2014 Sage",
+      "kind": "SIDING",
+      "color": [
+        0.28,
+        0.4,
+        0.3
+      ]
+    },
+    {
+      "id": "T068",
+      "name": "Timber Siding \u2014 Blue",
+      "kind": "SIDING",
+      "color": [
+        0.14,
+        0.29,
+        0.4
+      ]
+    },
+    {
+      "id": "T069",
+      "name": "Timber Siding \u2014 Red",
+      "kind": "SIDING",
+      "color": [
+        0.4,
+        0.085,
+        0.045
+      ]
+    },
+    {
+      "id": "T070",
+      "name": "Timber Siding \u2014 Black",
+      "kind": "SIDING",
+      "color": [
+        0.04,
+        0.045,
+        0.045
+      ]
+    },
+    {
+      "id": "T071",
+      "name": "Cut Stone \u2014 Limestone",
+      "kind": "STONE",
+      "color": [
+        0.64,
+        0.6,
+        0.47
+      ]
+    },
+    {
+      "id": "T072",
+      "name": "Cut Stone \u2014 Sandstone",
+      "kind": "STONE",
+      "color": [
+        0.62,
+        0.46,
+        0.27
+      ]
+    },
+    {
+      "id": "T073",
+      "name": "Cut Stone \u2014 Granite Grey",
+      "kind": "STONE",
+      "color": [
+        0.4,
+        0.42,
+        0.4
+      ]
+    },
+    {
+      "id": "T074",
+      "name": "Cut Stone \u2014 Basalt",
+      "kind": "STONE",
+      "color": [
+        0.12,
+        0.14,
+        0.14
+      ]
+    },
+    {
+      "id": "T075",
+      "name": "Cut Stone \u2014 Travertine Inspired",
+      "kind": "STONE",
+      "color": [
+        0.7,
+        0.58,
+        0.4
+      ]
+    },
+    {
+      "id": "T076",
+      "name": "Cut Stone \u2014 Warm Beige",
+      "kind": "STONE",
+      "color": [
+        0.58,
+        0.48,
+        0.34
+      ]
+    },
+    {
+      "id": "T077",
+      "name": "Cut Stone \u2014 Pale Cream",
+      "kind": "STONE",
+      "color": [
+        0.79,
+        0.74,
+        0.6
+      ]
+    },
+    {
+      "id": "T078",
+      "name": "Cut Stone \u2014 Rust Brown",
+      "kind": "STONE",
+      "color": [
+        0.36,
+        0.23,
+        0.13
+      ]
+    },
+    {
+      "id": "T079",
+      "name": "Cut Stone \u2014 Slate Blue",
+      "kind": "STONE",
+      "color": [
+        0.22,
+        0.3,
+        0.34
+      ]
+    },
+    {
+      "id": "T080",
+      "name": "Cut Stone \u2014 Weathered Grey",
+      "kind": "STONE",
+      "color": [
+        0.45,
+        0.44,
+        0.38
+      ]
+    },
+    {
+      "id": "T081",
+      "name": "Corrugated Metal \u2014 Galvanized",
+      "kind": "METAL",
+      "color": [
+        0.55,
+        0.6,
+        0.63
+      ]
+    },
+    {
+      "id": "T082",
+      "name": "Corrugated Metal \u2014 Charcoal",
+      "kind": "METAL",
+      "color": [
+        0.07,
+        0.085,
+        0.1
+      ]
+    },
+    {
+      "id": "T083",
+      "name": "Corrugated Metal \u2014 Terracotta",
+      "kind": "METAL",
+      "color": [
+        0.42,
+        0.1,
+        0.04
+      ]
+    },
+    {
+      "id": "T084",
+      "name": "Corrugated Metal \u2014 Forest Green",
+      "kind": "METAL",
+      "color": [
+        0.055,
+        0.2,
+        0.11
+      ]
+    },
+    {
+      "id": "T085",
+      "name": "Corrugated Metal \u2014 Ocean Blue",
+      "kind": "METAL",
+      "color": [
+        0.045,
+        0.18,
+        0.3
+      ]
+    },
+    {
+      "id": "T086",
+      "name": "Corrugated Metal \u2014 Cream",
+      "kind": "METAL",
+      "color": [
+        0.75,
+        0.68,
+        0.47
+      ]
+    },
+    {
+      "id": "T087",
+      "name": "Corrugated Metal \u2014 Silver",
+      "kind": "METAL",
+      "color": [
+        0.72,
+        0.75,
+        0.78
+      ]
+    },
+    {
+      "id": "T088",
+      "name": "Corrugated Metal \u2014 Copper Inspired",
+      "kind": "METAL",
+      "color": [
+        0.5,
+        0.23,
+        0.09
+      ]
+    },
+    {
+      "id": "T089",
+      "name": "Corrugated Metal \u2014 White",
+      "kind": "METAL",
+      "color": [
+        0.85,
+        0.86,
+        0.82
+      ]
+    },
+    {
+      "id": "T090",
+      "name": "Corrugated Metal \u2014 Burgundy",
+      "kind": "METAL",
+      "color": [
+        0.22,
+        0.035,
+        0.045
+      ]
+    },
+    {
+      "id": "T091",
+      "name": "Ceramic Tile \u2014 Terracotta",
+      "kind": "TILE",
+      "color": [
+        0.5,
+        0.15,
+        0.06
+      ]
+    },
+    {
+      "id": "T092",
+      "name": "Ceramic Tile \u2014 Rust",
+      "kind": "TILE",
+      "color": [
+        0.35,
+        0.07,
+        0.025
+      ]
+    },
+    {
+      "id": "T093",
+      "name": "Ceramic Tile \u2014 Charcoal",
+      "kind": "TILE",
+      "color": [
+        0.06,
+        0.075,
+        0.08
+      ]
+    },
+    {
+      "id": "T094",
+      "name": "Ceramic Tile \u2014 Chocolate",
+      "kind": "TILE",
+      "color": [
+        0.18,
+        0.07,
+        0.025
+      ]
+    },
+    {
+      "id": "T095",
+      "name": "Ceramic Tile \u2014 Sand",
+      "kind": "TILE",
+      "color": [
+        0.63,
+        0.46,
+        0.25
+      ]
+    },
+    {
+      "id": "T096",
+      "name": "Ceramic Tile \u2014 Cream",
+      "kind": "TILE",
+      "color": [
+        0.76,
+        0.68,
+        0.49
+      ]
+    },
+    {
+      "id": "T097",
+      "name": "Ceramic Tile \u2014 Slate Blue",
+      "kind": "TILE",
+      "color": [
+        0.13,
+        0.23,
+        0.3
+      ]
+    },
+    {
+      "id": "T098",
+      "name": "Ceramic Tile \u2014 Forest Green",
+      "kind": "TILE",
+      "color": [
+        0.07,
+        0.2,
+        0.12
+      ]
+    },
+    {
+      "id": "T099",
+      "name": "Ceramic Tile \u2014 Burgundy",
+      "kind": "TILE",
+      "color": [
+        0.25,
+        0.035,
+        0.045
+      ]
+    },
+    {
+      "id": "T100",
+      "name": "Ceramic Tile \u2014 Graphite",
+      "kind": "TILE",
+      "color": [
+        0.17,
+        0.19,
+        0.2
+      ]
+    }
+  ],
+  "columns": [
+    {
+      "id": "C001",
+      "name": "Square Pier \u2014 Compact",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C002",
+      "name": "Square Pier \u2014 Slender",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C003",
+      "name": "Square Pier \u2014 Balanced",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C004",
+      "name": "Square Pier \u2014 Broad Base",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C005",
+      "name": "Square Pier \u2014 Wide Capital",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C006",
+      "name": "Square Pier \u2014 Raised Base",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C007",
+      "name": "Square Pier \u2014 Fine Detail",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C008",
+      "name": "Square Pier \u2014 Deep Detail",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C009",
+      "name": "Square Pier \u2014 Porch",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C010",
+      "name": "Square Pier \u2014 Veranda",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C011",
+      "name": "Square Pier \u2014 Balcony",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C012",
+      "name": "Square Pier \u2014 Entrance",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C013",
+      "name": "Square Pier \u2014 Garden",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C014",
+      "name": "Square Pier \u2014 Courtyard",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C015",
+      "name": "Square Pier \u2014 Formal",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C016",
+      "name": "Square Pier \u2014 Grand",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C017",
+      "name": "Square Pier \u2014 Estate",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C018",
+      "name": "Square Pier \u2014 Monument",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C019",
+      "name": "Square Pier \u2014 Tall Profile",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C020",
+      "name": "Square Pier \u2014 Signature",
+      "family": "Square Pier",
+      "settings": {
+        "column_style": "SQUARE",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    },
+    {
+      "id": "C021",
+      "name": "Smooth Classical \u2014 Compact",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C022",
+      "name": "Smooth Classical \u2014 Slender",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C023",
+      "name": "Smooth Classical \u2014 Balanced",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C024",
+      "name": "Smooth Classical \u2014 Broad Base",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C025",
+      "name": "Smooth Classical \u2014 Wide Capital",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C026",
+      "name": "Smooth Classical \u2014 Raised Base",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C027",
+      "name": "Smooth Classical \u2014 Fine Detail",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C028",
+      "name": "Smooth Classical \u2014 Deep Detail",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C029",
+      "name": "Smooth Classical \u2014 Porch",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C030",
+      "name": "Smooth Classical \u2014 Veranda",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C031",
+      "name": "Smooth Classical \u2014 Balcony",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C032",
+      "name": "Smooth Classical \u2014 Entrance",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C033",
+      "name": "Smooth Classical \u2014 Garden",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C034",
+      "name": "Smooth Classical \u2014 Courtyard",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C035",
+      "name": "Smooth Classical \u2014 Formal",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C036",
+      "name": "Smooth Classical \u2014 Grand",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C037",
+      "name": "Smooth Classical \u2014 Estate",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C038",
+      "name": "Smooth Classical \u2014 Monument",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C039",
+      "name": "Smooth Classical \u2014 Tall Profile",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C040",
+      "name": "Smooth Classical \u2014 Signature",
+      "family": "Smooth Classical",
+      "settings": {
+        "column_style": "CLASSICAL",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    },
+    {
+      "id": "C041",
+      "name": "Fluted Round \u2014 Compact",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C042",
+      "name": "Fluted Round \u2014 Slender",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C043",
+      "name": "Fluted Round \u2014 Balanced",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C044",
+      "name": "Fluted Round \u2014 Broad Base",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C045",
+      "name": "Fluted Round \u2014 Wide Capital",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C046",
+      "name": "Fluted Round \u2014 Raised Base",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C047",
+      "name": "Fluted Round \u2014 Fine Detail",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C048",
+      "name": "Fluted Round \u2014 Deep Detail",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C049",
+      "name": "Fluted Round \u2014 Porch",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C050",
+      "name": "Fluted Round \u2014 Veranda",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C051",
+      "name": "Fluted Round \u2014 Balcony",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C052",
+      "name": "Fluted Round \u2014 Entrance",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C053",
+      "name": "Fluted Round \u2014 Garden",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C054",
+      "name": "Fluted Round \u2014 Courtyard",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C055",
+      "name": "Fluted Round \u2014 Formal",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C056",
+      "name": "Fluted Round \u2014 Grand",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C057",
+      "name": "Fluted Round \u2014 Estate",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C058",
+      "name": "Fluted Round \u2014 Monument",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C059",
+      "name": "Fluted Round \u2014 Tall Profile",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C060",
+      "name": "Fluted Round \u2014 Signature",
+      "family": "Fluted Round",
+      "settings": {
+        "column_style": "FLUTED",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    },
+    {
+      "id": "C061",
+      "name": "Fluted Square \u2014 Compact",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C062",
+      "name": "Fluted Square \u2014 Slender",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C063",
+      "name": "Fluted Square \u2014 Balanced",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C064",
+      "name": "Fluted Square \u2014 Broad Base",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C065",
+      "name": "Fluted Square \u2014 Wide Capital",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C066",
+      "name": "Fluted Square \u2014 Raised Base",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C067",
+      "name": "Fluted Square \u2014 Fine Detail",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C068",
+      "name": "Fluted Square \u2014 Deep Detail",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C069",
+      "name": "Fluted Square \u2014 Porch",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C070",
+      "name": "Fluted Square \u2014 Veranda",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C071",
+      "name": "Fluted Square \u2014 Balcony",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C072",
+      "name": "Fluted Square \u2014 Entrance",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C073",
+      "name": "Fluted Square \u2014 Garden",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C074",
+      "name": "Fluted Square \u2014 Courtyard",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C075",
+      "name": "Fluted Square \u2014 Formal",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C076",
+      "name": "Fluted Square \u2014 Grand",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C077",
+      "name": "Fluted Square \u2014 Estate",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C078",
+      "name": "Fluted Square \u2014 Monument",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C079",
+      "name": "Fluted Square \u2014 Tall Profile",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C080",
+      "name": "Fluted Square \u2014 Signature",
+      "family": "Fluted Square",
+      "settings": {
+        "column_style": "SQUARE_FLUTED",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    },
+    {
+      "id": "C081",
+      "name": "Decorative Round \u2014 Compact",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C082",
+      "name": "Decorative Round \u2014 Slender",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C083",
+      "name": "Decorative Round \u2014 Balanced",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C084",
+      "name": "Decorative Round \u2014 Broad Base",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C085",
+      "name": "Decorative Round \u2014 Wide Capital",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C086",
+      "name": "Decorative Round \u2014 Raised Base",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C087",
+      "name": "Decorative Round \u2014 Fine Detail",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C088",
+      "name": "Decorative Round \u2014 Deep Detail",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C089",
+      "name": "Decorative Round \u2014 Porch",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C090",
+      "name": "Decorative Round \u2014 Veranda",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C091",
+      "name": "Decorative Round \u2014 Balcony",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C092",
+      "name": "Decorative Round \u2014 Entrance",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C093",
+      "name": "Decorative Round \u2014 Garden",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C094",
+      "name": "Decorative Round \u2014 Courtyard",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C095",
+      "name": "Decorative Round \u2014 Formal",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C096",
+      "name": "Decorative Round \u2014 Grand",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C097",
+      "name": "Decorative Round \u2014 Estate",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C098",
+      "name": "Decorative Round \u2014 Monument",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C099",
+      "name": "Decorative Round \u2014 Tall Profile",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C100",
+      "name": "Decorative Round \u2014 Signature",
+      "family": "Decorative Round",
+      "settings": {
+        "column_style": "ORNATE",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    },
+    {
+      "id": "C101",
+      "name": "Tuscan Inspired \u2014 Compact",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C102",
+      "name": "Tuscan Inspired \u2014 Slender",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C103",
+      "name": "Tuscan Inspired \u2014 Balanced",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C104",
+      "name": "Tuscan Inspired \u2014 Broad Base",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C105",
+      "name": "Tuscan Inspired \u2014 Wide Capital",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C106",
+      "name": "Tuscan Inspired \u2014 Raised Base",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C107",
+      "name": "Tuscan Inspired \u2014 Fine Detail",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C108",
+      "name": "Tuscan Inspired \u2014 Deep Detail",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C109",
+      "name": "Tuscan Inspired \u2014 Porch",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C110",
+      "name": "Tuscan Inspired \u2014 Veranda",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C111",
+      "name": "Tuscan Inspired \u2014 Balcony",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C112",
+      "name": "Tuscan Inspired \u2014 Entrance",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C113",
+      "name": "Tuscan Inspired \u2014 Garden",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C114",
+      "name": "Tuscan Inspired \u2014 Courtyard",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C115",
+      "name": "Tuscan Inspired \u2014 Formal",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C116",
+      "name": "Tuscan Inspired \u2014 Grand",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C117",
+      "name": "Tuscan Inspired \u2014 Estate",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C118",
+      "name": "Tuscan Inspired \u2014 Monument",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C119",
+      "name": "Tuscan Inspired \u2014 Tall Profile",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C120",
+      "name": "Tuscan Inspired \u2014 Signature",
+      "family": "Tuscan Inspired",
+      "settings": {
+        "column_style": "TUSCAN",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    },
+    {
+      "id": "C121",
+      "name": "Doric Inspired \u2014 Compact",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C122",
+      "name": "Doric Inspired \u2014 Slender",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C123",
+      "name": "Doric Inspired \u2014 Balanced",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C124",
+      "name": "Doric Inspired \u2014 Broad Base",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C125",
+      "name": "Doric Inspired \u2014 Wide Capital",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C126",
+      "name": "Doric Inspired \u2014 Raised Base",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C127",
+      "name": "Doric Inspired \u2014 Fine Detail",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C128",
+      "name": "Doric Inspired \u2014 Deep Detail",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C129",
+      "name": "Doric Inspired \u2014 Porch",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C130",
+      "name": "Doric Inspired \u2014 Veranda",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C131",
+      "name": "Doric Inspired \u2014 Balcony",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C132",
+      "name": "Doric Inspired \u2014 Entrance",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C133",
+      "name": "Doric Inspired \u2014 Garden",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C134",
+      "name": "Doric Inspired \u2014 Courtyard",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C135",
+      "name": "Doric Inspired \u2014 Formal",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C136",
+      "name": "Doric Inspired \u2014 Grand",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C137",
+      "name": "Doric Inspired \u2014 Estate",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C138",
+      "name": "Doric Inspired \u2014 Monument",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C139",
+      "name": "Doric Inspired \u2014 Tall Profile",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C140",
+      "name": "Doric Inspired \u2014 Signature",
+      "family": "Doric Inspired",
+      "settings": {
+        "column_style": "DORIC",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    },
+    {
+      "id": "C141",
+      "name": "Octagonal \u2014 Compact",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C142",
+      "name": "Octagonal \u2014 Slender",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C143",
+      "name": "Octagonal \u2014 Balanced",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C144",
+      "name": "Octagonal \u2014 Broad Base",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C145",
+      "name": "Octagonal \u2014 Wide Capital",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C146",
+      "name": "Octagonal \u2014 Raised Base",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C147",
+      "name": "Octagonal \u2014 Fine Detail",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C148",
+      "name": "Octagonal \u2014 Deep Detail",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C149",
+      "name": "Octagonal \u2014 Porch",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C150",
+      "name": "Octagonal \u2014 Veranda",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C151",
+      "name": "Octagonal \u2014 Balcony",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C152",
+      "name": "Octagonal \u2014 Entrance",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C153",
+      "name": "Octagonal \u2014 Garden",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C154",
+      "name": "Octagonal \u2014 Courtyard",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C155",
+      "name": "Octagonal \u2014 Formal",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C156",
+      "name": "Octagonal \u2014 Grand",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C157",
+      "name": "Octagonal \u2014 Estate",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C158",
+      "name": "Octagonal \u2014 Monument",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C159",
+      "name": "Octagonal \u2014 Tall Profile",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C160",
+      "name": "Octagonal \u2014 Signature",
+      "family": "Octagonal",
+      "settings": {
+        "column_style": "OCTAGONAL",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    },
+    {
+      "id": "C161",
+      "name": "Banded Round \u2014 Compact",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C162",
+      "name": "Banded Round \u2014 Slender",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C163",
+      "name": "Banded Round \u2014 Balanced",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C164",
+      "name": "Banded Round \u2014 Broad Base",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C165",
+      "name": "Banded Round \u2014 Wide Capital",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C166",
+      "name": "Banded Round \u2014 Raised Base",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C167",
+      "name": "Banded Round \u2014 Fine Detail",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C168",
+      "name": "Banded Round \u2014 Deep Detail",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C169",
+      "name": "Banded Round \u2014 Porch",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C170",
+      "name": "Banded Round \u2014 Veranda",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C171",
+      "name": "Banded Round \u2014 Balcony",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C172",
+      "name": "Banded Round \u2014 Entrance",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C173",
+      "name": "Banded Round \u2014 Garden",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C174",
+      "name": "Banded Round \u2014 Courtyard",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C175",
+      "name": "Banded Round \u2014 Formal",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C176",
+      "name": "Banded Round \u2014 Grand",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C177",
+      "name": "Banded Round \u2014 Estate",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C178",
+      "name": "Banded Round \u2014 Monument",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C179",
+      "name": "Banded Round \u2014 Tall Profile",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C180",
+      "name": "Banded Round \u2014 Signature",
+      "family": "Banded Round",
+      "settings": {
+        "column_style": "BANDED",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    },
+    {
+      "id": "C181",
+      "name": "Spiral Fluted \u2014 Compact",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.28,
+        "plinth_height": 0.14,
+        "flute_count": 8,
+        "flute_depth": 0.025,
+        "capital_flare": 1.15
+      }
+    },
+    {
+      "id": "C182",
+      "name": "Spiral Fluted \u2014 Slender",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.29,
+        "plinth_height": 0.195,
+        "flute_count": 10,
+        "flute_depth": 0.033,
+        "capital_flare": 1.18
+      }
+    },
+    {
+      "id": "C183",
+      "name": "Spiral Fluted \u2014 Balanced",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.3,
+        "plinth_height": 0.25,
+        "flute_count": 12,
+        "flute_depth": 0.041,
+        "capital_flare": 1.21
+      }
+    },
+    {
+      "id": "C184",
+      "name": "Spiral Fluted \u2014 Broad Base",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.31,
+        "plinth_height": 0.305,
+        "flute_count": 14,
+        "flute_depth": 0.049,
+        "capital_flare": 1.24
+      }
+    },
+    {
+      "id": "C185",
+      "name": "Spiral Fluted \u2014 Wide Capital",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.32,
+        "plinth_height": 0.36,
+        "flute_count": 16,
+        "flute_depth": 0.057,
+        "capital_flare": 1.27
+      }
+    },
+    {
+      "id": "C186",
+      "name": "Spiral Fluted \u2014 Raised Base",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.33,
+        "plinth_height": 0.14,
+        "flute_count": 18,
+        "flute_depth": 0.065,
+        "capital_flare": 1.3
+      }
+    },
+    {
+      "id": "C187",
+      "name": "Spiral Fluted \u2014 Fine Detail",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.34,
+        "plinth_height": 0.195,
+        "flute_count": 20,
+        "flute_depth": 0.073,
+        "capital_flare": 1.33
+      }
+    },
+    {
+      "id": "C188",
+      "name": "Spiral Fluted \u2014 Deep Detail",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.35,
+        "plinth_height": 0.25,
+        "flute_count": 22,
+        "flute_depth": 0.081,
+        "capital_flare": 1.36
+      }
+    },
+    {
+      "id": "C189",
+      "name": "Spiral Fluted \u2014 Porch",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.36,
+        "plinth_height": 0.305,
+        "flute_count": 24,
+        "flute_depth": 0.089,
+        "capital_flare": 1.39
+      }
+    },
+    {
+      "id": "C190",
+      "name": "Spiral Fluted \u2014 Veranda",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.37,
+        "plinth_height": 0.36,
+        "flute_count": 26,
+        "flute_depth": 0.097,
+        "capital_flare": 1.42
+      }
+    },
+    {
+      "id": "C191",
+      "name": "Spiral Fluted \u2014 Balcony",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.38,
+        "plinth_height": 0.14,
+        "flute_count": 28,
+        "flute_depth": 0.025,
+        "capital_flare": 1.45
+      }
+    },
+    {
+      "id": "C192",
+      "name": "Spiral Fluted \u2014 Entrance",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.39,
+        "plinth_height": 0.195,
+        "flute_count": 30,
+        "flute_depth": 0.033,
+        "capital_flare": 1.48
+      }
+    },
+    {
+      "id": "C193",
+      "name": "Spiral Fluted \u2014 Garden",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.4,
+        "plinth_height": 0.25,
+        "flute_count": 32,
+        "flute_depth": 0.041,
+        "capital_flare": 1.51
+      }
+    },
+    {
+      "id": "C194",
+      "name": "Spiral Fluted \u2014 Courtyard",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.41,
+        "plinth_height": 0.305,
+        "flute_count": 8,
+        "flute_depth": 0.049,
+        "capital_flare": 1.54
+      }
+    },
+    {
+      "id": "C195",
+      "name": "Spiral Fluted \u2014 Formal",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.42,
+        "plinth_height": 0.36,
+        "flute_count": 10,
+        "flute_depth": 0.057,
+        "capital_flare": 1.57
+      }
+    },
+    {
+      "id": "C196",
+      "name": "Spiral Fluted \u2014 Grand",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.43,
+        "plinth_height": 0.14,
+        "flute_count": 12,
+        "flute_depth": 0.065,
+        "capital_flare": 1.6
+      }
+    },
+    {
+      "id": "C197",
+      "name": "Spiral Fluted \u2014 Estate",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.44,
+        "plinth_height": 0.195,
+        "flute_count": 14,
+        "flute_depth": 0.073,
+        "capital_flare": 1.63
+      }
+    },
+    {
+      "id": "C198",
+      "name": "Spiral Fluted \u2014 Monument",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.45,
+        "plinth_height": 0.25,
+        "flute_count": 16,
+        "flute_depth": 0.081,
+        "capital_flare": 1.66
+      }
+    },
+    {
+      "id": "C199",
+      "name": "Spiral Fluted \u2014 Tall Profile",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.46,
+        "plinth_height": 0.305,
+        "flute_count": 18,
+        "flute_depth": 0.089,
+        "capital_flare": 1.69
+      }
+    },
+    {
+      "id": "C200",
+      "name": "Spiral Fluted \u2014 Signature",
+      "family": "Spiral Fluted",
+      "settings": {
+        "column_style": "SPIRAL",
+        "column_size": 0.47,
+        "plinth_height": 0.36,
+        "flute_count": 20,
+        "flute_depth": 0.097,
+        "capital_flare": 1.72
+      }
+    }
+  ],
+  "maintainer": "Suahco4",
+  "weathering": {
+    "FRESH": {
+      "name": "Fresh / Clean",
+      "amounts": {
+        "moss": 0,
+        "rust": 0,
+        "oxidation": 0,
+        "dirt": 0,
+        "streaks": 0,
+        "salt": 0,
+        "wear": 0,
+        "wetness": 0
+      }
+    },
+    "TROPICAL": {
+      "name": "Tropical Damp",
+      "amounts": {
+        "moss": 0.6,
+        "rust": 0.15,
+        "oxidation": 0.1,
+        "dirt": 0.35,
+        "streaks": 0.6,
+        "salt": 0.15,
+        "wear": 0.15,
+        "wetness": 0.4
+      }
+    },
+    "COASTAL": {
+      "name": "Coastal Salt Air",
+      "amounts": {
+        "moss": 0.2,
+        "rust": 0.5,
+        "oxidation": 0.55,
+        "dirt": 0.25,
+        "streaks": 0.4,
+        "salt": 0.6,
+        "wear": 0.3,
+        "wetness": 0.15
+      }
+    },
+    "AGED": {
+      "name": "Aged / Neglected",
+      "amounts": {
+        "moss": 0.7,
+        "rust": 0.55,
+        "oxidation": 0.4,
+        "dirt": 0.65,
+        "streaks": 0.75,
+        "salt": 0.4,
+        "wear": 0.6,
+        "wetness": 0.1
+      }
+    },
+    "RUSTED": {
+      "name": "Rusty Metal",
+      "amounts": {
+        "moss": 0.05,
+        "rust": 0.9,
+        "oxidation": 0.2,
+        "dirt": 0.35,
+        "streaks": 0.45,
+        "salt": 0.1,
+        "wear": 0.3,
+        "wetness": 0.05
+      }
+    },
+    "RAIN": {
+      "name": "Rain Soaked",
+      "amounts": {
+        "moss": 0.3,
+        "rust": 0.1,
+        "oxidation": 0.05,
+        "dirt": 0.2,
+        "streaks": 0.8,
+        "salt": 0.05,
+        "wear": 0.1,
+        "wetness": 0.8
+      }
+    }
+  },
+  "release": "1.5.0",
+  "live_updates": "Unified; enabled by default"
+}

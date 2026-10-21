@@ -1,0 +1,51 @@
+ID,Name,Family,Floors,Width,Depth,Roof,Veranda
+H01,Monrovia Starter,Compact Hip Bungalows,1,8.0,8.0,HIP,True
+H02,Paynesville Compact,Compact Hip Bungalows,1,9.25,9.1,HIP,True
+H03,Brewerville Family,Compact Hip Bungalows,1,10.5,10.2,HIP,True
+H04,Gardnersville Raised,Compact Hip Bungalows,1,11.75,8.0,HIP,True
+H05,Kakata Wide Eaves,Compact Hip Bungalows,1,13.0,9.1,HIP,True
+H06,Sinkor Veranda,Full Veranda Bungalows,1,10.0,9.0,HIP,True
+H07,Robertsfield Porch,Full Veranda Bungalows,1,11.25,10.1,HIP,True
+H08,Gbarnga Family Veranda,Full Veranda Bungalows,1,12.5,11.2,HIP,True
+H09,Buchanan Long Porch,Full Veranda Bungalows,1,13.75,9.0,HIP,True
+H10,Harper Grand Veranda,Full Veranda Bungalows,1,15.0,10.1,HIP,True
+H11,Robertsport Breeze,Coastal Bungalows,1,9.0,8.0,HIP,True
+H12,Marshall Coast,Coastal Bungalows,1,10.25,9.1,HIP,True
+H13,Buchanan Seaside,Coastal Bungalows,1,11.5,10.2,HIP,True
+H14,Greenville Coastal,Coastal Bungalows,1,12.75,8.0,HIP,True
+H15,Harper Raised Coast,Coastal Bungalows,1,14.0,9.1,HIP,True
+H16,Sinkor Column Villa,Classical Villas,2,11.0,10.0,HIP,True
+H17,Paynesville Balcony Villa,Classical Villas,2,12.25,11.1,HIP,True
+H18,Monrovia Classical,Classical Villas,2,13.5,12.2,HIP,True
+H19,Brewerville Grand Villa,Classical Villas,2,14.75,10.0,HIP,True
+H20,Montserrado Residence,Classical Villas,2,16.0,11.1,HIP,True
+H21,Capital Modern,Modern Flat Roofs,1,8.0,9.0,FLAT,False
+H22,Congo Town Terrace,Modern Flat Roofs,1,9.25,10.1,FLAT,False
+H23,Urban Parapet,Modern Flat Roofs,1,10.5,11.2,FLAT,False
+H24,Minimal Family Home,Modern Flat Roofs,1,11.75,9.0,FLAT,False
+H25,Modern Tall Residence,Modern Flat Roofs,2,13.0,10.1,FLAT,False
+H26,Tropical Shed Compact,Shed Roof Homes,1,8.0,8.0,SHED,True
+H27,Garden Mono Pitch,Shed Roof Homes,1,9.25,9.1,SHED,True
+H28,Raised Shed Home,Shed Roof Homes,1,10.5,10.2,SHED,True
+H29,Wide Mono Pitch,Shed Roof Homes,1,11.75,8.0,SHED,True
+H30,Two Level Shed,Shed Roof Homes,2,13.0,9.1,SHED,True
+H31,Gable Starter,Gable Cottages,1,7.0,8.0,GABLE,True
+H32,Garden Gable,Gable Cottages,1,8.25,9.1,GABLE,True
+H33,Country Cottage,Gable Cottages,1,9.5,10.2,GABLE,True
+H34,Wide Gable Cottage,Gable Cottages,1,10.75,8.0,GABLE,True
+H35,Two Storey Gable,Gable Cottages,2,12.0,9.1,GABLE,True
+H36,Brick Compact,Brick Residences,1,8.0,9.0,HIP,True
+H37,Brick Family,Brick Residences,1,9.25,10.1,HIP,True
+H38,Brick Veranda,Brick Residences,1,10.5,11.2,HIP,True
+H39,Brick Town Residence,Brick Residences,2,11.75,9.0,HIP,True
+H40,Brick Balcony Home,Brick Residences,2,13.0,10.1,HIP,True
+H41,Duplex Veranda Massing,Multi Storey Tropical,2,10.0,10.0,HIP,True
+H42,Two Storey Tropical,Multi Storey Tropical,2,11.25,11.1,HIP,True
+H43,Three Storey Tropical,Multi Storey Tropical,3,12.5,12.2,HIP,True
+H44,Columned Three Storey,Multi Storey Tropical,3,13.75,10.0,HIP,True
+H45,Urban Four Storey,Multi Storey Tropical,4,15.0,11.1,HIP,True
+H46,Timber Cabin,Timber Retreats,1,7.0,8.0,GABLE,True
+H47,Raised Timber Retreat,Timber Retreats,1,8.25,9.1,GABLE,True
+H48,Timber Porch Home,Timber Retreats,1,9.5,10.2,GABLE,True
+H49,Wide Timber Lodge,Timber Retreats,1,10.75,8.0,GABLE,True
+H50,Two Level Timber,Timber Retreats,2,12.0,9.1,GABLE,True

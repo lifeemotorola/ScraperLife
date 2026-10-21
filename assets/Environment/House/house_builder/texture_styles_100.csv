@@ -1,0 +1,101 @@
+ID,Name,Pattern,Red,Green,Blue
+T001,Brick — Fired Red,BRICK,0.48,0.12,0.055
+T002,Brick — Rust,BRICK,0.38,0.095,0.04
+T003,Brick — Terracotta,BRICK,0.6,0.24,0.12
+T004,Brick — Chocolate,BRICK,0.19,0.085,0.045
+T005,Brick — Buff,BRICK,0.6,0.45,0.25
+T006,Brick — Sand,BRICK,0.7,0.57,0.38
+T007,Brick — Charcoal,BRICK,0.075,0.08,0.085
+T008,Brick — Rose,BRICK,0.6,0.3,0.24
+T009,Brick — Cream,BRICK,0.78,0.7,0.52
+T010,Brick — Weathered Brown,BRICK,0.27,0.18,0.12
+T011,Concrete Block — Raw Grey,BLOCK,0.32,0.34,0.35
+T012,Concrete Block — Ash,BLOCK,0.46,0.47,0.46
+T013,Concrete Block — Dark Grey,BLOCK,0.15,0.17,0.18
+T014,Concrete Block — Sand,BLOCK,0.55,0.48,0.36
+T015,Concrete Block — Cream,BLOCK,0.7,0.65,0.51
+T016,Concrete Block — Whitewash,BLOCK,0.82,0.8,0.73
+T017,Concrete Block — Warm Grey,BLOCK,0.42,0.39,0.34
+T018,Concrete Block — Earth,BLOCK,0.35,0.27,0.19
+T019,Concrete Block — Slate,BLOCK,0.2,0.24,0.27
+T020,Concrete Block — Pale Grey,BLOCK,0.62,0.65,0.65
+T021,Fine Plaster — Ivory,PLASTER,0.84,0.79,0.65
+T022,Fine Plaster — Peach,PLASTER,0.82,0.5,0.32
+T023,Fine Plaster — Cream,PLASTER,0.88,0.79,0.55
+T024,Fine Plaster — Sand,PLASTER,0.65,0.52,0.36
+T025,Fine Plaster — White,PLASTER,0.91,0.9,0.85
+T026,Fine Plaster — Mint,PLASTER,0.48,0.7,0.59
+T027,Fine Plaster — Sky Blue,PLASTER,0.4,0.65,0.78
+T028,Fine Plaster — Sage,PLASTER,0.4,0.5,0.34
+T029,Fine Plaster — Rose,PLASTER,0.75,0.44,0.4
+T030,Fine Plaster — Warm Grey,PLASTER,0.48,0.45,0.4
+T031,Coarse Stucco — Ivory,STUCCO,0.8,0.74,0.59
+T032,Coarse Stucco — Ochre,STUCCO,0.65,0.43,0.16
+T033,Coarse Stucco — Terracotta,STUCCO,0.63,0.26,0.13
+T034,Coarse Stucco — Taupe,STUCCO,0.4,0.33,0.26
+T035,Coarse Stucco — White,STUCCO,0.86,0.85,0.79
+T036,Coarse Stucco — Cream,STUCCO,0.78,0.67,0.43
+T037,Coarse Stucco — Peach,STUCCO,0.78,0.46,0.28
+T038,Coarse Stucco — Olive,STUCCO,0.33,0.37,0.2
+T039,Coarse Stucco — Grey,STUCCO,0.38,0.4,0.39
+T040,Coarse Stucco — Blue Grey,STUCCO,0.3,0.42,0.49
+T041,Cast Concrete — Natural,CONCRETE,0.32,0.33,0.32
+T042,Cast Concrete — Pale,CONCRETE,0.58,0.6,0.59
+T043,Cast Concrete — Charcoal,CONCRETE,0.1,0.12,0.13
+T044,Cast Concrete — Warm,CONCRETE,0.4,0.36,0.29
+T045,Cast Concrete — Cool,CONCRETE,0.3,0.36,0.4
+T046,Cast Concrete — Sandy,CONCRETE,0.5,0.44,0.32
+T047,Cast Concrete — White,CONCRETE,0.72,0.73,0.7
+T048,Cast Concrete — Brown,CONCRETE,0.27,0.23,0.18
+T049,Cast Concrete — Ash,CONCRETE,0.44,0.45,0.43
+T050,Cast Concrete — Slate,CONCRETE,0.18,0.22,0.25
+T051,Wood Grain — Mahogany,WOOD,0.28,0.075,0.035
+T052,Wood Grain — Teak,WOOD,0.42,0.23,0.075
+T053,Wood Grain — Iroko Inspired,WOOD,0.38,0.26,0.11
+T054,Wood Grain — Walnut,WOOD,0.18,0.085,0.035
+T055,Wood Grain — Oak,WOOD,0.55,0.38,0.16
+T056,Wood Grain — Pine,WOOD,0.68,0.5,0.23
+T057,Wood Grain — Cedar,WOOD,0.4,0.17,0.065
+T058,Wood Grain — Ebony,WOOD,0.045,0.032,0.025
+T059,Wood Grain — Weathered,WOOD,0.27,0.25,0.21
+T060,Wood Grain — Honey,WOOD,0.57,0.3,0.07
+T061,Timber Siding — Natural,SIDING,0.4,0.22,0.09
+T062,Timber Siding — Cedar,SIDING,0.45,0.18,0.07
+T063,Timber Siding — Dark Brown,SIDING,0.13,0.065,0.035
+T064,Timber Siding — Grey,SIDING,0.35,0.37,0.36
+T065,Timber Siding — White,SIDING,0.8,0.8,0.74
+T066,Timber Siding — Cream,SIDING,0.76,0.68,0.49
+T067,Timber Siding — Sage,SIDING,0.28,0.4,0.3
+T068,Timber Siding — Blue,SIDING,0.14,0.29,0.4
+T069,Timber Siding — Red,SIDING,0.4,0.085,0.045
+T070,Timber Siding — Black,SIDING,0.04,0.045,0.045
+T071,Cut Stone — Limestone,STONE,0.64,0.6,0.47
+T072,Cut Stone — Sandstone,STONE,0.62,0.46,0.27
+T073,Cut Stone — Granite Grey,STONE,0.4,0.42,0.4
+T074,Cut Stone — Basalt,STONE,0.12,0.14,0.14
+T075,Cut Stone — Travertine Inspired,STONE,0.7,0.58,0.4
+T076,Cut Stone — Warm Beige,STONE,0.58,0.48,0.34
+T077,Cut Stone — Pale Cream,STONE,0.79,0.74,0.6
+T078,Cut Stone — Rust Brown,STONE,0.36,0.23,0.13
+T079,Cut Stone — Slate Blue,STONE,0.22,0.3,0.34
+T080,Cut Stone — Weathered Grey,STONE,0.45,0.44,0.38
+T081,Corrugated Metal — Galvanized,METAL,0.55,0.6,0.63
+T082,Corrugated Metal — Charcoal,METAL,0.07,0.085,0.1
+T083,Corrugated Metal — Terracotta,METAL,0.42,0.1,0.04
+T084,Corrugated Metal — Forest Green,METAL,0.055,0.2,0.11
+T085,Corrugated Metal — Ocean Blue,METAL,0.045,0.18,0.3
+T086,Corrugated Metal — Cream,METAL,0.75,0.68,0.47
+T087,Corrugated Metal — Silver,METAL,0.72,0.75,0.78
+T088,Corrugated Metal — Copper Inspired,METAL,0.5,0.23,0.09
+T089,Corrugated Metal — White,METAL,0.85,0.86,0.82
+T090,Corrugated Metal — Burgundy,METAL,0.22,0.035,0.045
+T091,Ceramic Tile — Terracotta,TILE,0.5,0.15,0.06
+T092,Ceramic Tile — Rust,TILE,0.35,0.07,0.025
+T093,Ceramic Tile — Charcoal,TILE,0.06,0.075,0.08
+T094,Ceramic Tile — Chocolate,TILE,0.18,0.07,0.025
+T095,Ceramic Tile — Sand,TILE,0.63,0.46,0.25
+T096,Ceramic Tile — Cream,TILE,0.76,0.68,0.49
+T097,Ceramic Tile — Slate Blue,TILE,0.13,0.23,0.3
+T098,Ceramic Tile — Forest Green,TILE,0.07,0.2,0.12
+T099,Ceramic Tile — Burgundy,TILE,0.25,0.035,0.045
+T100,Ceramic Tile — Graphite,TILE,0.17,0.19,0.2
