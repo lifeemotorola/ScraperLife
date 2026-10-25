@@ -32,9 +32,10 @@ export class City {
       building.addCollider();
       return building;
     });
-    // The authored house model replaces the box visuals once it loads; boxes stay as the fallback.
-    // Endless districts start once the house template is known, so the first chunks around the spawn are ready
-    // before the game is revealed.
+    // Generated houses from assets/Environment/House/house_builder replace the box visuals once
+    // they are built; boxes stay as the fallback.
+    // Endless districts start once the house templates are known, so the first chunks around the
+    // spawn are ready before the game is revealed.
     // Trees are optional: if they fail to load, districts still build without them.
     const treesReady = loadTreeTemplates().catch((error) => {
       console.warn('Tree models could not load; districts will have no trees.', error);
